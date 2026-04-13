@@ -414,13 +414,14 @@ export default function OnboardingPage() {
   return (
     <div
       style={{
-        minHeight: "100vh",
+        height: "100vh",
         background: "#07090f",
         color: "#ffffff",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         padding: "32px 20px 40px",
+        overflow: "hidden",
         backgroundImage: "radial-gradient(ellipse at 30% 40%, rgba(74,144,217,0.04) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(200,169,110,0.03) 0%, transparent 45%)",
       }}
     >
@@ -561,7 +562,7 @@ export default function OnboardingPage() {
 
       <ProgressIndicator currentStep={Math.min(step, 5)} totalSteps={5} />
 
-      <main style={{ width: "100%", maxWidth: 640, flex: 1 }}>
+      <main style={{ width: "100%", maxWidth: 640, flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
         {errorMessage && (
           <div
             style={{
@@ -838,9 +839,11 @@ export default function OnboardingPage() {
         )}
 
         {showStep2Interview && (
-          <VoiceInterviewChat
-            onComplete={({ interviewResponses }) => handleInterviewComplete({ interviewResponses })}
-          />
+          <div style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+            <VoiceInterviewChat
+              onComplete={({ interviewResponses }) => handleInterviewComplete({ interviewResponses })}
+            />
+          </div>
         )}
 
         {showStep2Upload && (

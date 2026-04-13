@@ -20,10 +20,9 @@ interface VoiceInterviewChatProps {
 }
 
 const INITIAL_PROMPT =
-  "I am going to ask you a few questions to understand how you communicate. Not what you say, how you say it. Most people do not know what they sound like, but you know more than you think. Type anything to get started.";
+  "I am going to ask you a few questions to understand how you communicate. Not what you say, how you say it. Most people do not know what they sound like, but you know more than you think.\n\nFirst thing: when people describe you, do they see you as more formal or more casual? Do you agree with them?";
 
 const QUESTION_SEQUENCE: string[] = [
-  "First thing: when people describe you, do they see you as more formal or more casual? Do you agree with them?",
   "When you are at your best in a conversation, how would you describe your energy?",
   "When you write something you are proud of, do the sentences tend to be short and punchy, long and flowing, or a mix?",
   "Do you tend to start with the point and then support it, or build up a story and arrive at the point?",
@@ -171,9 +170,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
     const text = input.trim();
     if (!text || loading) return;
 
-    // Skip validation for the first response (warm-up "Ready?" question)
-    const isFirstResponse = messages.length === 1 && messages[0].id === "sys-0";
-    if (!isFirstResponse && !validateResponse(text)) {
+    if (!validateResponse(text)) {
       setValidationWarning(true);
       return;
     }
@@ -192,9 +189,11 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
   const containerStyle = {
     maxWidth: 640,
     margin: "0 auto",
-    minHeight: "calc(100vh - 140px)",
+    height: "100%",
+    minHeight: 0,
     display: "flex",
     flexDirection: "column" as const,
+    overflow: "hidden",
   };
 
   return (
