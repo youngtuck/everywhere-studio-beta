@@ -28,7 +28,9 @@ export default async function handler(req, res) {
     const { error } = await supabase.from("access_codes").insert({
       code,
       max_uses: 1,
-      current_uses: 0,
+      use_count: 0,
+      assigned_email: email,
+      assigned_name: name || "",
       note: `Kajabi purchase: ${name || email} (offer: ${offer_id || "unknown"})`,
     });
 
@@ -39,7 +41,51 @@ export default async function handler(req, res) {
 
     console.log(`[kajabi-webhook] Provisioned access for ${email}, code: ${code}`);
 
-    // TODO: Send welcome email with access code (wire up when email service is ready)
+    // Send welcome email with access code via Resend
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey) {
+      try {
+        const firstName = name ? name.split(" ")[0] : "";
+        const siteUrl = process.env.VITE_API_BASE || "https://everywhere-studio-beta.vercel.app";
+
+        const emailResponse = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${resendKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            from: process.env.RESEND_FROM_EMAIL || "EVERYWHERE Studio <onboarding@resend.dev>",
+            to: [email],
+            subject: "Welcome to EVERYWHERE Studio",
+            html: `
+              <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px; color: #1a1a1a;">
+                <h1 style="font-size: 24px; font-weight: 600; margin-bottom: 24px;">Welcome to EVERYWHERE Studio${firstName ? `, ${firstName}` : ""}</h1>
+                <p style="font-size: 16px; line-height: 1.6; margin-bottom: 16px;">Your account is ready. Use the access code below to sign up and start creating.</p>
+                <div style="background: #f4f4f5; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
+                  <p style="font-size: 13px; color: #71717a; margin: 0 0 8px 0;">Your access code</p>
+                  <p style="font-size: 28px; font-weight: 700; letter-spacing: 2px; margin: 0; color: #09090b;">${code}</p>
+                </div>
+                <a href="${siteUrl}" style="display: inline-block; background: #09090b; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 6px; font-size: 15px; font-weight: 500; margin-bottom: 24px;">Open EVERYWHERE Studio</a>
+                <p style="font-size: 14px; line-height: 1.6; color: #71717a; margin-top: 32px;">If you have any questions, reply to this email. We read everything.</p>
+              </div>
+            `,
+          }),
+        });
+
+        if (!emailResponse.ok) {
+          const errBody = await emailResponse.text();
+          console.error("[kajabi-webhook] Resend error:", errBody);
+        } else {
+          console.log(`[kajabi-webhook] Welcome email sent to ${email}`);
+        }
+      } catch (emailErr) {
+        // Log but don't fail the webhook if email fails
+        console.error("[kajabi-webhook] Email send failed:", emailErr);
+      }
+    } else {
+      console.warn("[kajabi-webhook] RESEND_API_KEY not set, skipping welcome email");
+    }
 
     return res.status(200).json({ success: true, message: "Access provisioned" });
   } catch (err) {
