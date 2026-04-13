@@ -479,7 +479,7 @@ export default function OnboardingPage() {
             <div style={{ textAlign: "center", marginBottom: 32 }}>
               <span style={{ letterSpacing: "-1px", fontFamily: "'Afacad Flux', sans-serif", display: "inline-flex", alignItems: "baseline" }}>
                 <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>EVERYWHERE</span>
-                <span style={{ color: "#0D1B2A", fontWeight: 300, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>STUDIO<span style={{ color: "#0D1B2A", fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>™</span></span>
+                <span style={{ color: "#0D1B2A", fontWeight: 300, fontSize: 14, lineHeight: 1 }}>Studio<span style={{ color: "#0D1B2A", fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>™</span></span>
               </span>
             </div>
             <div
