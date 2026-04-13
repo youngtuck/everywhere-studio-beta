@@ -290,11 +290,54 @@ export default function StudioShell() {
       reedThread, setReedThread,
     }}>
       <ProjectProvider>
+      {!isMobile && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          height: 44,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "0 20px",
+          zIndex: 2,
+          pointerEvents: "none",
+          background: "transparent",
+        }}>
+          <span style={{
+            fontFamily: "'Afacad Flux', sans-serif",
+            letterSpacing: "-1px",
+            lineHeight: 1,
+            display: "inline-flex",
+            alignItems: "baseline",
+            pointerEvents: "auto",
+          }}>
+            <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 14, textTransform: "uppercase" }}>EVERYWHERE</span>
+            <span style={{ color: "var(--fg-3)", fontWeight: 300, fontSize: 14, marginLeft: 1 }}>Studio</span>
+            <span style={{ color: "var(--fg-3)", fontWeight: 300, fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>&trade;</span>
+          </span>
+          <a
+            href="mailto:beta@everywhere.studio.ai"
+            style={{
+              fontFamily: "'Afacad Flux', sans-serif",
+              fontSize: 12,
+              fontWeight: 500,
+              color: "var(--fg-3)",
+              textDecoration: "none",
+              pointerEvents: "auto",
+              letterSpacing: "0.02em",
+            }}
+          >
+            Feedback
+          </a>
+        </div>
+      )}
       <div
         className={`studio-app-shell ${studioViewportLock ? "studio-app-shell--viewport-lock" : "studio-app-shell--document-scroll"}`}
         style={{
           background: "var(--bg)", fontFamily: "var(--font)",
-          width: "100%",
+          width: "100%", marginTop: isMobile ? 0 : 44,
         }}
       >
         <StudioGlobalSearch />

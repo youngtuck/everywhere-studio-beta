@@ -323,49 +323,7 @@ export default function Dashboard() {
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      position: "relative",
     }}>
-      <div style={{
-        position: "absolute",
-        top: 16,
-        left: 24,
-        right: 24,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        pointerEvents: "none",
-        zIndex: 5,
-      }}>
-        <span style={{
-          fontFamily: "'Afacad Flux', sans-serif",
-          letterSpacing: "-1px",
-          lineHeight: 1,
-          display: "inline-flex",
-          alignItems: "baseline",
-          pointerEvents: "auto",
-        }}>
-          <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 14, textTransform: "uppercase" }}>EVERYWHERE</span>
-          <span style={{ color: "var(--fg-3)", fontWeight: 300, fontSize: 14, marginLeft: 1 }}>Studio</span>
-          <span style={{ color: "var(--fg-3)", fontWeight: 300, fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>&trade;</span>
-        </span>
-        <a
-          href="mailto:beta@everywhere.studio.ai"
-          style={{
-            fontFamily: "'Afacad Flux', sans-serif",
-            fontSize: 12,
-            fontWeight: 500,
-            color: "var(--fg-3)",
-            textDecoration: "none",
-            pointerEvents: "auto",
-            letterSpacing: "0.02em",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.color = "var(--fg)"; }}
-          onMouseLeave={e => { e.currentTarget.style.color = "var(--fg-3)"; }}
-        >
-          Feedback
-        </a>
-      </div>
-
       {/* Greeting */}
       <div style={{
         fontFamily: "var(--studio-display-font)",
