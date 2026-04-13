@@ -10,6 +10,7 @@ interface LocalFile {
 const MAX_COMBINED_TEXT_CHARS = 100_000;
 const MAX_PDF_BYTES = 5 * 1024 * 1024;
 const MAX_PDF_COUNT = 4;
+const MAX_FILE_COUNT = 10;
 
 function bufferToBase64(buf: ArrayBuffer): string {
   const bytes = new Uint8Array(buf);
@@ -53,10 +54,15 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
 
   const handleFiles = (fileList: FileList | null) => {
     if (!fileList) return;
-    const next: LocalFile[] = [];
-    Array.from(fileList).forEach(f => {
-      next.push({ id: `${f.name}-${f.lastModified}-${Math.random().toString(36).slice(2)}`, file: f });
-    });
+    const incoming = Array.from(fileList);
+    if (files.length + incoming.length > MAX_FILE_COUNT) {
+      setLocalError(`You can upload up to ${MAX_FILE_COUNT} files at a time. Remove some files or select fewer.`);
+      return;
+    }
+    const next: LocalFile[] = incoming.map(f => ({
+      id: `${f.name}-${f.lastModified}-${Math.random().toString(36).slice(2)}`,
+      file: f,
+    }));
     setFiles(prev => [...prev, ...next]);
     setLocalError(null);
   };
@@ -223,12 +229,27 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
             color: "rgba(255,255,255,0.35)",
           }}
         >
-          Accepts .txt, .md, .docx, and .pdf (up to {MAX_PDF_COUNT} PDFs, {Math.round(MAX_PDF_BYTES / (1024 * 1024))} MB each).
+          Accepts .txt, .md, .docx, and .pdf. Up to {MAX_FILE_COUNT} files, {MAX_PDF_COUNT} PDFs max, {Math.round(MAX_PDF_BYTES / (1024 * 1024))} MB each.
         </p>
       </div>
 
       {!!files.length && (
         <div style={{ marginTop: 20, display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 4,
+          }}>
+            <span style={{
+              fontFamily: "'Afacad Flux', sans-serif",
+              fontSize: 12,
+              color: files.length >= MAX_FILE_COUNT ? "#f87171" : "rgba(255,255,255,0.4)",
+              fontWeight: 500,
+            }}>
+              {files.length} of {MAX_FILE_COUNT} files
+            </span>
+          </div>
           {files.map(item => (
             <div
               key={item.id}
