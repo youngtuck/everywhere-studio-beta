@@ -363,15 +363,7 @@ export default function ExplorePage() {
           </div>
         </div>
 
-        {/* Scroll hint */}
-        <div style={{
-          position: "absolute", bottom: 40, left: 0, right: 0,
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-          animation: `xpFadeUp 0.6s ${EASE} 2.2s both`,
-        }}>
-          <span className="xp-mono" style={{ fontSize: 10, letterSpacing: "0.1em", color: "var(--xp-dim-dark)", textTransform: "uppercase" }}>Scroll</span>
-          <div style={{ width: 1, height: 24, background: "var(--xp-gold)", borderRadius: 1, animation: "xpScrollHint 2s ease-in-out infinite 2.5s" }} />
-        </div>
+
       </section>
 
       {/* ═══ ACT 1.5: THREE-PART DEMO ═══ */}
