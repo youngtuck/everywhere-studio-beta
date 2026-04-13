@@ -485,7 +485,7 @@ export default function OnboardingPage() {
             <div
               style={{
                 height: 3,
-                background: "#F0EDE4",
+                background: "#DDD8CE",
                 borderRadius: 2,
                 overflow: "hidden",
                 marginBottom: 24,
@@ -842,6 +842,7 @@ export default function OnboardingPage() {
           <div style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
             <VoiceInterviewChat
               onComplete={({ interviewResponses }) => handleInterviewComplete({ interviewResponses })}
+              error={errorMessage}
             />
           </div>
         )}

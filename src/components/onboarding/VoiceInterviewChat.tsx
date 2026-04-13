@@ -17,6 +17,7 @@ interface VoiceInterviewChatProps {
     interviewResponses: Record<string, string>;
   }) => Promise<void> | void;
   onCancel?: () => void;
+  error?: string | null;
 }
 
 const INITIAL_PROMPT =
@@ -69,7 +70,7 @@ function validateResponse(text: string): boolean {
   return true;
 }
 
-export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatProps) {
+export function VoiceInterviewChat({ onComplete, onCancel, error }: VoiceInterviewChatProps) {
   const [messages, setMessages] = useState<QA[]>([
     { id: "sys-0", role: "system", content: INITIAL_PROMPT },
   ]);
@@ -283,6 +284,35 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
         })}
         <div ref={bottomRef} />
       </div>
+
+      {error && (
+        <div style={{
+          padding: "12px 16px",
+          margin: "0 0 8px",
+          borderRadius: 10,
+          background: "rgba(248,113,113,0.12)",
+          border: "1px solid rgba(248,113,113,0.25)",
+        }}>
+          <p style={{
+            margin: 0,
+            fontFamily: "'Afacad Flux', sans-serif",
+            fontSize: 13,
+            color: "#f87171",
+            lineHeight: 1.45,
+          }}>
+            {error}
+          </p>
+          <p style={{
+            margin: "8px 0 0",
+            fontFamily: "'Afacad Flux', sans-serif",
+            fontSize: 12,
+            color: "rgba(248,113,113,0.7)",
+            lineHeight: 1.4,
+          }}>
+            Your answers are still here. Tap "Analyze responses" to try again.
+          </p>
+        </div>
+      )}
 
       <div
         style={{

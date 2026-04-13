@@ -34,7 +34,7 @@
       "maxDuration": 60
     },
     "api/voice-dna.js": {
-      "maxDuration": 30
+      "maxDuration": 60
     },
     "api/visual.js": {
       "maxDuration": 60
