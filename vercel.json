@@ -1,0 +1,137 @@
+{
+  "crons": [
+    {
+      "path": "/api/sentinel-cron",
+      "schedule": "0 15 * * *"
+    }
+  ],
+  "functions": {
+    "api/sentinel-generate.js": {
+      "maxDuration": 60
+    },
+    "api/sentinel-seed.js": {
+      "maxDuration": 30
+    },
+    "api/sentinel-cron.js": {
+      "maxDuration": 60
+    },
+    "api/generate.js": {
+      "maxDuration": 60
+    },
+    "api/outline.js": {
+      "maxDuration": 60
+    },
+    "api/chat.js": {
+      "maxDuration": 30
+    },
+    "api/score.js": {
+      "maxDuration": 30
+    },
+    "api/brand-dna.js": {
+      "maxDuration": 30
+    },
+    "api/brand-dna-from-url.js": {
+      "maxDuration": 60
+    },
+    "api/voice-dna.js": {
+      "maxDuration": 30
+    },
+    "api/visual.js": {
+      "maxDuration": 60
+    },
+    "api/upload-resource.js": {
+      "maxDuration": 60
+    },
+    "api/run-pipeline.js": {
+      "maxDuration": 180,
+      "includeFiles": "src/lib/agents/prompts/*.md"
+    },
+    "api/pipeline-health.js": {
+      "maxDuration": 30,
+      "includeFiles": "src/lib/agents/prompts/*.md"
+    },
+    "api/admin-data.js": {
+      "maxDuration": 30
+    },
+    "api/run-sentinel.js": {
+      "maxDuration": 120
+    },
+    "api/firecrawl-search.js": {
+      "maxDuration": 30
+    },
+    "api/writers-room/bluesky.js": {
+      "maxDuration": 30
+    },
+    "api/writers-room/structure.js": {
+      "maxDuration": 30
+    },
+    "api/writers-room/stress-test.js": {
+      "maxDuration": 60,
+      "includeFiles": "CLEAN_6_5/*.md"
+    },
+    "api/adapt-format.js": {
+      "maxDuration": 60,
+      "includeFiles": "src/lib/agents/prompts/*.md"
+    },
+    "api/brand-assets.js": {
+      "maxDuration": 30
+    },
+    "api/kajabi-webhook.js": {
+      "maxDuration": 10
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
+      "source": "/sw.js",
+      "destination": "/sw.js"
+    },
+    {
+      "source": "/manifest.json",
+      "destination": "/manifest.json"
+    },
+    {
+      "source": "/icons/(.*)",
+      "destination": "/icons/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    },
+    {
+      "source": "/sw.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache"
+        },
+        {
+          "key": "Service-Worker-Allowed",
+          "value": "/"
+        }
+      ]
+    }
+  ]
+}

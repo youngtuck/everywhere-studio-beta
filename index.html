@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EVERYWHERE Studio — Ideas to Impact</title>
+    <meta name="description" content="Composed Intelligence for Thought Leaders. One idea. Twelve formats. EVERYWHERE it belongs." />
+    <!-- Open Graph -->
+    <meta property="og:title" content="EVERYWHERE Studio" />
+    <meta property="og:description" content="Your thinking. Composed. One idea in, publication-ready content out." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content="/og-image.png" />
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    <!-- Theme color for browser chrome -->
+    <meta name="theme-color" content="#0D1B2A" />
+    <!-- iOS PWA support -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="EVERYWHERE Studio" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <!-- Windows PWA -->
+    <meta name="msapplication-TileColor" content="#0D1B2A" />
+    <!-- Prevent white flash on load -->
+    <style>
+      html { background-color: #111f88; }
+      html, body, #root { transition: none !important; }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..900&family=DM+Mono:wght@400;500&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@500;600&display=swap" rel="stylesheet">
+  </head>
+  <body style="margin: 0;">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    <!-- Service Worker Registration -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js', { scope: '/' })
+            .then(reg => console.log('SW registered:', reg.scope))
+            .catch(err => console.warn('SW registration failed:', err));
+        });
+      }
+    </script>
+  </body>
+</html>

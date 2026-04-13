@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Liquid glass comparison</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Instrument Sans", system-ui, sans-serif;
+      color: #0a0a0a;
+    }
+    .bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background: linear-gradient(-45deg, #1a237e, #4a90d9, #f5c642, #0d1b2a);
+      background-size: 400% 400%;
+      animation: gradMove 14s ease-in-out infinite;
+    }
+    @keyframes gradMove {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .wrap {
+      position: relative;
+      z-index: 1;
+      padding: 40px 20px 80px;
+      max-width: 1120px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0 0 8px;
+      color: rgba(255, 255, 255, 0.95);
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+    }
+    .lead {
+      margin: 0 0 28px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: rgba(255, 255, 255, 0.85);
+      max-width: 720px;
+      text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+    }
+    .lead code {
+      font-family: "DM Mono", ui-monospace, monospace;
+      font-size: 12px;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 22px;
+    }
+    .panel { margin: 0; }
+    .label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.75);
+      margin-bottom: 10px;
+    }
+    .inner-copy {
+      font-size: 14px;
+      line-height: 1.55;
+      color: rgba(10, 10, 10, 0.88);
+    }
+    .inner-copy strong { display: block; margin-bottom: 8px; font-size: 15px; }
+
+    /* A: Your snippet (saturate as 1.8 for wider engine support) */
+    .proposed {
+      position: relative;
+      padding: 28px 24px;
+      min-height: 200px;
+      border-radius: 2rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow:
+        inset 0 4px 20px rgba(255, 255, 255, 0.3),
+        0 8px 32px rgba(31, 38, 135, 0.2);
+      filter: url(#liquid-refraction);
+    }
+
+    /* B: Same, no SVG filter */
+    .proposed-plain {
+      position: relative;
+      padding: 28px 24px;
+      min-height: 200px;
+      border-radius: 2rem;
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow:
+        inset 0 4px 20px rgba(255, 255, 255, 0.3),
+        0 8px 32px rgba(31, 38, 135, 0.2);
+    }
+
+    /* C: Studio-style stack (static, no keyframe animations) */
+    .studio-stack {
+      position: relative;
+      isolation: isolate;
+      overflow: hidden;
+      min-height: 200px;
+      border-radius: 2rem;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.42);
+      color: #0a0a0a;
+    }
+    .studio-stack::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 0;
+      pointer-events: none;
+      backdrop-filter: blur(22px) saturate(1.65);
+      -webkit-backdrop-filter: blur(22px) saturate(1.65);
+    }
+    .studio-stack::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(
+        118deg,
+        transparent 38%,
+        rgba(255, 255, 255, 0.22) 50%,
+        transparent 62%
+      );
+      box-shadow:
+        inset 0 0 28px rgba(255, 255, 255, 0.12),
+        inset -1px -1px 0.5px rgba(255, 255, 255, 0.22);
+    }
+    .studio-stack .inner {
+      position: relative;
+      z-index: 2;
+      padding: 28px 24px;
+    }
+
+    /* D: Backdrop only on a child layer, filter on decorative layer only (no text warp) */
+    .layered-refraction {
+      position: relative;
+      border-radius: 2rem;
+      overflow: hidden;
+      min-height: 200px;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+    .layered-refraction .blur-layer {
+      position: absolute;
+      inset: 0;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      filter: url(#liquid-refraction);
+      pointer-events: none;
+    }
+    .layered-refraction .shine {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: linear-gradient(125deg, transparent 42%, rgba(255, 255, 255, 0.25) 50%, transparent 58%);
+      opacity: 0.85;
+    }
+    .layered-refraction .inner {
+      position: relative;
+      z-index: 2;
+      padding: 28px 24px;
+      box-shadow: inset 0 4px 20px rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+    <defs>
+      <!-- Mild liquid warp; raise scale to see cost and distortion -->
+      <filter id="liquid-refraction" x="-8%" y="-8%" width="116%" height="116%" filterUnits="objectBoundingBox">
+        <feTurbulence type="fractalNoise" baseFrequency="0.018" numOctaves="2" seed="42" result="noise" />
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2.2" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+    </defs>
+  </svg>
+
+  <div class="bg" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <h1>Liquid glass comparison</h1>
+    <p class="lead">
+      Run the dev server, then open
+      <code>/liquid-glass-compare.html</code>.
+      The background moves on purpose so you can compare blur stability, text sharpness, and CPU/GPU load (Performance panel).
+    </p>
+
+    <div class="grid">
+      <div class="panel">
+        <div class="label">A Your snippet (filter on whole card)</div>
+        <div class="proposed">
+          <div class="inner-copy">
+            <strong>Heading</strong>
+            Single layer, backdrop on the same element as <code>filter: url()</code>. Displacement applies to text too.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="label">B Same look, no SVG filter</div>
+        <div class="proposed-plain">
+          <div class="inner-copy">
+            <strong>Heading</strong>
+            Isolates cost of <code>feDisplacementMap</code> versus blur alone. Usually clearer type.
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="label">C Studio-style (::after blur + ::before shine)</div>
+        <div class="studio-stack">
+          <div class="inner inner-copy">
+            <strong>Heading</strong>
+            Matches how the app separates tint, live blur, and specular. No SVG. Static here (no infinite keyframes).
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="label">D Hybrid (filter only on blur layer, not on text)</div>
+        <div class="layered-refraction">
+          <div class="blur-layer" aria-hidden="true"></div>
+          <div class="shine" aria-hidden="true"></div>
+          <div class="inner inner-copy">
+            <strong>Heading</strong>
+            If you want refraction, keep type on a layer above an optionally warped frosted plane.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
