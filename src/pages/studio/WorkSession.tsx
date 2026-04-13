@@ -2184,6 +2184,12 @@ function StageEdit({
   canGenerateMore: boolean;
 }) {
   const [input, setInput] = useState("");
+  const titleRef = useRef<HTMLTextAreaElement>(null);
+
+  useLayoutEffect(() => {
+    const t = titleRef.current;
+    if (t) { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
+  }, [draft]);
 
   const handleRevise = () => {
     if (!input.trim() || generating) return;
@@ -2297,9 +2303,12 @@ function StageEdit({
               const body = lines.slice(1).join("\n");
               return (
                 <>
-                  <input
+                  <textarea
+                    ref={titleRef}
+                    rows={1}
                     value={title}
                     onChange={(e) => onDraftChange(e.target.value + "\n" + body)}
+                    onInput={(e) => { const t = e.currentTarget; t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }}
                     style={{
                       width: "100%",
                       flexShrink: 0,
@@ -2313,6 +2322,9 @@ function StageEdit({
                       padding: 0,
                       marginBottom: 14,
                       lineHeight: 1.2,
+                      resize: "none",
+                      overflow: "hidden",
+                      minHeight: "1.2em",
                     }}
                   />
                   <textarea
@@ -4857,13 +4869,18 @@ export default function WorkSession() {
       } else {
         sessionStorage.removeItem("ew-wrap-talk-duration");
       }
-      const adaptedContent = buildWrapSeededContentFromFormatDrafts(formats, formatDrafts);
+      const adaptedContent: Record<string, unknown> = {};
       if (Object.keys(adaptedContent).length > 0) {
         sessionStorage.setItem("ew-wrap-formats", JSON.stringify(adaptedContent));
       } else {
         sessionStorage.removeItem("ew-wrap-formats");
       }
-      const wrapChannelPicks = workReviewFormatsToWrapChannels(formats);
+      const wrapChannelPicks = resolvedTypeIds
+        .map(id => {
+          const match = OUTPUT_TYPES.find(ot => ot.id === id);
+          return match?.label ?? id;
+        })
+        .filter(Boolean);
       if (wrapChannelPicks.length > 0) {
         sessionStorage.setItem("ew-wrap-channel-picks", JSON.stringify(wrapChannelPicks));
       } else {
