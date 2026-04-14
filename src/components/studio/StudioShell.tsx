@@ -433,10 +433,17 @@ export default function StudioShell() {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; open: boolean; setOpen: (v: boolean) => void }) {
-  const { feedbackContent, dashContent } = useShell();
+  const { feedbackContent, dashContent, reedPrefill, setReedPrefill, setReedChipRequest } = useShell();
   const location = useLocation();
   const pathname = location.pathname;
   const feedbackBody = feedbackContent ?? dashContent;
+  const workStage = useWorkStageFromShell();
+  const stageKey = pathname.includes("/studio/watch")
+    ? "Watch"
+    : pathname.includes("/studio/wrap")
+      ? "Wrap"
+      : workStage;
+  const stageChips = REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
 
   useEffect(() => {
     if (!open) return;
@@ -500,35 +507,71 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
           minHeight: 0,
           display: "flex",
           flexDirection: "column",
-        }}
-        >
+          overflow: "hidden",
+        }}>
           <div
             className="studio-advisor-scroll"
             style={{
-              flex: "0 1 auto",
-              maxHeight: "50%",
+              flex: 1,
               minHeight: 0,
               overflowY: "auto",
-              padding: "12px 12px 8px",
+              padding: "14px 14px 8px",
             }}
           >
-            <InspectorEyebrow>Feedback</InspectorEyebrow>
-            <div style={{ marginBottom: 2 }}>
-              {feedbackBody ?? <AdvisorFeedbackFallback pathname={pathname} />}
+            {/* Reed's Take */}
+            <InspectorEyebrow>Reed's Take</InspectorEyebrow>
+            <div style={{
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: "var(--fg)",
+              marginBottom: 16,
+              fontFamily: "var(--font)",
+            }}>
+              {feedbackBody ?? (
+                <p style={{ margin: 0, color: "var(--fg-2)", fontSize: 13, lineHeight: 1.6 }}>
+                  Run a briefing in Watch to get Reed's take on what matters this week.
+                </p>
+              )}
             </div>
-            <InspectorDivider />
+
+            {/* First Move */}
+            <InspectorEyebrow>First Move</InspectorEyebrow>
+            <button
+              type="button"
+              className="liquid-glass-btn-gold"
+              onClick={() => {
+                const chip = stageChips[0];
+                if (chip) {
+                  if (stageKey === "Edit") {
+                    setReedChipRequest({ id: Date.now(), text: chip.prefill });
+                  } else {
+                    setReedPrefill(chip.prefill);
+                  }
+                }
+              }}
+              style={{
+                width: "100%",
+                padding: "10px 16px",
+                fontSize: 12,
+                fontWeight: 600,
+                marginBottom: 16,
+                borderRadius: 10,
+              }}
+            >
+              <span className="liquid-glass-btn-gold-label">
+                {stageChips[0]?.label || "Start a new session"}
+              </span>
+            </button>
           </div>
+
+          {/* Ask Reed (chat input only, no chips) */}
           <div style={{
-            flex: 1,
-            minHeight: 0,
-            display: "flex",
-            flexDirection: "column",
-            padding: "10px 12px 8px",
+            flexShrink: 0,
+            padding: "8px 14px 10px",
             borderTop: "1px solid var(--glass-border)",
-          }}
-          >
+          }}>
             <InspectorEyebrow>Ask Reed</InspectorEyebrow>
-            <ReedPanel />
+            <ReedPanelInputOnly />
           </div>
         </div>
 
@@ -693,6 +736,142 @@ function ReedPanel() {
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
           placeholder="Ask Reed..."
+          aria-label="Ask Reed"
+          style={{
+            flex: 1,
+            minWidth: 0,
+            width: "100%",
+            background: "transparent",
+            border: "none",
+            outline: "none",
+            fontSize: 12,
+            color: "var(--fg)",
+            fontFamily: "var(--font)",
+          }}
+        />
+        <button
+          type="button"
+          onClick={handleSend}
+          disabled={!input.trim()}
+          aria-label="Send message to Reed"
+          style={{
+            width: 28,
+            height: 28,
+            borderRadius: 6,
+            background: input.trim() ? "var(--fg)" : "rgba(0,0,0,0.06)",
+            border: "none",
+            cursor: input.trim() ? "pointer" : "not-allowed",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            transition: "background 0.15s",
+            flexShrink: 0,
+          }}
+        >
+          <svg style={{ width: 11, height: 11, stroke: input.trim() ? "#F5F3EF" : "var(--fg-3)", strokeWidth: 2.5, fill: "none" }} viewBox="0 0 24 24">
+            <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ReedPanelInputOnly() {
+  const { reedThread, setReedThread, reedPrefill, setReedPrefill } = useShell();
+  const location = useLocation();
+  const [input, setInput] = useState("");
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const workStage = useWorkStageFromShell();
+  const stageKey = location.pathname.includes("/studio/watch")
+    ? "Watch"
+    : location.pathname.includes("/studio/wrap")
+      ? "Wrap"
+      : workStage;
+
+  const prefillAndFocus = useCallback((text: string) => {
+    setInput(text);
+    requestAnimationFrame(() => {
+      inputRef.current?.focus();
+    });
+  }, []);
+
+  useEffect(() => {
+    const t = (reedPrefill || "").trim();
+    if (!t) return;
+    setReedPrefill("");
+    prefillAndFocus(t);
+  }, [reedPrefill, setReedPrefill, prefillAndFocus]);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [reedThread.length]);
+
+  const handleSend = () => {
+    if (!input.trim()) return;
+    const message = input.trim();
+    setInput("");
+    setReedThread(prev => [...prev, { type: "user", text: message }]);
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", minHeight: 0, width: "100%" }}>
+      {reedThread.length > 0 && (
+        <div style={{ maxHeight: 180, overflowY: "auto", marginBottom: 8, minHeight: 0, width: "100%" }}>
+          {reedThread.map((m, i) => {
+            if (m.type === "reed") {
+              return (
+                <div key={i} style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "flex-start" }}>
+                  <div style={{
+                    display: "flex", alignItems: "flex-start", justifyContent: "center",
+                    flexShrink: 0, width: 24, paddingTop: 1,
+                  }}>
+                    <ReedProfileIcon size={18} title="Reed" />
+                  </div>
+                  <div style={{
+                    background: "rgba(74,144,217,0.06)", border: "1px solid rgba(74,144,217,0.2)",
+                    borderRadius: "0 8px 8px 8px", padding: "8px 10px",
+                    fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: "85%",
+                  }}>{m.text}</div>
+                </div>
+              );
+            }
+            if (m.type === "user") {
+              return (
+                <div key={i} style={{ display: "flex", justifyContent: "flex-end", marginBottom: 8 }}>
+                  <div style={{
+                    background: "rgba(245,198,66,0.1)", border: "1px solid rgba(245,198,66,0.2)",
+                    borderRadius: "8px 0 8px 8px", padding: "8px 10px",
+                    fontSize: 11, color: "var(--fg)", lineHeight: 1.6, maxWidth: "85%",
+                  }}>{m.text}</div>
+                </div>
+              );
+            }
+            return null;
+          })}
+          <div ref={bottomRef} />
+        </div>
+      )}
+      <div style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 8,
+        width: "100%",
+        boxSizing: "border-box",
+        background: "rgba(0,0,0,0.03)",
+        border: "1px solid rgba(0,0,0,0.1)",
+        borderRadius: 8,
+        padding: "8px 10px",
+        flexShrink: 0,
+      }}>
+        <input
+          ref={inputRef}
+          type="text"
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          placeholder={`Ask Reed about ${stageKey === "Watch" ? "this week's signals" : "your current session"}...`}
           aria-label="Ask Reed"
           style={{
             flex: 1,
