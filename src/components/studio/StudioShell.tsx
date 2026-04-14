@@ -471,28 +471,26 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
         aria-hidden={!open}
       >
         <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          borderBottom: "1px solid rgba(0,0,0,0.06)",
-          background: "rgba(255,255,255,0.42)", flexShrink: 0,
-          padding: "10px 12px",
+          display: "flex", alignItems: "center", justifyContent: "flex-end",
+          flexShrink: 0,
+          padding: "8px 10px",
         }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--fg)", letterSpacing: "0.01em" }}>Inspector</span>
           <button
             type="button"
             onClick={() => setOpen(false)}
-            aria-label="Close inspector panel"
+            aria-label="Collapse panel"
             style={{
-              width: 30, height: 30, borderRadius: 8, border: "1px solid rgba(0,0,0,0.08)",
-              background: "rgba(255,255,255,0.5)", color: "var(--fg-3)", cursor: "pointer",
+              width: 28, height: 28, borderRadius: 8,
+              border: "none",
+              background: "transparent", color: "var(--fg-3)", cursor: "pointer",
               display: "flex", alignItems: "center", justifyContent: "center", padding: 0,
-              fontFamily: "var(--font)", transition: "background 0.12s, color 0.12s",
-              flexShrink: 0,
+              transition: "color 0.12s",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "rgba(0,0,0,0.04)"; e.currentTarget.style.color = "var(--fg)"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,0.5)"; e.currentTarget.style.color = "var(--fg-3)"; }}
+            onMouseEnter={e => { e.currentTarget.style.color = "var(--fg)"; }}
+            onMouseLeave={e => { e.currentTarget.style.color = "var(--fg-3)"; }}
           >
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-              <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              <path d="M5 3l5 4-5 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </button>
         </div>
