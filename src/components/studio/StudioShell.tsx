@@ -313,9 +313,9 @@ export default function StudioShell() {
             alignItems: "baseline",
             pointerEvents: "auto",
           }}>
-            <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 14, textTransform: "uppercase" }}>EVERYWHERE</span>
-            <span style={{ color: "var(--fg-3)", fontWeight: 300, fontSize: 14, marginLeft: 1 }}>Studio</span>
-            <span style={{ color: "var(--fg-3)", fontWeight: 300, fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>&trade;</span>
+            <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 20, textTransform: "uppercase" }}>EVERYWHERE</span>
+            <span style={{ color: "#C8961A", fontWeight: 300, fontSize: 20, marginLeft: 2 }}>Studio</span>
+            <span style={{ color: "#C8961A", fontWeight: 300, fontSize: 12, verticalAlign: "top", marginLeft: 2 }}>&trade;</span>
           </span>
           <a
             href="mailto:beta@everywhere.studio.ai"
