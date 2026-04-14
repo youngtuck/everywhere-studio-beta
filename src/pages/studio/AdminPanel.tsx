@@ -125,7 +125,7 @@ function InviteTab() {
     setCreating(false);
   };
 
-  const inviteMessage = result ? `Hey ${result.name}, I'd like you to try EVERYWHERE Studio. It's an AI content system that actually sounds like you, not like AI. Here's your invite code: ${result.code}. Sign up at everywherestudio-one.vercel.app` : "";
+  const inviteMessage = result ? `Hey ${result.name}, I'd like you to try EVERYWHERE Studio. It's an AI content system that actually sounds like you, not like AI. Here's your invite code: ${result.code}. Sign up at everywhere-studio-beta.vercel.app` : "";
 
   const handleCopy = (text: string, label: string) => { copyToClipboard(text); setCopied(label); setTimeout(() => setCopied(""), 1500); };
 

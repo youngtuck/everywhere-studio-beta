@@ -235,11 +235,6 @@ export default function ExplorePage() {
               <button className="xp-nav-link" onClick={goSignin} style={{
                 color: isDarkNav ? "rgba(255,255,255,0.55)" : "var(--xp-sec)",
               }}>Sign In</button>
-              <button className="xp-nav-cta" onClick={goSignup} style={
-                isDarkNav
-                  ? { background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "var(--xp-on-dark)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }
-                  : { background: "rgba(12,26,41,0.08)", border: "1px solid rgba(12,26,41,0.15)", color: "var(--xp-navy)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }
-              }>Request Access</button>
             </div>
           )}
           {isMobile && (
@@ -262,7 +257,6 @@ export default function ExplorePage() {
             { label: "The System", action: () => { setMobileMenuOpen(false); navigate("/the-system"); } },
             { label: "About", action: () => { setMobileMenuOpen(false); navigate("/about"); } },
             { label: "Sign In", action: () => { setMobileMenuOpen(false); goSignin(); } },
-            { label: "Request Access", action: () => { setMobileMenuOpen(false); goSignup(); } },
           ].map((link, i) => (
             <button key={link.label} onClick={link.action} style={{
               background: "none", border: "none", cursor: "pointer",
