@@ -161,19 +161,19 @@ div:hover > .nav-tooltip { display: block !important; }
 ────────────────────────────────────────────────────────────────── */
 
 @media (min-width: 1280px) {
-  #root { zoom: 1.00; }
+  #root { zoom: 1.04; }
 }
 @media (min-width: 1440px) {
-  #root { zoom: 1.06; }
+  #root { zoom: 1.10; }
 }
 @media (min-width: 1600px) {
-  #root { zoom: 1.12; }
+  #root { zoom: 1.16; }
 }
 @media (min-width: 1920px) {
-  #root { zoom: 1.22; }
+  #root { zoom: 1.26; }
 }
 @media (min-width: 2560px) {
-  #root { zoom: 1.40; }
+  #root { zoom: 1.44; }
 }
 
 /* Firefox doesn't support zoom — use transform scale instead */
@@ -227,34 +227,34 @@ div:hover > .nav-tooltip { display: block !important; }
 
 /* Override the viewport breakpoint zoom values to multiply with font size */
 @media (min-width: 1280px) {
-  :root { --viewport-zoom: 1.00; }
-  #root[data-font-size="1"] { zoom: calc(1.00 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.00; }
-  #root[data-font-size="3"] { zoom: calc(1.00 * 1.12); }
+  :root { --viewport-zoom: 1.04; }
+  #root[data-font-size="1"] { zoom: calc(1.04 * 0.88); }
+  #root[data-font-size="2"] { zoom: 1.04; }
+  #root[data-font-size="3"] { zoom: calc(1.04 * 1.12); }
 }
 @media (min-width: 1440px) {
-  :root { --viewport-zoom: 1.06; }
-  #root[data-font-size="1"] { zoom: calc(1.06 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.06; }
-  #root[data-font-size="3"] { zoom: calc(1.06 * 1.12); }
+  :root { --viewport-zoom: 1.10; }
+  #root[data-font-size="1"] { zoom: calc(1.10 * 0.88); }
+  #root[data-font-size="2"] { zoom: 1.10; }
+  #root[data-font-size="3"] { zoom: calc(1.10 * 1.12); }
 }
 @media (min-width: 1600px) {
-  :root { --viewport-zoom: 1.12; }
-  #root[data-font-size="1"] { zoom: calc(1.12 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.12; }
-  #root[data-font-size="3"] { zoom: calc(1.12 * 1.12); }
+  :root { --viewport-zoom: 1.16; }
+  #root[data-font-size="1"] { zoom: calc(1.16 * 0.88); }
+  #root[data-font-size="2"] { zoom: 1.16; }
+  #root[data-font-size="3"] { zoom: calc(1.16 * 1.12); }
 }
 @media (min-width: 1920px) {
-  :root { --viewport-zoom: 1.22; }
-  #root[data-font-size="1"] { zoom: calc(1.22 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.22; }
-  #root[data-font-size="3"] { zoom: calc(1.22 * 1.12); }
+  :root { --viewport-zoom: 1.26; }
+  #root[data-font-size="1"] { zoom: calc(1.26 * 0.88); }
+  #root[data-font-size="2"] { zoom: 1.26; }
+  #root[data-font-size="3"] { zoom: calc(1.26 * 1.12); }
 }
 @media (min-width: 2560px) {
-  :root { --viewport-zoom: 1.40; }
-  #root[data-font-size="1"] { zoom: calc(1.40 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.40; }
-  #root[data-font-size="3"] { zoom: calc(1.40 * 1.12); }
+  :root { --viewport-zoom: 1.44; }
+  #root[data-font-size="1"] { zoom: calc(1.44 * 0.88); }
+  #root[data-font-size="2"] { zoom: 1.44; }
+  #root[data-font-size="3"] { zoom: calc(1.44 * 1.12); }
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {
