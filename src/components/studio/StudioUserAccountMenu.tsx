@@ -145,7 +145,7 @@ export function StudioUserAccountMenu({
                   key={item.label}
                   role="menuitem"
                   onClick={item.action}
-                  style={{ padding: "7px 10px", fontSize: 12, color: "rgba(255,255,255,0.88)", cursor: "pointer", borderRadius: 5, transition: "background 0.1s" }}
+                  style={{ padding: "7px 10px", fontSize: 13, color: "rgba(255,255,255,0.88)", cursor: "pointer", borderRadius: 5, transition: "background 0.1s" }}
                   onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)"; }}
                   onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
                 >
@@ -156,7 +156,7 @@ export function StudioUserAccountMenu({
               <div
                 role="menuitem"
                 onClick={handleSignOut}
-                style={{ padding: "7px 10px", fontSize: 12, color: "#e85d75", cursor: "pointer", borderRadius: 5, transition: "background 0.1s" }}
+                style={{ padding: "7px 10px", fontSize: 13, color: "#ff8a9b", cursor: "pointer", borderRadius: 5, transition: "background 0.1s" }}
                 onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(255,255,255,0.06)"; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
               >
