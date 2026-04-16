@@ -49,6 +49,7 @@ import {
 } from "../../lib/reedStructuredIntake";
 import { publishWorkSessionMeta } from "../../lib/workSessionMetaBridge";
 import {
+  classifyDraftInputIntent,
   classifyEditRevisionScope,
   extractDraftSectionForTargetedEdit,
 } from "../../lib/editRevisionIntent";
@@ -2173,6 +2174,7 @@ function OutlineRowComponent({
 function StageEdit({
   draft, generating, generatingLabel, generationPreamble, applyingSuggestion, onDraftChange, onAdvance, onRevise,
   versions, activeVersionIdx, onVersionSelect, onGenerateVersion, canGenerateMore,
+  draftChatMessages = [], draftChatSending = false,
 }: {
   draft: string; generating: boolean; generatingLabel: string;
   /** CO_023: one-line confirmation shown above the phase display, e.g. "Writing a LinkedIn post for AI governance leads..." */
@@ -2185,6 +2187,9 @@ function StageEdit({
   onVersionSelect: (idx: number) => void;
   onGenerateVersion: () => void;
   canGenerateMore: boolean;
+  /** CO_024: conversational thread above the input when user asks questions at Draft. */
+  draftChatMessages?: Array<{ role: "user" | "reed"; content: string }>;
+  draftChatSending?: boolean;
 }) {
   const [input, setInput] = useState("");
   const titleRef = useRef<HTMLTextAreaElement>(null);
@@ -2195,7 +2200,7 @@ function StageEdit({
   }, [draft]);
 
   const handleRevise = () => {
-    if (!input.trim() || generating) return;
+    if (!input.trim() || generating || draftChatSending) return;
     onRevise(input.trim());
     setInput("");
   };
@@ -2362,6 +2367,51 @@ function StageEdit({
         {!generating && draft && <AdvanceButton label="Finish and Review &#8594;" onClick={onAdvance} />}
       </div>
 
+      {draftChatMessages.length > 0 || draftChatSending ? (
+        <div style={{
+          flexShrink: 0,
+          background: "var(--bg)",
+          borderTop: "1px solid var(--glass-border)",
+          maxHeight: "30vh",
+          overflowY: "auto",
+        }}>
+          <div className="work-stage-content-column" style={{ padding: "12px clamp(10px, 3vw, 14px)", display: "flex", flexDirection: "column", gap: 10 }}>
+            {draftChatMessages.map((m, i) => (
+              <div key={i} style={{
+                alignSelf: m.role === "user" ? "flex-end" : "flex-start",
+                maxWidth: "85%",
+                padding: "8px 12px",
+                borderRadius: m.role === "user" ? "14px 14px 4px 14px" : "14px 14px 14px 4px",
+                background: m.role === "user" ? "var(--surface)" : "transparent",
+                border: m.role === "user" ? "1px solid var(--glass-border)" : "none",
+                fontSize: 13,
+                lineHeight: 1.55,
+                color: "var(--fg)",
+                fontFamily: FONT,
+                whiteSpace: "pre-wrap" as const,
+              }}>
+                {m.role === "reed" && (
+                  <div style={{ fontSize: 10, color: "var(--fg-3)", letterSpacing: 0.4, textTransform: "uppercase" as const, marginBottom: 4, fontWeight: 600 }}>Reed</div>
+                )}
+                {m.content}
+              </div>
+            ))}
+            {draftChatSending ? (
+              <div style={{
+                alignSelf: "flex-start",
+                maxWidth: "85%",
+                padding: "8px 12px",
+                fontSize: 12,
+                color: "var(--fg-3)",
+                fontFamily: FONT,
+                fontStyle: "italic" as const,
+              }}>
+                Reed is thinking...
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
       <div style={{
         borderTop: "1px solid var(--glass-border)",
         flexShrink: 0,
@@ -2377,7 +2427,7 @@ function StageEdit({
           <input
             value={input} onChange={e => setInput(e.target.value)}
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleRevise(); } }}
-            placeholder="Tell Reed what to change, or edit above..."
+            placeholder="Ask Reed, or tell Reed what to change..."
             readOnly={generating}
             style={{ flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10, padding: "0 12px", fontSize: 12, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36, opacity: generating ? 0.5 : 1, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}
             onFocus={e => { e.target.style.borderColor = "rgba(245,198,66,0.4)"; }}
@@ -3444,6 +3494,13 @@ export default function WorkSession() {
    * Set at the moment generation kicks off; cleared when generation ends.
    */
   const [generationPreamble, setGenerationPreamble] = useState<string | null>(null);
+  /**
+   * CO_024: Draft-stage conversational thread. When the user types a question
+   * or ambiguous input at Edit, Reed responds here instead of firing an edit.
+   * Only clear directives route to handleRevise and touch the draft.
+   */
+  const [draftChatMessages, setDraftChatMessages] = useState<Array<{ role: "user" | "reed"; content: string }>>([]);
+  const [draftChatSending, setDraftChatSending] = useState(false);
   const [applyingSuggestion, setApplyingSuggestion] = useState(false);
   const [dismissedFlags, setDismissedFlags] = useState<Set<string>>(new Set());
   const [fixedFlags, setFixedFlags] = useState<Map<string, string>>(new Map());
@@ -4347,10 +4404,76 @@ export default function WorkSession() {
     void runGenerateDraftFromOutline();
   }, [talkLengthDraftInput, toast, runGenerateDraftFromOutline]);
 
+  /**
+   * CO_024: route a typed input at Draft stage through Reed first.
+   * Posts the user's message + current draft context to /api/chat and
+   * appends Reed's conversational reply to draftChatMessages.
+   */
+  const postDraftChatToReed = useCallback(async (userText: string) => {
+    const nextMessages = [...draftChatMessages, { role: "user" as const, content: userText }];
+    setDraftChatMessages(nextMessages);
+    setDraftChatSending(true);
+    try {
+      // Reconstruct a conversation Reed can understand: intake + "here is the draft" + the new Draft-stage turns.
+      const intakeSlice = messages.map(m => ({
+        role: m.role === "reed" ? ("assistant" as const) : ("user" as const),
+        content: m.content,
+      }));
+      const draftContext = {
+        role: "user" as const,
+        content: `Here is the current draft I am looking at:\n\n${draft}\n\nI am now at the Draft stage. Respond to my next message as a conversation. Do not rewrite the draft unless I explicitly ask you to.`,
+      };
+      const draftTurns = nextMessages.map(m => ({
+        role: m.role === "reed" ? ("assistant" as const) : ("user" as const),
+        content: m.content,
+      }));
+      const apiMessages = [...intakeSlice, draftContext, ...draftTurns];
+
+      const res = await fetchWithRetry(`${API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: apiMessages,
+          outputType: catalogOutputTypeForApi(outputType),
+          voiceDnaMd,
+          userId: user?.id,
+          userName: displayName || undefined,
+          systemMode: "CONTENT_PRODUCTION",
+          stage: "Draft",
+        }),
+      }, { timeout: 60000 });
+
+      if (!res.ok) throw new Error(`API error ${res.status}`);
+      const data = await res.json();
+      const reply = (data.reply ?? "").replace(/\u2014/g, ",").replace(/\u2013/g, ",");
+      setDraftChatMessages(prev => [...prev, { role: "reed", content: reply }]);
+    } catch (err: any) {
+      setDraftChatMessages(prev => [...prev, {
+        role: "reed",
+        content: "Something went wrong reaching me. Try again, or make the change directly in the draft above.",
+      }]);
+      console.error("[WorkSession][draftChat]", err);
+    } finally {
+      setDraftChatSending(false);
+    }
+  }, [draftChatMessages, messages, draft, outputType, voiceDnaMd, user?.id, displayName]);
+
   // ── EDIT: Revise draft ────────────────────────────────────────
   const handleRevise = useCallback(async (instructions: string, opts?: { fromChip?: boolean }) => {
     if (!draft) return;
     const fromChip = opts?.fromChip === true;
+
+    // CO_024: at Draft stage, typed input routes through Reed first.
+    // Only clear directives trigger an immediate revise. Chip clicks bypass
+    // this classifier because they are explicit one-click commands.
+    if (!fromChip) {
+      const intent = classifyDraftInputIntent(instructions);
+      if (intent !== "directive") {
+        void postDraftChatToReed(instructions);
+        return;
+      }
+    }
+
     if (fromChip) {
       setApplyingSuggestion(true);
     } else {
@@ -4417,7 +4540,7 @@ export default function WorkSession() {
       if (fromChip) setApplyingSuggestion(false);
       else setGenerating(false);
     }
-  }, [draft, buildConvSummary, outputType, talkDuration, user?.id, activeVersionIdx, toast, structuredIntakePayload]);
+  }, [draft, buildConvSummary, outputType, talkDuration, user?.id, activeVersionIdx, toast, structuredIntakePayload, postDraftChatToReed]);
 
   const lastAppliedChipRequestIdRef = useRef<number | null>(null);
   useEffect(() => {
@@ -6267,6 +6390,8 @@ export default function WorkSession() {
           generatingLabel={generatingLabel}
           generationPreamble={generationPreamble}
           applyingSuggestion={applyingSuggestion}
+          draftChatMessages={draftChatMessages}
+          draftChatSending={draftChatSending}
           onDraftChange={handleDraftChangeWithTracking}
           onAdvance={handleRunPipeline}
           onRevise={handleRevise}
