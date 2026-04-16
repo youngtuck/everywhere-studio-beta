@@ -7,7 +7,7 @@ export const MARKETING_NUMBERS = {
   voiceDnaTarget: 95,
 } as const;
 
-export const APP_VERSION = "Beta 1.08";
+export const APP_VERSION = "Beta 1.09";
 
 export const REED_STAGE_CHIPS: Record<string, Array<{ label: string; prefill: string }>> = {
   Watch: [
@@ -94,9 +94,9 @@ export const OUTPUT_TYPES = {
   },
   freestyle: {
     label: "Freestyle",
-    description: "When what you need does not fit a category.",
+    description: "Thought partner mode. Open conversation with Reed. No deliverable assumed.",
     types: [
-      { id: "freestyle", name: "Freestyle", format: "Varies", shortDesc: "You describe it, Reed builds it. Same quality standards." },
+      { id: "freestyle", name: "Freestyle", format: "Conversation", shortDesc: "Think out loud with Reed. Output is optional, not required." },
     ],
   },
 };
@@ -110,7 +110,7 @@ export const OUTPUT_TYPES_FULL: Record<string, { label: string; description: str
       { id: "podcast", name: "Podcast", what: "A scripted audio show, solo, two hosts, interview, or panel. Built to sound like a real conversation.", reed: "Reed asks who you are really talking to and what you want them to feel by the end. For interviews, he builds questions for genuine revelation, not softballs.", format: ".md for the complete script with host cues. Show notes in .md. Suno prompts inline if musical bed is on.", delivery: "Full show script, host script, show notes, source links. All files production-ready.", notFit: "You want a rough outline to riff from. Reed produces a complete script." },
       { id: "video_script", name: "Video Script", what: "Scripts built for the platform. The algorithm decides in the first three seconds. Reed starts there.", reed: "Reed goes straight to the first three seconds. What does the opening frame need to do? The rest builds from that decision.", format: ".md with time-coded sections, speaker direction, and B-roll callouts. Caption version as plain text.", delivery: "Full script, B-roll prompts, caption version, and thumbnail image prompt.", notFit: "You want talking points. This is a full script." },
       { id: "email", name: "Email", what: "Any email, any purpose. Reed produces 2 to 3 strategic variants, each aimed at a different outcome.", reed: "Reed runs the Communication Framework: goal, strategy, what is in it for them, what you need them to do, what happens next. Multiple variants, different approaches.", format: "Plain text. No markdown. As short as possible, as long as necessary.", delivery: "2 to 3 variants with a brief note on the strategic difference. Copy-ready.", notFit: "You need a newsletter. That is its own output type." },
-      { id: "freestyle", name: "Freestyle", what: "You describe it, Reed builds it. Not a shortcut, a blank page with all the same intelligence behind it.", reed: "Reed asks enough questions to understand format, audience, length, and purpose. He proposes a structure, you confirm or adjust. If it matches an existing type, he will say so.", format: "Whatever the output requires. Reed recommends, you decide.", delivery: "Whatever was defined. All seven Checkpoints available. Human Voice Test always on.", notFit: "What you need already has a name. Use the right output type." },
+      { id: "freestyle", name: "Freestyle", what: "Open conversation with Reed. No format required. No deliverable assumed. You think out loud, Reed thinks with you.", reed: "Reed follows your lead. He asks questions, pushes back on weak premises, and reflects what he is hearing. He does not propose a structure or move toward production unless you ask. At a natural stopping point he asks one question: \"Do you want to capture any of this?\"", format: "Whatever you need. If something worth keeping emerges, Reed helps you shape it. If nothing needs to be saved, the session is complete.", delivery: "On request only. No automatic outline. No forced next step. If you want an output, Reed will ask what form it should take, then produce it. Checkpoints run only if you ask.", notFit: "You already know what you are building. Pick the output type." },
     ],
   },
   social: {

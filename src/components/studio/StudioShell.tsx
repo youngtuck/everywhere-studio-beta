@@ -12,6 +12,7 @@ import Logo from "../Logo";
 import NotificationBell from "./NotificationBell";
 import { REED_STAGE_CHIPS } from "../../lib/constants";
 import { useWorkStageFromShell } from "../../hooks/useWorkStageBridge";
+import { useWorkSessionContext } from "../../hooks/useWorkSessionContext";
 import { ReedProfileIcon } from "./ReedProfileIcon";
 
 export { useShell } from "./StudioShellContext";
@@ -444,6 +445,84 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
       ? "Wrap"
       : workStage;
   const stageChips = REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
+  // CO_031: Reed sidebar reads the active Work session context so Reed's
+  // Take and First Move reflect where the user actually is, not a default.
+  const workCtx = useWorkSessionContext();
+  const onWorkPath = pathname.includes("/studio/work");
+  const sessionActive = workCtx.active && onWorkPath;
+
+  // Reed's Take fallback: stage-aware when a Work session is active. The
+  // generic Watch copy only applies on the Watch page.
+  const reedTakeFallback = (() => {
+    if (stageKey === "Watch") {
+      return "Run a briefing in Watch to get Reed's take on what matters this week.";
+    }
+    if (!sessionActive) {
+      return "Open a Work session and Reed will show his take on the piece as you build.";
+    }
+    switch (workCtx.stage) {
+      case "Intake":
+        if (workCtx.intakeReady) {
+          return "The intake is strong enough. Move to the outline.";
+        }
+        if (!workCtx.hasChannel || !workCtx.hasAudience) {
+          return "Channel and audience first. Reed will not draft until both are clear.";
+        }
+        return "Reed is shaping the piece with you. Keep sharpening the angle.";
+      case "Outline":
+        return "Reed is reading your outline. When the structure holds, move to the draft.";
+      case "Edit":
+        return workCtx.hasDraft
+          ? "Reed has a draft to work on. Use the chips to tighten, expand, or fix the flagged lines."
+          : "Reed is writing the draft. Give it a second.";
+      case "Review":
+        return workCtx.hasReviewed
+          ? "The piece has cleared the gates. Pick the formats you want to ship."
+          : "The piece is heading into Review. Reed will flag anything that needs a second pass.";
+      default:
+        return "Reed is ready when you are.";
+    }
+  })();
+
+  // First Move: pick the chip that matches real session progress instead of
+  // always showing index 0. In Intake, skip questions the user has already
+  // answered. Once intake is ready, point at the outline.
+  const firstMoveChip = (() => {
+    if (!sessionActive || stageKey === "Watch" || stageKey === "Wrap") {
+      return stageChips[0] ?? null;
+    }
+    if (stageKey === "Intake") {
+      if (workCtx.intakeReady) {
+        return {
+          label: "Move to the outline",
+          prefill: "My intake is ready. Draft the outline from what we have.",
+        };
+      }
+      if (!workCtx.hasChannel) {
+        return {
+          label: "Pick the channel",
+          prefill: "Where is this going? LinkedIn, newsletter, internal memo, email, something else?",
+        };
+      }
+      if (!workCtx.hasAudience) {
+        return {
+          label: "Define the audience",
+          prefill: "Who specifically is reading this, and what do they already believe about this topic before they start?",
+        };
+      }
+      // Channel + audience in hand. Walk the user toward the next sharpening
+      // question based on how many Reed questions have been asked so far.
+      const idx = Math.min(Math.max(workCtx.reedQuestionCount - 2, 0), stageChips.length - 1);
+      return stageChips[idx] ?? stageChips[0] ?? null;
+    }
+    if (stageKey === "Edit" && !workCtx.hasDraft) {
+      return {
+        label: "Waiting on the draft",
+        prefill: "Write the draft from my outline.",
+      };
+    }
+    return stageChips[0] ?? null;
+  })();
 
   useEffect(() => {
     if (!open) return;
@@ -529,7 +608,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
             }}>
               {feedbackBody ?? (
                 <p style={{ margin: 0, color: "var(--fg-2)", fontSize: 13, lineHeight: 1.6 }}>
-                  Run a briefing in Watch to get Reed's take on what matters this week.
+                  {reedTakeFallback}
                 </p>
               )}
             </div>
@@ -540,7 +619,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
               type="button"
               className="liquid-glass-btn-gold"
               onClick={() => {
-                const chip = stageChips[0];
+                const chip = firstMoveChip;
                 if (chip) {
                   if (stageKey === "Edit") {
                     setReedChipRequest({ id: Date.now(), text: chip.prefill });
@@ -559,7 +638,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
               }}
             >
               <span className="liquid-glass-btn-gold-label">
-                {stageChips[0]?.label || "Start a new session"}
+                {firstMoveChip?.label || "Start a new session"}
               </span>
             </button>
           </div>

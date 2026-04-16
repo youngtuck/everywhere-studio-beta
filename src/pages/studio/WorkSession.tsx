@@ -49,6 +49,10 @@ import {
 } from "../../lib/reedStructuredIntake";
 import { publishWorkSessionMeta } from "../../lib/workSessionMetaBridge";
 import {
+  publishWorkSessionContext,
+  clearWorkSessionContext,
+} from "../../lib/workSessionContextBridge";
+import {
   classifyDraftInputIntent,
   classifyEditRevisionScope,
   extractDraftSectionForTargetedEdit,
@@ -3979,6 +3983,30 @@ export default function WorkSession() {
       window.dispatchEvent(new CustomEvent("ew-work-stage"));
     };
   }, [stage, goToStage]);
+
+  // CO_031: publish session context so the Reed sidebar can render
+  // stage-appropriate copy and advance First Move beyond questions already
+  // answered. Cleared on unmount so Watch / Wrap see an empty snapshot.
+  useEffect(() => {
+    const reedQuestionCount = messages.filter(
+      m => m.role === "reed" && m.content.trim().endsWith("?"),
+    ).length;
+    const fmt = (structuredIntake?.format || "").trim();
+    const aud = (structuredIntake?.audience || "").trim();
+    publishWorkSessionContext({
+      active: true,
+      stage,
+      reedQuestionCount: Math.min(reedQuestionCount, 5),
+      hasChannel: fmt.length > 0,
+      hasAudience: aud.length > 0,
+      intakeReady,
+      hasDraft: !!draft && draft.trim().length > 0,
+      hasReviewed: !!pipelineRun,
+    });
+    return () => {
+      clearWorkSessionContext();
+    };
+  }, [stage, messages, structuredIntake, intakeReady, draft, pipelineRun]);
 
   // ── Build conversation summary for API calls ──────────────────
   const buildConvSummary = useCallback(() =>
