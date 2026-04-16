@@ -82,6 +82,17 @@ function intakeHasAnyField(i: StructuredIntake): boolean {
   return INTAKE_KEYS.some(k => i[k].trim().length > 0);
 }
 
+/**
+ * CO_023 gate: channel (format) and audience are non-skippable before draft generation.
+ * Both fields must carry real content from the conversation.
+ */
+export function hasChannelAndAudience(intake: StructuredIntake | null | undefined): boolean {
+  if (!intake) return false;
+  const format = (intake.format || "").trim();
+  const audience = (intake.audience || "").trim();
+  return format.length > 0 && audience.length > 0;
+}
+
 /** Prefer persisted intake; otherwise parse last Reed assistant message (for older session saves). */
 export function mergeStoredAndParsed(
   stored: StructuredIntake | null | undefined,

@@ -41,6 +41,7 @@ import {
   type WorkSessionDbRow,
 } from "../../lib/sessionPersistence";
 import {
+  hasChannelAndAudience,
   mergeStoredAndParsed,
   parseStructuredIntakeFromReedReply,
   structuredIntakeForApiBody,
@@ -2170,10 +2171,12 @@ function OutlineRowComponent({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function StageEdit({
-  draft, generating, generatingLabel, applyingSuggestion, onDraftChange, onAdvance, onRevise,
+  draft, generating, generatingLabel, generationPreamble, applyingSuggestion, onDraftChange, onAdvance, onRevise,
   versions, activeVersionIdx, onVersionSelect, onGenerateVersion, canGenerateMore,
 }: {
   draft: string; generating: boolean; generatingLabel: string;
+  /** CO_023: one-line confirmation shown above the phase display, e.g. "Writing a LinkedIn post for AI governance leads..." */
+  generationPreamble?: string | null;
   applyingSuggestion?: boolean;
   onDraftChange: (v: string) => void; onAdvance: () => void;
   onRevise: (instructions: string, opts?: { fromChip?: boolean }) => void;
@@ -2264,7 +2267,7 @@ function StageEdit({
         )}
         {generating ? (
           <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
-            <GenerationProgress />
+            <GenerationProgress preamble={generationPreamble} />
           </div>
         ) : (
           <div
@@ -2404,7 +2407,7 @@ function StageEdit({
 
 // ── Review progress (format adaptation + quality pipeline) ───────────────────
 // ── Generation progress (Edit stage) ─────────────────────────────────────────
-function GenerationProgress() {
+function GenerationProgress({ preamble }: { preamble?: string | null }) {
   const [elapsed, setElapsed] = useState(0);
   const startRef = useRef(Date.now());
 
@@ -2429,6 +2432,19 @@ function GenerationProgress() {
 
   return (
     <div style={{ padding: "40px clamp(16px, 3vw, 28px)", width: "100%", boxSizing: "border-box" as const }}>
+      {preamble ? (
+        <div style={{
+          fontSize: 12,
+          fontWeight: 500,
+          color: "var(--fg-2)",
+          marginBottom: 16,
+          paddingBottom: 14,
+          borderBottom: "1px solid var(--glass-border)",
+          letterSpacing: 0.1,
+        }}>
+          {preamble}
+        </div>
+      ) : null}
       <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{currentPhase.label}</div>
       <div style={{ fontSize: 11, color: "var(--fg-3)", marginBottom: 20 }}>{currentPhase.sub}</div>
       <div style={{ width: "100%", height: 3, borderRadius: 2, background: "var(--glass-border)", overflow: "hidden", marginBottom: 20 }}>
@@ -3329,12 +3345,19 @@ export default function WorkSession() {
     [structuredIntake],
   );
 
-  /** After five Reed questions ending in "?", treat intake as ready so outline CTA is never stuck behind API-only flags. */
+  /**
+   * After five Reed questions ending in "?", treat intake as ready so outline CTA
+   * is never stuck behind API-only flags. CO_023: channel (format) + audience must
+   * be present before readiness flips. Without them, Reed is still running the
+   * two non-skippable intake questions.
+   */
   useEffect(() => {
     if (stage !== "Intake") return;
     const rq = messages.filter(m => m.role === "reed" && m.content.trim().endsWith("?")).length;
-    if (rq >= 5 && !intakeReady) setIntakeReady(true);
-  }, [messages, stage, intakeReady]);
+    if (rq >= 5 && !intakeReady && hasChannelAndAudience(structuredIntake)) {
+      setIntakeReady(true);
+    }
+  }, [messages, stage, intakeReady, structuredIntake]);
 
   // ── Output type (CO-003) ─────────────────────────────────────
   const [outputType, setOutputType] = useState<string | null>(() => persisted?.outputTypeId ?? null);
@@ -3415,6 +3438,12 @@ export default function WorkSession() {
   const [activeVersionIdx, setActiveVersionIdx] = useState(0);
   const [generating, setGenerating] = useState(false);
   const [generatingLabel, setGeneratingLabel] = useState("Writing draft...");
+  /**
+   * CO_023: one-line confirmation rendered above the progress phases during
+   * generation, e.g. "Writing a LinkedIn post for AI governance leads...".
+   * Set at the moment generation kicks off; cleared when generation ends.
+   */
+  const [generationPreamble, setGenerationPreamble] = useState<string | null>(null);
   const [applyingSuggestion, setApplyingSuggestion] = useState(false);
   const [dismissedFlags, setDismissedFlags] = useState<Set<string>>(new Set());
   const [fixedFlags, setFixedFlags] = useState<Map<string, string>>(new Map());
@@ -3901,7 +3930,13 @@ export default function WorkSession() {
       const parsedIntake = parseStructuredIntakeFromReedReply(reply);
       if (parsedIntake) setStructuredIntake(parsedIntake);
 
-      if (data.readyToGenerate) {
+      // CO_023: channel (format) + audience are the non-skippable gate. Readiness
+      // only flips when both are present, whether signalled by the server, the
+      // user's explicit "write it", or the five-message fallback.
+      const effectiveIntake = parsedIntake ?? structuredIntake;
+      const gatePassed = hasChannelAndAudience(effectiveIntake);
+
+      if (data.readyToGenerate && gatePassed) {
         setIntakeReady(true);
         setReadySummary(reply);
       } else if (!intakeReady) {
@@ -3928,7 +3963,10 @@ export default function WorkSession() {
           reedLower.includes("here is what i will produce") ||
           reedLower.includes("here's what i'll produce");
 
-        if ((userWantsToGenerate && userMsgs.length >= 2) || reedSignalsReady || userMsgs.length >= 5) {
+        const heuristicReady =
+          (userWantsToGenerate && userMsgs.length >= 2) || reedSignalsReady || userMsgs.length >= 5;
+
+        if (heuristicReady && gatePassed) {
           setIntakeReady(true);
           setReadySummary(reply);
         }
@@ -3939,7 +3977,7 @@ export default function WorkSession() {
     } finally {
       setIntakeSending(false);
     }
-  }, [messages, voiceDnaMd, user?.id, outputType, intakeReady]);
+  }, [messages, voiceDnaMd, user?.id, outputType, intakeReady, structuredIntake]);
 
   const handleIntakeBarSend = useCallback(() => {
     if (intakeSending) return;
@@ -4205,6 +4243,15 @@ export default function WorkSession() {
     setOutlineEnterActive(false);
     setGenerating(true);
     setGeneratingLabel("Generating draft...");
+    // CO_023: surface the channel + audience confirmation above the phase list
+    // so the user can see what Reed is writing and who it is for.
+    {
+      const fmt = (structuredIntake?.format || "").trim();
+      const aud = (structuredIntake?.audience || "").trim();
+      const fmtLabel = fmt || "piece";
+      const audLabel = aud ? aud.split(/[.;]\s+/)[0].slice(0, 120) : "your audience";
+      setGenerationPreamble(`Writing a ${fmtLabel} for ${audLabel}...`);
+    }
     setDraft("");
 
     const convSummary = buildConvSummary();
@@ -4273,8 +4320,9 @@ export default function WorkSession() {
       console.error("[WorkSession][generate]", err);
     } finally {
       setGenerating(false);
+      setGenerationPreamble(null);
     }
-  }, [buildConvSummary, outlineRows, user?.id, toast, goToStage, handleBackgroundQualityCheck, outputType, talkDuration, structuredIntakePayload]);
+  }, [buildConvSummary, outlineRows, user?.id, toast, goToStage, handleBackgroundQualityCheck, outputType, talkDuration, structuredIntakePayload, structuredIntake]);
 
   const handleGenerateDraft = useCallback(() => {
     if (outputType === "talk" && !talkLengthGatePassed) {
@@ -6217,6 +6265,7 @@ export default function WorkSession() {
           draft={draft}
           generating={generating}
           generatingLabel={generatingLabel}
+          generationPreamble={generationPreamble}
           applyingSuggestion={applyingSuggestion}
           onDraftChange={handleDraftChangeWithTracking}
           onAdvance={handleRunPipeline}
