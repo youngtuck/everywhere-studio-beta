@@ -3313,20 +3313,34 @@ function StageReview({
 // ACTION CHIPS
 // ─────────────────────────────────────────────────────────────────────────────
 
-function ActionChips({ chips, onChipClick }: { chips: string[]; onChipClick: (text: string) => void }) {
+function ActionChips({
+  chips,
+  onChipClick,
+  disabled = false,
+}: {
+  chips: string[];
+  onChipClick: (text: string) => void;
+  disabled?: boolean;
+}) {
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: 5, marginTop: 8 }}>
       {chips.map(chip => (
         <div
           key={chip}
-          onClick={() => onChipClick(chip)}
+          onClick={disabled ? undefined : () => onChipClick(chip)}
+          aria-disabled={disabled}
           style={{
-            fontSize: 10, color: "var(--blue, #4A90D9)",
-            padding: "4px 10px", borderRadius: 99,
+            fontSize: 10,
+            color: "var(--blue, #4A90D9)",
+            padding: "4px 10px",
+            borderRadius: 99,
             border: "1px solid rgba(74,144,217,0.3)",
             background: "rgba(74,144,217,0.04)",
-            cursor: "pointer", transition: "all 0.12s",
+            cursor: disabled ? "not-allowed" : "pointer",
+            transition: "all 0.12s",
             fontFamily: FONT,
+            opacity: disabled ? 0.45 : 1,
+            pointerEvents: disabled ? "none" : "auto",
           }}
         >
           {chip}
@@ -3501,7 +3515,24 @@ export default function WorkSession() {
    */
   const [draftChatMessages, setDraftChatMessages] = useState<Array<{ role: "user" | "reed"; content: string }>>([]);
   const [draftChatSending, setDraftChatSending] = useState(false);
+  /**
+   * CO_026: Inspector chip proposals. The user clicks a chip (Tighten this,
+   * Fix flagged lines, etc.). Reed proposes the change in the Inspector,
+   * naming specific lines and word count impact. The draft does not change
+   * until the user clicks Apply. Only one proposal at a time; other chips
+   * are disabled while a proposal is pending.
+   */
+  const [pendingChipProposal, setPendingChipProposal] = useState<
+    { chipLabel: string; instructions: string; proposalText: string; wordsBefore: number } | null
+  >(null);
+  const [proposalLoading, setProposalLoading] = useState(false);
   const [applyingSuggestion, setApplyingSuggestion] = useState(false);
+  // CO_026: ref to handleRevise so applyChipProposal (declared earlier in the
+  // file) can invoke it without forward-reference issues. Kept in sync via
+  // useEffect below the handleRevise declaration.
+  const handleReviseRef = useRef<
+    ((instructions: string, opts?: { fromChip?: boolean }) => Promise<void>) | null
+  >(null);
   const [dismissedFlags, setDismissedFlags] = useState<Set<string>>(new Set());
   const [fixedFlags, setFixedFlags] = useState<Map<string, string>>(new Map());
 
@@ -4405,6 +4436,79 @@ export default function WorkSession() {
   }, [talkLengthDraftInput, toast, runGenerateDraftFromOutline]);
 
   /**
+   * CO_026: ask Reed to propose (not perform) an Inspector chip edit.
+   * Renders in the Inspector as a card with Apply / Skip. One at a time.
+   */
+  const requestChipProposal = useCallback(async (chipLabel: string, instructions: string) => {
+    if (!draft) return;
+    if (pendingChipProposal || proposalLoading) return;
+    setProposalLoading(true);
+    try {
+      const wordsBefore = draft.trim().split(/\s+/).filter(Boolean).length;
+      const intakeSlice = messages.map(m => ({
+        role: m.role === "reed" ? ("assistant" as const) : ("user" as const),
+        content: m.content,
+      }));
+      const proposalPrompt = `INSPECTOR_PROPOSAL: The user just clicked the Inspector chip "${chipLabel}".
+Instructions behind the chip: ${instructions}
+Current word count: ${wordsBefore}.
+
+Here is the current draft in full:
+
+${draft}
+
+Propose the change you would make. Three parts, in order: (1) what will change (specific lines or paragraphs), (2) why in one sentence, (3) word count impact from ${wordsBefore} to your estimate. Do not rewrite the draft. Do not ask a question at the end. Three or four sentences total.`;
+      const res = await fetchWithRetry(`${API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: [...intakeSlice, { role: "user", content: proposalPrompt }],
+          outputType: catalogOutputTypeForApi(outputType),
+          voiceDnaMd,
+          userId: user?.id,
+          userName: displayName || undefined,
+          systemMode: "CONTENT_PRODUCTION",
+          stage: "Draft",
+          proposalMode: true,
+        }),
+      }, { timeout: 60000 });
+      if (!res.ok) throw new Error(`Proposal error ${res.status}`);
+      const data = await res.json();
+      const proposalText = (data.reply ?? "")
+        .replace(/\u2014/g, ",")
+        .replace(/\u2013/g, ",")
+        .trim();
+      if (!proposalText) {
+        toast("Reed could not form a proposal. Try again.", "error");
+        return;
+      }
+      setPendingChipProposal({ chipLabel, instructions, proposalText, wordsBefore });
+    } catch (err: any) {
+      toast("Reed could not form a proposal. Try again.", "error");
+      console.error("[WorkSession][proposal]", err);
+    } finally {
+      setProposalLoading(false);
+    }
+  }, [draft, messages, outputType, voiceDnaMd, user?.id, displayName, pendingChipProposal, proposalLoading, toast]);
+
+  const applyChipProposal = useCallback(() => {
+    const p = pendingChipProposal;
+    if (!p) return;
+    setPendingChipProposal(null);
+    void handleReviseRef.current?.(p.instructions, { fromChip: true });
+  }, [pendingChipProposal]);
+
+  const skipChipProposal = useCallback(() => {
+    const p = pendingChipProposal;
+    if (!p) return;
+    setPendingChipProposal(null);
+    setDraftChatMessages(prev => [...prev, {
+      role: "reed",
+      content: `Skipped "${p.chipLabel}". The draft is unchanged. Let me know what you want next.`,
+    }]);
+  }, [pendingChipProposal]);
+
+  /**
    * CO_024: route a typed input at Draft stage through Reed first.
    * Posts the user's message + current draft context to /api/chat and
    * appends Reed's conversational reply to draftChatMessages.
@@ -4541,6 +4645,12 @@ export default function WorkSession() {
       else setGenerating(false);
     }
   }, [draft, buildConvSummary, outputType, talkDuration, user?.id, activeVersionIdx, toast, structuredIntakePayload, postDraftChatToReed]);
+
+  // CO_026: keep handleReviseRef in sync so applyChipProposal (declared
+  // earlier in the file) always calls the current handleRevise.
+  useEffect(() => {
+    handleReviseRef.current = handleRevise;
+  }, [handleRevise]);
 
   const lastAppliedChipRequestIdRef = useRef<number | null>(null);
   useEffect(() => {
@@ -5862,8 +5972,65 @@ export default function WorkSession() {
                 </>
               )}
 
+              {/* CO_026: PROPOSED EDIT CARD (appears above chips when pending) */}
+              {stage === "Edit" && proposalLoading && !pendingChipProposal && (
+                <DpSection>
+                  <div style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                    <span style={{ animation: "pulse 1.5s infinite" }}>&#9679;</span>
+                    <span>Reed is proposing...</span>
+                  </div>
+                </DpSection>
+              )}
+              {stage === "Edit" && pendingChipProposal && (
+                <DpSection>
+                  <div style={{ fontSize: 10, color: "var(--fg-2)", fontWeight: 600, marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.4 }}>
+                    Reed is proposing: {pendingChipProposal.chipLabel}
+                  </div>
+                  <div style={{
+                    fontSize: 11, color: "var(--fg-1)", lineHeight: 1.55,
+                    padding: "8px 10px", borderRadius: 6,
+                    background: "rgba(74,144,217,0.05)",
+                    border: "1px solid rgba(74,144,217,0.18)",
+                    whiteSpace: "pre-wrap",
+                  }}>
+                    {pendingChipProposal.proposalText}
+                  </div>
+                  <div style={{ display: "flex", gap: 6, marginTop: 8 }}>
+                    <button
+                      onClick={applyChipProposal}
+                      style={{
+                        fontSize: 10, fontWeight: 600,
+                        padding: "5px 12px", borderRadius: 99,
+                        border: "1px solid var(--blue, #4A90D9)",
+                        background: "var(--blue, #4A90D9)",
+                        color: "#fff",
+                        cursor: "pointer", transition: "all 0.12s",
+                        fontFamily: FONT,
+                      }}
+                    >
+                      Apply
+                    </button>
+                    <button
+                      onClick={skipChipProposal}
+                      style={{
+                        fontSize: 10, fontWeight: 500,
+                        padding: "5px 12px", borderRadius: 99,
+                        border: "1px solid rgba(74,144,217,0.3)",
+                        background: "transparent",
+                        color: "var(--blue, #4A90D9)",
+                        cursor: "pointer", transition: "all 0.12s",
+                        fontFamily: FONT,
+                      }}
+                    >
+                      Skip
+                    </button>
+                  </div>
+                </DpSection>
+              )}
+
               {/* ACTION CHIPS */}
               <ActionChips
+                disabled={stage === "Edit" && (pendingChipProposal !== null || proposalLoading)}
                 chips={[
                   "Fix the flagged lines",
                   "Tighten the hook",
@@ -5873,20 +6040,18 @@ export default function WorkSession() {
                   "Cut 100 words without losing the point",
                 ]}
                 onChipClick={(chip) => {
-                  const run = (msg: string) => {
-                    if (stage === "Edit") {
-                      void handleRevise(msg, { fromChip: true });
-                      return;
-                    }
-                    prefillReed(msg);
-                  };
-                  if (chip.startsWith("Tighten to")) {
-                    run(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
-                  } else if (chip.startsWith("Expand")) {
-                    run(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
-                  } else {
-                    run(chip);
+                  // CO_026: in Edit stage, chip click asks Reed to propose first.
+                  // Outside Edit, behavior unchanged (chip prefills Reed).
+                  const resolvedInstructions = chip.startsWith("Tighten to")
+                    ? `Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`
+                    : chip.startsWith("Expand")
+                      ? `Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`
+                      : chip;
+                  if (stage === "Edit") {
+                    void requestChipProposal(chip, resolvedInstructions);
+                    return;
                   }
+                  prefillReed(resolvedInstructions);
                 }}
               />
             </>
@@ -5930,6 +6095,7 @@ export default function WorkSession() {
     methodDnaMd, methodTermHits, methodLintLoading, methodLintInspectorError,
     methodLintLastCompletedFp, draftLintFp, handleRetryMethodLint,
     editWordTargetOverride, editWordTargetEditorOpen, editWordTargetDraftInput, commitEditWordTargetDraft,
+    pendingChipProposal, proposalLoading, requestChipProposal, applyChipProposal, skipChipProposal,
   ]);
 
   // ─────────────────────────────────────────────────────────────

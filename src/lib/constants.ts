@@ -7,7 +7,7 @@ export const MARKETING_NUMBERS = {
   voiceDnaTarget: 95,
 } as const;
 
-export const APP_VERSION = "Beta 1.07";
+export const APP_VERSION = "Beta 1.08";
 
 export const REED_STAGE_CHIPS: Record<string, Array<{ label: string; prefill: string }>> = {
   Watch: [
