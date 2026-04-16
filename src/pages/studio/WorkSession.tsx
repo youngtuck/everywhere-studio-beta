@@ -5558,7 +5558,7 @@ export default function WorkSession() {
             <>
               {generating && (
                 <DpSection>
-                  <DpLabel>Generating</DpLabel>
+                  <DpLabel>Reed's take</DpLabel>
                   <div style={{ fontSize: 11, color: "var(--gold-bright)", lineHeight: 1.6, fontWeight: 500 }}>{generatingLabel}</div>
                 </DpSection>
               )}
@@ -5688,36 +5688,36 @@ export default function WorkSession() {
                       </div>
                     </DpSection>
                   )}
+
+                  {/* CO_022: action chips only appear once a draft exists. Every chip is an edit op on the current draft. */}
+                  <ActionChips
+                    chips={[
+                      "Fix the flagged lines",
+                      "Tighten the hook",
+                      `Tighten to ${targetWords}`,
+                      "Expand, add an example",
+                      "Check the voice match",
+                      "Cut 100 words without losing the point",
+                    ]}
+                    onChipClick={(chip) => {
+                      const run = (msg: string) => {
+                        if (stage === "Edit") {
+                          void handleRevise(msg, { fromChip: true });
+                          return;
+                        }
+                        prefillReed(msg);
+                      };
+                      if (chip.startsWith("Tighten to")) {
+                        run(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
+                      } else if (chip.startsWith("Expand")) {
+                        run(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
+                      } else {
+                        run(chip);
+                      }
+                    }}
+                  />
                 </>
               )}
-
-              {/* ACTION CHIPS */}
-              <ActionChips
-                chips={[
-                  "Fix the flagged lines",
-                  "Tighten the hook",
-                  `Tighten to ${targetWords}`,
-                  "Expand, add an example",
-                  "Check the voice match",
-                  "Cut 100 words without losing the point",
-                ]}
-                onChipClick={(chip) => {
-                  const run = (msg: string) => {
-                    if (stage === "Edit") {
-                      void handleRevise(msg, { fromChip: true });
-                      return;
-                    }
-                    prefillReed(msg);
-                  };
-                  if (chip.startsWith("Tighten to")) {
-                    run(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
-                  } else if (chip.startsWith("Expand")) {
-                    run(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
-                  } else {
-                    run(chip);
-                  }
-                }}
-              />
             </>
           );
         }
