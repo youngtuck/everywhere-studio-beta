@@ -5691,14 +5691,19 @@ export default function WorkSession() {
                 </>
               )}
 
-              {/* ACTION CHIPS */}
+              {/* ACTION CHIPS
+                  CO_027: non-functional chips are hidden until they land on the
+                  propose-before-apply flow defined in CO_026.
+                  Hidden for now:
+                  - "Fix the flagged lines" (no per-line resolver yet; also needs CO_025 flag gating)
+                  - "Tighten the hook" (vague instruction; returns unreliable edits)
+                  - "Check the voice match" (needs a voice-review surface, not a silent edit)
+                  Shown: three chips whose onClick already maps to a specific,
+                  model-actionable revision instruction that handleRevise can run. */}
               <ActionChips
                 chips={[
-                  "Fix the flagged lines",
-                  "Tighten the hook",
                   `Tighten to ${targetWords}`,
                   "Expand, add an example",
-                  "Check the voice match",
                   "Cut 100 words without losing the point",
                 ]}
                 onChipClick={(chip) => {
