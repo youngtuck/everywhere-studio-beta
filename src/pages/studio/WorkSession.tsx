@@ -1044,8 +1044,10 @@ function ReviewDash({
                   Checking...
                 </div>
               ) : methodLintInspectorError === "timeout" ? (
-                <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
-                  <div style={{ marginBottom: 8 }}>Check timed out. Try again.</div>
+                <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                  <div style={{ fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>Method wording check timed out.</div>
+                  <div style={{ marginBottom: 4 }}>The server took too long to respond. This sometimes happens during heavy load or on longer drafts.</div>
+                  <div style={{ marginBottom: 8 }}>Hit Retry, it usually resolves in one attempt.</div>
                   <button
                     type="button"
                     className="liquid-glass-btn"
@@ -1056,10 +1058,10 @@ function ReviewDash({
                   </button>
                 </div>
               ) : methodLintInspectorError === "unreachable" ? (
-                <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
-                  <div style={{ marginBottom: 8 }}>
-                    The studio API is not reachable from this browser. Check your connection or VPN, then try again.
-                  </div>
+                <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                  <div style={{ fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>Studio API is unreachable.</div>
+                  <div style={{ marginBottom: 4 }}>Your browser could not connect to the check service. This is usually a network issue on your side (VPN, captive Wi-Fi, or a paused connection).</div>
+                  <div style={{ marginBottom: 8 }}>Check your connection, then hit Retry.</div>
                   <button
                     type="button"
                     className="liquid-glass-btn"
@@ -1070,8 +1072,10 @@ function ReviewDash({
                   </button>
                 </div>
               ) : (
-                <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
-                  <div style={{ marginBottom: 8 }}>Check could not finish. Try again.</div>
+                <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                  <div style={{ fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>Method wording check did not complete.</div>
+                  <div style={{ marginBottom: 4 }}>Reed could not finish the pass on this draft. This sometimes happens with very short drafts or when the service hiccups mid-check.</div>
+                  <div style={{ marginBottom: 8 }}>Hit Retry, it usually resolves in one attempt. If it keeps failing, return to Draft and add more material.</div>
                   <button
                     type="button"
                     className="liquid-glass-btn"
@@ -2753,6 +2757,7 @@ function PreWrapOutputGate({
   onPresentationMinutesChange,
   talkDuration,
   onTalkDurationChange,
+  userTemplates,
 }: {
   pipelineRun: PipelineRun | null;
   recommendedId: string;
@@ -2766,17 +2771,50 @@ function PreWrapOutputGate({
   onPresentationMinutesChange: (n: number) => void;
   talkDuration: number;
   onTalkDurationChange: (n: number) => void;
+  // CO_029 F5: user-saved templates live in the same grid as Catalog
+  // formats. When empty, we show a promise of what this becomes.
+  userTemplates?: { id: string; label: string; subtitle?: string }[];
 }) {
+  // CO_029 F1/F6: compute display gates so the Review page can show the list
+  // of flagged items inline and route the user back to Draft if the piece
+  // still needs work. This mirrors the Inspector's logic so the two surfaces
+  // cannot disagree about whether the draft is clear.
+  const displayGates = pipelineRun
+    ? deriveReviewDisplayGates(pipelineRun.checkpointResults, pipelineRun.humanVoiceTest)
+    : [];
+  const nonPassGates = displayGates.filter(g => g.status !== "Pass");
+  const hasFlags = nonPassGates.length > 0;
+  const draftNeedsAttention = !!pipelineRun && hasFlags;
+
+  // CO_029 F9: when Reed's sidebar fires "What needs fixing?", the Work page
+  // scrolls the flagged-items card into view and briefly pulses it. No chat
+  // round-trip: the answer is already on the page.
+  const [flaggedPulse, setFlaggedPulse] = useState(false);
+  useEffect(() => {
+    const onFocus = () => {
+      if (!draftNeedsAttention) return;
+      const el = document.getElementById("pre-wrap-flagged-items");
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      setFlaggedPulse(true);
+      window.setTimeout(() => setFlaggedPulse(false), 1500);
+    };
+    window.addEventListener("ew-focus-flagged-items", onFocus);
+    return () => window.removeEventListener("ew-focus-flagged-items", onFocus);
+  }, [draftNeedsAttention]);
+
   const reviewStatusLine = !pipelineRun
     ? "When you are ready, continue below."
-    : pipelineRun.status === "PASSED"
-      ? "Checks passed."
-      : "Quality review finished. Address any items Reed flagged before you continue.";
-  const hvtLine = !pipelineRun
+    : draftNeedsAttention
+      ? `Reed flagged ${nonPassGates.length === 1 ? "one item" : `${nonPassGates.length} items`} before this is ready to ship. Fix them in Draft, then come back.`
+      : pipelineRun.status === "PASSED"
+        ? "All checks passed. No flags. You are clear to continue."
+        : "No flags. You are clear to continue.";
+  const hvtLine = !pipelineRun || draftNeedsAttention
     ? ""
     : pipelineRun.humanVoiceTest?.verdict === "PASSES"
       ? "Human Voice Test passed."
-      : "Human Voice Test: review flagged lines if needed.";
+      : "";
 
   const recLabel = OUTPUT_TYPES.find(t => t.id === recommendedId)?.label || recommendedId;
   const wrapReady =
@@ -2793,6 +2831,21 @@ function PreWrapOutputGate({
     const b = OUTPUT_TYPES.find(t => t.id === selectedIds[1])?.label || selectedIds[1];
     return `Start Wrap with ${a} and ${b}`;
   })();
+
+  // CO_029 F1: plain-language descriptions for each flagged gate, matching
+  // the Inspector's vocabulary so the user sees consistent copy on both
+  // surfaces.
+  const flagDescription = (gateName: string): string => {
+    const name = (gateName || "").toLowerCase();
+    if (name.includes("dedup")) return "Repeated ideas. Tighten or cut duplicates.";
+    if (name.includes("research") || name.includes("validation")) return "Unverified claim. Add a source or soften the claim.";
+    if (name.includes("voice") || name.includes("human voice")) return "A few lines drift from your voice. Rewrite or cut them.";
+    if (name.includes("engagement") || name.includes("hook")) return "The opening could hit harder. Rewrite the hook.";
+    if (name.includes("slop")) return "AI-sounding language detected. Humanize the flagged lines.";
+    if (name.includes("editorial")) return "A section needs tightening. Cut what does not earn its place.";
+    if (name.includes("perspective") || name.includes("risk")) return "A perspective gap. Address the counterargument.";
+    return `${gateName} needs attention.`;
+  };
 
   const categories: { key: PreWrapPickCategory; title: string; items: { id: string; label: string }[] }[] = [
     { key: "Content", title: "Content", items: PRE_WRAP_PICK_GROUPS.Content },
@@ -2834,48 +2887,310 @@ function PreWrapOutputGate({
           boxSizing: "border-box" as const,
         }}
       >
-        <h1 style={{
-          fontSize: "clamp(22px, 4vw, 28px)", fontWeight: 700, color: "var(--fg)",
-          margin: "0 0 8px", fontFamily: FONT, letterSpacing: "-0.02em",
+        {/* CO_029 F2: an eyebrow above the h1 anchors context. The h1 is the
+            decision. The lede is status. The meta line is confirmation. */}
+        <div style={{
+          fontSize: 10, fontWeight: 700, color: draftNeedsAttention ? "#9A7030" : "var(--fg-3)",
+          letterSpacing: "0.14em", textTransform: "uppercase" as const,
+          marginBottom: 8, fontFamily: FONT,
         }}>
-          Where is this going?
+          {draftNeedsAttention ? "Pre-Wrap gate" : "Pre-Wrap gate · Review complete"}
+        </div>
+        <h1 style={{
+          fontSize: "clamp(24px, 4.2vw, 30px)", fontWeight: 700, color: "var(--fg)",
+          margin: "0 0 10px", fontFamily: FONT, letterSpacing: "-0.02em",
+          lineHeight: 1.15,
+        }}>
+          {draftNeedsAttention ? "Draft needs attention" : "Where is this going?"}
         </h1>
-        <p style={{ fontSize: 13, color: "var(--fg-2)", margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT }}>
+        <p style={{
+          fontSize: 15, color: "var(--fg-2)", margin: "0 0 6px",
+          lineHeight: 1.55, fontFamily: FONT, maxWidth: 640,
+        }}>
           {reviewStatusLine}
         </p>
         {hvtLine ? (
-          <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT }}>
+          <p style={{
+            fontSize: 13, color: "var(--fg-3)", margin: "0 0 18px",
+            lineHeight: 1.55, fontFamily: FONT,
+          }}>
             {hvtLine}
           </p>
-        ) : null}
-        <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 22px", lineHeight: 1.5, fontFamily: FONT }}>
-          Select exactly one Catalog format to start Wrap, or turn on Add another format and pick two.
-        </p>
+        ) : (
+          <div style={{ marginBottom: 18 }} />
+        )}
 
-        <button
-          type="button"
-          onClick={() => onPickFormat(recommendedId)}
+        {/* CO_029 F1: flagged items are visible on the page itself. Each row
+            names the gate and proposes a fix. No chat round-trip required.
+            CO_029 F9: the sidebar "What needs fixing?" chip focuses this
+            card via the ew-focus-flagged-items event (see effect below). */}
+        {draftNeedsAttention && (
+          <div
+            id="pre-wrap-flagged-items"
+            style={{
+              marginBottom: 20,
+              border: `1px solid ${flaggedPulse ? "rgba(245,198,66,0.95)" : "rgba(245,198,66,0.35)"}`,
+              borderRadius: 10,
+              background: "rgba(245,198,66,0.05)",
+              overflow: "hidden",
+              boxShadow: flaggedPulse ? "0 0 0 3px rgba(245,198,66,0.25)" : "none",
+              transition: "box-shadow 0.35s ease, border-color 0.35s ease",
+            }}
+          >
+            <div style={{
+              padding: "10px 14px",
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase" as const,
+              color: "#9A7030",
+              background: "rgba(245,198,66,0.08)",
+              borderBottom: "1px solid rgba(245,198,66,0.25)",
+              fontFamily: FONT,
+            }}>
+              Flagged items ({nonPassGates.length})
+            </div>
+            <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+              {nonPassGates.map((g, i) => (
+                <li
+                  key={g.name}
+                  style={{
+                    padding: "10px 14px",
+                    borderTop: i === 0 ? "none" : "1px solid rgba(245,198,66,0.2)",
+                    fontFamily: FONT,
+                  }}
+                >
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--fg)", marginBottom: 2 }}>
+                    {g.name}
+                  </div>
+                  <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                    {flagDescription(g.name)}
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <div style={{
+              display: "flex",
+              gap: 8,
+              padding: "10px 14px",
+              borderTop: "1px solid rgba(245,198,66,0.25)",
+              background: "rgba(245,198,66,0.04)",
+            }}>
+              <button
+                type="button"
+                onClick={() => window.__ewSetWorkStage?.("Edit")}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: FONT,
+                  border: "1px solid var(--gold-bright, #F5C642)",
+                  background: "var(--gold-bright, #F5C642)",
+                  color: "var(--bg)",
+                  cursor: "pointer",
+                }}
+              >
+                Return to Draft
+              </button>
+              <button
+                type="button"
+                onClick={onRepairPipeline}
+                style={{
+                  padding: "8px 14px",
+                  borderRadius: 8,
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: FONT,
+                  border: "1px solid var(--glass-border)",
+                  background: "transparent",
+                  color: "var(--fg-2)",
+                  cursor: "pointer",
+                }}
+              >
+                Let Reed fix it
+              </button>
+            </div>
+          </div>
+        )}
+
+        {!draftNeedsAttention && (
+          <>
+            {/* CO_029 F4A: explain what Wrap does on first use. One line, no
+                more. */}
+            <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 6px", lineHeight: 1.5, fontFamily: FONT, fontStyle: "italic" }}>
+              Wrap formats and delivers your piece for the channel you choose.
+            </p>
+            <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 22px", lineHeight: 1.5, fontFamily: FONT }}>
+              Select exactly one Catalog format to start Wrap, or turn on Add another format and pick two.
+            </p>
+          </>
+        )}
+
+        {/* CO_029 F4B: Reed's recommendation is the primary choice on this
+            screen. It carries the gold band, a Reed attribution, and a clear
+            primary action. The category grids below are alternates, not peers. */}
+        <div
           style={{
+            position: "relative" as const,
             width: "100%",
             marginBottom: 28,
-            padding: "14px 16px",
-            borderRadius: 12,
-            border: "2px dashed rgba(245,198,66,0.55)",
-            background: "rgba(245,198,66,0.06)",
+            padding: "20px 22px",
+            borderRadius: 16,
+            border: "2px solid rgba(245,198,66,0.85)",
+            background:
+              "linear-gradient(180deg, rgba(245,198,66,0.14) 0%, rgba(245,198,66,0.06) 100%)",
             fontFamily: FONT,
-            textAlign: "left" as const,
-            cursor: "pointer",
+            boxShadow: "0 10px 28px rgba(245,198,66,0.18), 0 2px 6px rgba(0,0,0,0.04)",
             boxSizing: "border-box" as const,
           }}
         >
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "#9A7030", marginBottom: 6, textTransform: "uppercase" as const }}>
-            Reed recommends (tap to select)
+          <div style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginBottom: 12,
+          }}>
+            <span style={{
+              display: "inline-block",
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              background: "var(--gold-bright, #F5C642)",
+              boxShadow: "0 0 0 4px rgba(245,198,66,0.18)",
+            }} />
+            <span style={{
+              fontSize: 10,
+              fontWeight: 700,
+              letterSpacing: "0.14em",
+              color: "#8A6220",
+              textTransform: "uppercase" as const,
+            }}>
+              Reed's Recommendation
+            </span>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)" }}>{recLabel}</div>
-          <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 6, lineHeight: 1.45 }}>
-            Suggestion only. Your pick in the grids below uses the gold selected style.
+
+          <div style={{
+            fontSize: 13,
+            color: "var(--fg-2)",
+            lineHeight: 1.5,
+            marginBottom: 6,
+          }}>
+            Based on this piece, the strongest fit is
           </div>
-        </button>
+
+          <div style={{
+            fontSize: 28,
+            fontWeight: 700,
+            color: "var(--fg)",
+            letterSpacing: "-0.015em",
+            lineHeight: 1.15,
+            marginBottom: 16,
+          }}>
+            {recLabel}
+          </div>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" as const }}>
+            <button
+              type="button"
+              onClick={() => onPickFormat(recommendedId)}
+              style={{
+                padding: "12px 20px",
+                borderRadius: 10,
+                border: "1px solid var(--gold-bright, #F5C642)",
+                background: "var(--gold-bright, #F5C642)",
+                color: "var(--bg)",
+                fontSize: 13,
+                fontWeight: 700,
+                fontFamily: FONT,
+                cursor: "pointer",
+                boxShadow: "0 4px 10px rgba(245,198,66,0.25)",
+              }}
+            >
+              Use {recLabel}
+            </button>
+            <span style={{
+              alignSelf: "center",
+              fontSize: 11,
+              color: "var(--fg-3)",
+              lineHeight: 1.45,
+            }}>
+              Or pick a different format below.
+            </span>
+          </div>
+        </div>
+
+        {/* CO_029 F5: Templates are a first-class category, rendered at the
+            top of the grid. When the user has none saved, this row still
+            appears so the behavior is discoverable. */}
+        <div style={{ marginBottom: 28 }}>
+          <div style={{
+            fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "var(--fg-3)",
+            marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
+            display: "flex", alignItems: "center", gap: 8,
+          }}>
+            Your templates
+            <span style={{
+              fontSize: 9, fontWeight: 600, color: "#8A6220",
+              background: "rgba(245,198,66,0.12)",
+              border: "1px solid rgba(245,198,66,0.25)",
+              padding: "1px 6px", borderRadius: 99,
+              letterSpacing: "0.05em",
+            }}>
+              Saved patterns
+            </span>
+          </div>
+          {userTemplates && userTemplates.length > 0 ? (
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+              gap: 10,
+            }}>
+              {userTemplates.map(t => {
+                const isSel = selectedIds.includes(t.id);
+                return (
+                  <button
+                    key={t.id}
+                    type="button"
+                    aria-pressed={isSel}
+                    onClick={() => onPickFormat(t.id)}
+                    style={{
+                      ...baseCard,
+                      ...(isSel
+                        ? {
+                          border: "2px solid var(--gold-bright, #F5C642)",
+                          background: "rgba(245,198,66,0.18)",
+                          boxShadow: "0 4px 18px rgba(245,198,66,0.15)",
+                        }
+                        : {}),
+                    }}
+                  >
+                    {isSel ? <PreWrapCornerCheck /> : null}
+                    <span style={{ paddingRight: isSel ? 24 : 0 }}>{t.label}</span>
+                    {t.subtitle ? (
+                      <span style={{ fontSize: 10, fontWeight: 500, color: "var(--fg-3)" }}>
+                        {t.subtitle}
+                      </span>
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div style={{
+              padding: "14px 16px",
+              borderRadius: 10,
+              border: "1px dashed var(--glass-border)",
+              background: "var(--glass-card)",
+              fontSize: 12,
+              color: "var(--fg-3)",
+              lineHeight: 1.5,
+              fontFamily: FONT,
+            }}>
+              No templates saved yet. Use the same format twice and Reed will offer to save it here as a reusable pattern.
+            </div>
+          )}
+        </div>
 
         {categories.map(({ key, title, items }) => (
           <div key={key} style={{ marginBottom: 28 }}>
@@ -3378,6 +3693,17 @@ export default function WorkSession() {
   const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { voiceDnaMd, brandDnaMd, methodDnaMd } = useUserDNA(user?.id);
+
+  // CO_029 F8: push a persistent system notice into the Reed thread.
+  // Pair this with a toast when the user would want to scroll back later
+  // to see what happened (fixes applied, pipeline errors, parked sessions).
+  const pushReedSystem = useCallback((text: string, tone: "info" | "success" | "error" = "info") => {
+    window.dispatchEvent(new CustomEvent("ew-reed-system-message", { detail: { text, tone } }));
+  }, []);
+
+  // CO_029 F3: responsive verb. "Tap" on touch devices, "Click" on desktop.
+  const isMobileDevice = useMobile();
+  const tapOrClick = isMobileDevice ? "Tap" : "Click";
 
   // ── Restore persisted session on mount ────────────────────────
   const restored = useRef(false);
@@ -5041,11 +5367,12 @@ Propose the change you would make. Three parts, in order: (1) what will change (
       // Pipeline complete - no toast, results show in Review stage silently
     } catch (err: any) {
       toast("Pipeline encountered an error. Try again.", "error");
+      pushReedSystem("Quality pipeline errored. The draft did not reach Review.", "error");
       console.error("[WorkSession][pipeline]", err);
     } finally {
       setPipelineRunning(false);
     }
-  }, [draft, user, voiceDnaMd, brandDnaMd, methodDnaMd, outputId, outlineRows, messages, toast, goToStage, handleFormatAdaptation, outputType, projectId, backgroundPipelineRun, draftChangedSinceBackground]);
+  }, [draft, user, voiceDnaMd, brandDnaMd, methodDnaMd, outputId, outlineRows, messages, toast, pushReedSystem, goToStage, handleFormatAdaptation, outputType, projectId, backgroundPipelineRun, draftChangedSinceBackground]);
 
   // ── REVIEW: Export all (save to Catalog first, then hand off to Wrap) ──
   const handleExportAll = useCallback(async (forcedOutputType?: string | string[]) => {
@@ -5416,9 +5743,11 @@ Propose the change you would make. Three parts, in order: (1) what will change (
       });
       if (error) throw error;
       toast("Parked in the Pipeline.", "success");
+      pushReedSystem("Session parked in the Pipeline. Pick it up from Resources.", "success");
     } catch (err) {
       console.error("[WorkSession][park-new-session]", err);
       toast("Could not park in the Pipeline. Try again.", "error");
+      pushReedSystem("Parking the session failed. Try again or export manually.", "error");
       setNewSessionParkBusy(false);
       return;
     }
@@ -5428,6 +5757,7 @@ Propose the change you would make. Three parts, in order: (1) what will change (
   }, [
     user?.id,
     toast,
+    pushReedSystem,
     outlineRows,
     messages,
     resolvedSessionTitle,
@@ -5586,12 +5916,15 @@ Propose the change you would make. Three parts, in order: (1) what will change (
         }
 
         toast("Draft updated.");
+        pushReedSystem("Draft updated by Reed.", "success");
       } else {
         toast("No changes detected.");
+        pushReedSystem("Reed ran the fix. No changes were needed.", "info");
       }
     } catch (err: any) {
       console.error("[handleReviewFix]", err);
       toast("Fix failed. Try again.", "error");
+      pushReedSystem("Fix failed. Your draft is unchanged.", "error");
       throw err;
     }
   }, [draft, buildConvSummary, outputType, user?.id, voiceDnaMd, brandDnaMd, activeReviewTab, toast, preWrapPresentationMins, talkDuration, structuredIntakePayload]);
@@ -5902,8 +6235,8 @@ Propose the change you would make. Three parts, in order: (1) what will change (
                       </div>
                       <div style={{ fontSize: 10, color: "var(--fg-3)", lineHeight: 1.45 }}>
                         {hasCatalogOutputType
-                          ? `Set for ${typeLabel}. Tap to adjust.`
-                          : "Tap to adjust."}
+                          ? `Set for ${typeLabel}. ${tapOrClick} to adjust.`
+                          : `${tapOrClick} to adjust.`}
                       </div>
                     </button>
                     {editWordTargetEditorOpen ? (
@@ -6614,6 +6947,7 @@ Propose the change you would make. Three parts, in order: (1) what will change (
             onPresentationMinutesChange={setPreWrapPresentationMins}
             talkDuration={talkDuration}
             onTalkDurationChange={setTalkDuration}
+            userTemplates={[]}
           />
         ) : (
           <StageReview

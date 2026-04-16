@@ -7,9 +7,14 @@ export const MARKETING_NUMBERS = {
   voiceDnaTarget: 95,
 } as const;
 
-export const APP_VERSION = "Beta 1.09";
+export const APP_VERSION = "Beta 1.10";
 
-export const REED_STAGE_CHIPS: Record<string, Array<{ label: string; prefill: string }>> = {
+// CO_029 F9: chips can now declare a non-chat action. When action is set,
+// the shell dispatches a window event instead of prefilling the composer,
+// so "What needs fixing?" focuses the on-page flagged-items card.
+export type ReedStageChip = { label: string; prefill: string; action?: "show_flagged_items" };
+
+export const REED_STAGE_CHIPS: Record<string, ReedStageChip[]> = {
   Watch: [
     { label: "Turn signal into brief", prefill: "Turn the strongest signal this week into a content brief for me." },
     { label: "What should I write about?", prefill: "Based on this week's signals, what's the most timely thing for me to write about?" },
@@ -34,7 +39,7 @@ export const REED_STAGE_CHIPS: Record<string, Array<{ label: string; prefill: st
     { label: "Stronger opening", prefill: "Rewrite the opening paragraph to pass the 7-second hook test. Keep my voice." },
   ],
   Review: [
-    { label: "What needs fixing?", prefill: "What are the specific issues the checkpoints flagged? Tell me in plain language." },
+    { label: "What needs fixing?", prefill: "", action: "show_flagged_items" },
     { label: "Final read", prefill: "Do a final read of this piece as an adversarial editor. What would make someone stop reading?" },
     { label: "Pull the best line", prefill: "Pull the single most quotable line from this piece for social." },
     { label: "Is this ready?", prefill: "Is this ready to publish? Give me your honest assessment in two sentences." },

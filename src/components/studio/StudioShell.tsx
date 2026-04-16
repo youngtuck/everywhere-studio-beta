@@ -267,7 +267,27 @@ export default function StudioShell() {
   const [feedbackContent, setFeedbackContent] = useState<React.ReactNode | null>(null);
   const [reedPrefill, setReedPrefill] = useState("");
   const [reedChipRequest, setReedChipRequest] = useState<{ id: number; text: string } | null>(null);
-  const [reedThread, setReedThread] = useState<Array<{ type: "user" | "reed" | "note"; text: string; from?: string; to?: string }>>([]);
+  // CO_029 F8: "system" messages persist in the Inspector thread. These are
+  // events that would otherwise live only in a toast (draft updated, fix
+  // applied, pipeline error). Keeping them inline so the user can scroll
+  // back and see what happened during the session.
+  const [reedThread, setReedThread] = useState<Array<{ type: "user" | "reed" | "note" | "system"; text: string; from?: string; to?: string; tone?: "info" | "success" | "error" }>>([]);
+
+  // CO_029 F8: any part of the studio can fire "ew-reed-system-message"
+  // and the message lands in the Reed thread as a persistent system notice.
+  // Opt-in: only events that the user would want to scroll back to. Trivial
+  // toasts stay transient.
+  useEffect(() => {
+    const onMsg = (evt: Event) => {
+      const detail = (evt as CustomEvent<{ text?: string; tone?: "info" | "success" | "error" }>).detail;
+      const text = (detail?.text || "").trim();
+      if (!text) return;
+      const tone = detail?.tone || "info";
+      setReedThread(prev => [...prev, { type: "system", text, tone }]);
+    };
+    window.addEventListener("ew-reed-system-message", onMsg);
+    return () => window.removeEventListener("ew-reed-system-message", onMsg);
+  }, []);
 
   const studioGlassDense =
     location.pathname.startsWith("/studio/outputs") ||
@@ -620,12 +640,15 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
               className="liquid-glass-btn-gold"
               onClick={() => {
                 const chip = firstMoveChip;
-                if (chip) {
-                  if (stageKey === "Edit") {
-                    setReedChipRequest({ id: Date.now(), text: chip.prefill });
-                  } else {
-                    setReedPrefill(chip.prefill);
-                  }
+                if (!chip) return;
+                if ((chip as { action?: string }).action === "show_flagged_items") {
+                  window.dispatchEvent(new CustomEvent("ew-focus-flagged-items"));
+                  return;
+                }
+                if (stageKey === "Edit") {
+                  setReedChipRequest({ id: Date.now(), text: chip.prefill });
+                } else {
+                  setReedPrefill(chip.prefill);
                 }
               }}
               style={{
@@ -689,12 +712,19 @@ function ReedPanel() {
     });
   }, []);
 
-  const runChip = useCallback((text: string) => {
-    if (stageKey === "Edit") {
-      setReedChipRequest({ id: Date.now(), text });
+  // CO_029 F9: chips with an action do not prefill chat. They dispatch
+  // a window event the Work session listens for, so "What needs fixing?"
+  // focuses the on-page flagged-items card instead of starting a chat loop.
+  const runChip = useCallback((chip: { prefill: string; action?: string }) => {
+    if (chip.action === "show_flagged_items") {
+      window.dispatchEvent(new CustomEvent("ew-focus-flagged-items"));
       return;
     }
-    prefillAndFocus(text);
+    if (stageKey === "Edit") {
+      setReedChipRequest({ id: Date.now(), text: chip.prefill });
+      return;
+    }
+    prefillAndFocus(chip.prefill);
   }, [prefillAndFocus, setReedChipRequest, stageKey]);
 
   // Same path as stage chips: external pages call setReedPrefill; we only fill the one composer.
@@ -727,7 +757,7 @@ function ReedPanel() {
             <button
               key={ci}
               type="button"
-              onClick={() => runChip(chip.prefill)}
+              onClick={() => runChip(chip)}
               style={{
                 fontSize: 10, padding: "4px 10px", borderRadius: 99,
                 background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.1)",
@@ -779,6 +809,35 @@ function ReedPanel() {
                   borderRadius: "0 8px 8px 8px", padding: "8px 10px",
                   fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: "85%",
                 }}>{m.text}</div>
+              </div>
+            );
+          }
+          // CO_029 F8: persisted system notice. Stays in the thread after
+          // the transient toast disappears, so the user can scroll back.
+          if (m.type === "system") {
+            const dot = m.tone === "error"
+              ? "var(--danger, #D64545)"
+              : m.tone === "info"
+                ? "rgba(107,127,242,0.85)"
+                : "var(--gold-dark, #C8A96E)";
+            return (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: 8,
+                marginBottom: 8, padding: "6px 10px",
+                background: "rgba(0,0,0,0.03)",
+                border: "1px dashed rgba(0,0,0,0.12)",
+                borderRadius: 6,
+              }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  background: dot, flexShrink: 0,
+                }} />
+                <span style={{
+                  fontSize: 10, color: "var(--fg-3)",
+                  fontFamily: "var(--font-mono, 'DM Mono', monospace)",
+                  letterSpacing: "0.04em", flexShrink: 0,
+                }}>SYSTEM</span>
+                <span style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.45 }}>{m.text}</span>
               </div>
             );
           }
@@ -924,6 +983,31 @@ function ReedPanelInputOnly() {
                     borderRadius: "8px 0 8px 8px", padding: "8px 10px",
                     fontSize: 11, color: "var(--fg)", lineHeight: 1.6, maxWidth: "85%",
                   }}>{m.text}</div>
+                </div>
+              );
+            }
+            // CO_029 F8: persisted system notice in the floating Inspector.
+            if (m.type === "system") {
+              const dot = m.tone === "error"
+                ? "var(--danger, #D64545)"
+                : m.tone === "info"
+                  ? "rgba(107,127,242,0.85)"
+                  : "var(--gold-dark, #C8A96E)";
+              return (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  marginBottom: 8, padding: "6px 10px",
+                  background: "rgba(0,0,0,0.03)",
+                  border: "1px dashed rgba(0,0,0,0.12)",
+                  borderRadius: 6,
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: dot, flexShrink: 0 }} />
+                  <span style={{
+                    fontSize: 10, color: "var(--fg-3)",
+                    fontFamily: "var(--font-mono, 'DM Mono', monospace)",
+                    letterSpacing: "0.04em", flexShrink: 0,
+                  }}>SYSTEM</span>
+                  <span style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.45 }}>{m.text}</span>
                 </div>
               );
             }
