@@ -14,6 +14,57 @@ import { REED_STAGE_CHIPS } from "../../lib/constants";
 import { useWorkStageFromShell } from "../../hooks/useWorkStageBridge";
 import { useWorkSessionContext } from "../../hooks/useWorkSessionContext";
 import { ReedProfileIcon } from "./ReedProfileIcon";
+import { useAuth } from "../../context/AuthContext";
+import { fetchWithRetry } from "../../lib/retry";
+
+// Vite exposes the API base at build time; align with WorkSession's API_BASE.
+const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+
+// CO_020 Part 1: the Ask Reed panel input was accepting text but never firing.
+// This helper posts a side-channel message to /api/chat so the panel receives
+// a real Reed response with current session context. The main stage
+// conversation is untouched; the panel runs its own thread.
+type AskReedMsg = { type: "user" | "reed" | "note"; text: string; from?: string; to?: string };
+
+async function askReedPanel(params: {
+  text: string;
+  priorThread: AskReedMsg[];
+  stageKey: string;
+  userId?: string;
+  userName?: string;
+}): Promise<string> {
+  const history = params.priorThread
+    .filter(m => m.type === "user" || m.type === "reed")
+    .map(m => ({ role: m.type === "reed" ? "assistant" : "user", content: m.text }));
+
+  const contextPrefix = `[Ask Reed side panel, stage: ${params.stageKey}. The user is stepping outside the main stage flow to talk to you directly. Respond with full Reed capability. Do not emit READY_TO_GENERATE from this channel; it is reserved for the main stage.]\n\n`;
+
+  const messages = [
+    ...history,
+    { role: "user" as const, content: contextPrefix + params.text },
+  ];
+
+  const res = await fetchWithRetry(`${API_BASE}/api/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      messages,
+      outputType: "freestyle",
+      userId: params.userId,
+      userName: params.userName,
+      systemMode: "CONTENT_PRODUCTION",
+    }),
+  }, { timeout: 60000 });
+
+  if (!res.ok) throw new Error(`Ask Reed API error ${res.status}`);
+  const data = await res.json();
+  const raw = (data?.reply ?? "") as string;
+  return raw
+    .replace(/\u2014/g, ",")
+    .replace(/\u2013/g, ",")
+    .replace(/\n?READY_TO_GENERATE\s*$/i, "")
+    .trim();
+}
 
 export { useShell } from "./StudioShellContext";
 
@@ -693,8 +744,10 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
 
 function ReedPanel() {
   const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest } = useShell();
+  const { user, displayName } = useAuth();
   const location = useLocation();
   const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const workStage = useWorkStageFromShell();
@@ -738,15 +791,30 @@ function ReedPanel() {
   // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [reedThread.length]);
+  }, [reedThread.length, sending]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  // CO_020 Part 1: fire the panel message at /api/chat so Reed responds.
+  const handleSend = async () => {
+    if (!input.trim() || sending) return;
     const message = input.trim();
     setInput("");
-
-    // Add to thread (no fake reply)
+    const priorThread = reedThread as AskReedMsg[];
     setReedThread(prev => [...prev, { type: "user", text: message }]);
+    setSending(true);
+    try {
+      const reply = await askReedPanel({
+        text: message,
+        priorThread,
+        stageKey,
+        userId: user?.id,
+        userName: displayName || undefined,
+      });
+      setReedThread(prev => [...prev, { type: "reed", text: reply || "I'm here. Say more." }]);
+    } catch {
+      setReedThread(prev => [...prev, { type: "reed", text: "Something blocked that message on the way to me. Try again in a moment." }]);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -852,6 +920,18 @@ function ReedPanel() {
             </div>
           );
         })}
+        {sending && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "flex-start" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", flexShrink: 0, width: 24, paddingTop: 1 }}>
+              <ReedProfileIcon size={18} title="Reed" />
+            </div>
+            <div style={{
+              background: "rgba(74,144,217,0.06)", border: "1px solid rgba(74,144,217,0.2)",
+              borderRadius: "0 8px 8px 8px", padding: "8px 10px",
+              fontSize: 11, color: "var(--fg-3)", lineHeight: 1.6, fontStyle: "italic",
+            }}>Reed is thinking...</div>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
       <div style={{
@@ -873,8 +953,9 @@ function ReedPanel() {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder="Ask Reed..."
+          placeholder={sending ? "Reed is thinking..." : "Ask Reed..."}
           aria-label="Ask Reed"
+          disabled={sending}
           style={{
             flex: 1,
             minWidth: 0,
@@ -885,20 +966,21 @@ function ReedPanel() {
             fontSize: 12,
             color: "var(--fg)",
             fontFamily: "var(--font)",
+            opacity: sending ? 0.6 : 1,
           }}
         />
         <button
           type="button"
           onClick={handleSend}
-          disabled={!input.trim()}
+          disabled={!input.trim() || sending}
           aria-label="Send message to Reed"
           style={{
             width: 28,
             height: 28,
             borderRadius: 6,
-            background: input.trim() ? "var(--fg)" : "rgba(0,0,0,0.06)",
+            background: input.trim() && !sending ? "var(--fg)" : "rgba(0,0,0,0.06)",
             border: "none",
-            cursor: input.trim() ? "pointer" : "not-allowed",
+            cursor: input.trim() && !sending ? "pointer" : "not-allowed",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -906,7 +988,7 @@ function ReedPanel() {
             flexShrink: 0,
           }}
         >
-          <svg style={{ width: 11, height: 11, stroke: input.trim() ? "#F5F3EF" : "var(--fg-3)", strokeWidth: 2.5, fill: "none" }} viewBox="0 0 24 24">
+          <svg style={{ width: 11, height: 11, stroke: input.trim() && !sending ? "#F5F3EF" : "var(--fg-3)", strokeWidth: 2.5, fill: "none" }} viewBox="0 0 24 24">
             <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
         </button>
@@ -917,8 +999,10 @@ function ReedPanel() {
 
 function ReedPanelInputOnly() {
   const { reedThread, setReedThread, reedPrefill, setReedPrefill } = useShell();
+  const { user, displayName } = useAuth();
   const location = useLocation();
   const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const workStage = useWorkStageFromShell();
@@ -944,13 +1028,30 @@ function ReedPanelInputOnly() {
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [reedThread.length]);
+  }, [reedThread.length, sending]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  // CO_020 Part 1: the Watch/Wrap side panel sends to /api/chat too.
+  const handleSend = async () => {
+    if (!input.trim() || sending) return;
     const message = input.trim();
     setInput("");
+    const priorThread = reedThread as AskReedMsg[];
     setReedThread(prev => [...prev, { type: "user", text: message }]);
+    setSending(true);
+    try {
+      const reply = await askReedPanel({
+        text: message,
+        priorThread,
+        stageKey,
+        userId: user?.id,
+        userName: displayName || undefined,
+      });
+      setReedThread(prev => [...prev, { type: "reed", text: reply || "I'm here. Say more." }]);
+    } catch {
+      setReedThread(prev => [...prev, { type: "reed", text: "Something blocked that message on the way to me. Try again in a moment." }]);
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -1013,6 +1114,18 @@ function ReedPanelInputOnly() {
             }
             return null;
           })}
+          {sending && (
+            <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "flex-start" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "center", flexShrink: 0, width: 24, paddingTop: 1 }}>
+                <ReedProfileIcon size={18} title="Reed" />
+              </div>
+              <div style={{
+                background: "rgba(74,144,217,0.06)", border: "1px solid rgba(74,144,217,0.2)",
+                borderRadius: "0 8px 8px 8px", padding: "8px 10px",
+                fontSize: 11, color: "var(--fg-3)", lineHeight: 1.6, fontStyle: "italic",
+              }}>Reed is thinking...</div>
+            </div>
+          )}
           <div ref={bottomRef} />
         </div>
       )}
@@ -1034,8 +1147,9 @@ function ReedPanelInputOnly() {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder={`Ask Reed about ${stageKey === "Watch" ? "this week's signals" : "your current session"}...`}
+          placeholder={sending ? "Reed is thinking..." : `Ask Reed about ${stageKey === "Watch" ? "this week's signals" : "your current session"}...`}
           aria-label="Ask Reed"
+          disabled={sending}
           style={{
             flex: 1,
             minWidth: 0,
@@ -1046,20 +1160,21 @@ function ReedPanelInputOnly() {
             fontSize: 12,
             color: "var(--fg)",
             fontFamily: "var(--font)",
+            opacity: sending ? 0.6 : 1,
           }}
         />
         <button
           type="button"
           onClick={handleSend}
-          disabled={!input.trim()}
+          disabled={!input.trim() || sending}
           aria-label="Send message to Reed"
           style={{
             width: 28,
             height: 28,
             borderRadius: 6,
-            background: input.trim() ? "var(--fg)" : "rgba(0,0,0,0.06)",
+            background: input.trim() && !sending ? "var(--fg)" : "rgba(0,0,0,0.06)",
             border: "none",
-            cursor: input.trim() ? "pointer" : "not-allowed",
+            cursor: input.trim() && !sending ? "pointer" : "not-allowed",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
@@ -1067,7 +1182,7 @@ function ReedPanelInputOnly() {
             flexShrink: 0,
           }}
         >
-          <svg style={{ width: 11, height: 11, stroke: input.trim() ? "#F5F3EF" : "var(--fg-3)", strokeWidth: 2.5, fill: "none" }} viewBox="0 0 24 24">
+          <svg style={{ width: 11, height: 11, stroke: input.trim() && !sending ? "#F5F3EF" : "var(--fg-3)", strokeWidth: 2.5, fill: "none" }} viewBox="0 0 24 24">
             <line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" />
           </svg>
         </button>
