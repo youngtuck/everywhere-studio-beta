@@ -1249,7 +1249,7 @@ function StageIntake({
             textAlign: "center" as const,
             lineHeight: 1.25,
           }}>
-            {composerSeed ? "Let's work on this." : firstName ? `Hey ${firstName}, what are we working on?` : "What are we working on?"}
+            {firstName ? `Hey ${firstName}, what are we working on?` : "What are we working on?"}
           </div>
 
           {/* Centered input bar */}
@@ -5155,9 +5155,7 @@ export default function WorkSession() {
 
     if (wantsNew) {
       sessionStorage.removeItem("ew-new-session");
-      if (!signalText) {
-        setNewSessionParkConfirmOpen(true);
-      }
+      setNewSessionParkConfirmOpen(true);
     }
 
     if (!signalText) return;

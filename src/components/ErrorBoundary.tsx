@@ -44,11 +44,12 @@ export default class ErrorBoundary extends Component<Props, State> {
               fontSize: 13,
               fontWeight: 700,
               letterSpacing: "0.15em",
+              textTransform: "uppercase" as const,
               color: "var(--gold-dark, #C8961A)",
               marginBottom: 24,
             }}
           >
-            EVERYWHERE Studio
+            EVERYWHERE STUDIO
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>
             Something went wrong

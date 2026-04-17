@@ -50,9 +50,14 @@ export default function MarketingBuiltForCta({ onRequestAccess, onSignIn }: Mark
       >
         {CTA_BODY}
       </p>
-      <button type="button" className="xp-btn xp-btn-liquid" onClick={onSignIn} style={{ marginBottom: 16 }}>
-        Sign In
+      <button type="button" className="xp-btn xp-btn-liquid" onClick={onRequestAccess} style={{ marginBottom: 16 }}>
+        Request Access
       </button>
+      <div style={{ marginTop: 20 }}>
+        <button type="button" className="xp-btn xp-btn-glass" onClick={onSignIn}>
+          Sign In
+        </button>
+      </div>
       <div style={{ marginTop: 40 }}>
         <a href="mailto:beta@everywherestudio.ai" className="xp-mono" style={{ fontSize: 12, color: "var(--xp-dim-dark)", textDecoration: "none" }}>
           beta@everywherestudio.ai

@@ -80,14 +80,14 @@ html:has(.studio-app-shell--viewport-lock) #root {
 }
 
 .studio-app-shell--document-scroll .studio-main-inner.studio-stage-scroll {
-  flex: 1 1 auto;
+  flex: 0 1 auto;
   min-height: 0;
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: stretch;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: visible;
   overscroll-behavior-y: auto;
 }
 

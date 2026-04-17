@@ -414,14 +414,13 @@ export default function OnboardingPage() {
   return (
     <div
       style={{
-        height: "100vh",
+        minHeight: "100vh",
         background: "#07090f",
         color: "#ffffff",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         padding: "32px 20px 40px",
-        overflow: "hidden",
         backgroundImage: "radial-gradient(ellipse at 30% 40%, rgba(74,144,217,0.04) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(200,169,110,0.03) 0%, transparent 45%)",
       }}
     >
@@ -479,13 +478,13 @@ export default function OnboardingPage() {
             <div style={{ textAlign: "center", marginBottom: 32 }}>
               <span style={{ letterSpacing: "-1px", fontFamily: "'Afacad Flux', sans-serif", display: "inline-flex", alignItems: "baseline" }}>
                 <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>EVERYWHERE</span>
-                <span style={{ color: "#0D1B2A", fontWeight: 300, fontSize: 14, lineHeight: 1 }}>Studio<span style={{ color: "#0D1B2A", fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>™</span></span>
+                <span style={{ color: "#0D1B2A", fontWeight: 300, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>STUDIO<span style={{ color: "#0D1B2A", fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>™</span></span>
               </span>
             </div>
             <div
               style={{
                 height: 3,
-                background: "#DDD8CE",
+                background: "#F0EDE4",
                 borderRadius: 2,
                 overflow: "hidden",
                 marginBottom: 24,
@@ -562,7 +561,7 @@ export default function OnboardingPage() {
 
       <ProgressIndicator currentStep={Math.min(step, 5)} totalSteps={5} />
 
-      <main style={{ width: "100%", maxWidth: 640, flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <main style={{ width: "100%", maxWidth: 640, flex: 1 }}>
         {errorMessage && (
           <div
             style={{
@@ -839,12 +838,9 @@ export default function OnboardingPage() {
         )}
 
         {showStep2Interview && (
-          <div style={{ flex: 1, minHeight: 0, overflow: "hidden", display: "flex", flexDirection: "column" }}>
-            <VoiceInterviewChat
-              onComplete={({ interviewResponses }) => handleInterviewComplete({ interviewResponses })}
-              error={errorMessage}
-            />
-          </div>
+          <VoiceInterviewChat
+            onComplete={({ interviewResponses }) => handleInterviewComplete({ interviewResponses })}
+          />
         )}
 
         {showStep2Upload && (

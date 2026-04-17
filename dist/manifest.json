@@ -1,0 +1,58 @@
+{
+  "name": "EVERYWHERE Studio",
+  "short_name": "EVERYWHERE",
+  "description": "Your thinking. Composed. AI-powered content operating system for thought leaders.",
+  "start_url": "/studio/dashboard",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0D1B2A",
+  "theme_color": "#0D1B2A",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["productivity", "business"],
+  "shortcuts": [
+    {
+      "name": "New Session",
+      "short_name": "New",
+      "url": "/studio/work",
+      "description": "Start a new content session with Reed"
+    },
+    {
+      "name": "The Vault",
+      "short_name": "Vault",
+      "url": "/studio/outputs",
+      "description": "View your content library"
+    },
+    {
+      "name": "Visual Intelligence",
+      "short_name": "Visual",
+      "url": "/studio/outputs",
+      "description": "Transform content into visuals"
+    }
+  ]
+}

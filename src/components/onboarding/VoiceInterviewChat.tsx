@@ -17,13 +17,13 @@ interface VoiceInterviewChatProps {
     interviewResponses: Record<string, string>;
   }) => Promise<void> | void;
   onCancel?: () => void;
-  error?: string | null;
 }
 
 const INITIAL_PROMPT =
-  "I am going to ask you a few questions to understand how you communicate. Not what you say, how you say it. Most people do not know what they sound like, but you know more than you think.\n\nFirst thing: when people describe you, do they see you as more formal or more casual? Do you agree with them?";
+  "I am going to ask you a few questions to understand how you communicate. Not what you say, how you say it. Most people do not know what they sound like, but you know more than you think. Type anything to get started.";
 
 const QUESTION_SEQUENCE: string[] = [
+  "First thing: when people describe you, do they see you as more formal or more casual? Do you agree with them?",
   "When you are at your best in a conversation, how would you describe your energy?",
   "When you write something you are proud of, do the sentences tend to be short and punchy, long and flowing, or a mix?",
   "Do you tend to start with the point and then support it, or build up a story and arrive at the point?",
@@ -70,7 +70,7 @@ function validateResponse(text: string): boolean {
   return true;
 }
 
-export function VoiceInterviewChat({ onComplete, onCancel, error }: VoiceInterviewChatProps) {
+export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatProps) {
   const [messages, setMessages] = useState<QA[]>([
     { id: "sys-0", role: "system", content: INITIAL_PROMPT },
   ]);
@@ -171,7 +171,9 @@ export function VoiceInterviewChat({ onComplete, onCancel, error }: VoiceIntervi
     const text = input.trim();
     if (!text || loading) return;
 
-    if (!validateResponse(text)) {
+    // Skip validation for the first response (warm-up "Ready?" question)
+    const isFirstResponse = messages.length === 1 && messages[0].id === "sys-0";
+    if (!isFirstResponse && !validateResponse(text)) {
       setValidationWarning(true);
       return;
     }
@@ -190,11 +192,9 @@ export function VoiceInterviewChat({ onComplete, onCancel, error }: VoiceIntervi
   const containerStyle = {
     maxWidth: 640,
     margin: "0 auto",
-    height: "100%",
-    minHeight: 0,
+    minHeight: "calc(100vh - 140px)",
     display: "flex",
     flexDirection: "column" as const,
-    overflow: "hidden",
   };
 
   return (
@@ -284,35 +284,6 @@ export function VoiceInterviewChat({ onComplete, onCancel, error }: VoiceIntervi
         })}
         <div ref={bottomRef} />
       </div>
-
-      {error && (
-        <div style={{
-          padding: "12px 16px",
-          margin: "0 0 8px",
-          borderRadius: 10,
-          background: "rgba(248,113,113,0.12)",
-          border: "1px solid rgba(248,113,113,0.25)",
-        }}>
-          <p style={{
-            margin: 0,
-            fontFamily: "'Afacad Flux', sans-serif",
-            fontSize: 13,
-            color: "#f87171",
-            lineHeight: 1.45,
-          }}>
-            {error}
-          </p>
-          <p style={{
-            margin: "8px 0 0",
-            fontFamily: "'Afacad Flux', sans-serif",
-            fontSize: 12,
-            color: "rgba(248,113,113,0.7)",
-            lineHeight: 1.4,
-          }}>
-            Your answers are still here. Tap "Analyze responses" to try again.
-          </p>
-        </div>
-      )}
 
       <div
         style={{

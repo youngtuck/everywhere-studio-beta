@@ -895,9 +895,8 @@ export default function StudioTopBar() {
   return (
     <div className="liquid-glass" style={{
       height: 50,
-      borderRadius: 16,
-      border: "1px solid rgba(0,0,0,0.06)",
-      margin: "10px 10px 0 0",
+      borderRadius: 0,
+      borderBottom: "1px solid rgba(0,0,0,0.06)",
       display: "flex",
       alignItems: "center",
       padding: "0 16px",

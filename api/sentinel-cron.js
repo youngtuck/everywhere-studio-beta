@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const supabase = createClient(supabaseUrl, serviceRoleKey);
   const baseUrl = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
-    : "https://everywhere-studio-beta.vercel.app";
+    : "https://everywherestudio-one.vercel.app";
   const apiUrl = `${baseUrl}/api/sentinel-generate`;
 
   const defaultTopics = ["AI", "thought leadership", "executive communication", "content strategy"];
