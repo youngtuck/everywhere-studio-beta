@@ -12,6 +12,7 @@ import Logo from "../Logo";
 import NotificationBell from "./NotificationBell";
 import { REED_STAGE_CHIPS } from "../../lib/constants";
 import { useWorkStageFromShell } from "../../hooks/useWorkStageBridge";
+import { useWorkSessionContext } from "../../hooks/useWorkSessionContext";
 import { ReedProfileIcon } from "./ReedProfileIcon";
 
 export { useShell } from "./StudioShellContext";
@@ -266,7 +267,27 @@ export default function StudioShell() {
   const [feedbackContent, setFeedbackContent] = useState<React.ReactNode | null>(null);
   const [reedPrefill, setReedPrefill] = useState("");
   const [reedChipRequest, setReedChipRequest] = useState<{ id: number; text: string } | null>(null);
-  const [reedThread, setReedThread] = useState<Array<{ type: "user" | "reed" | "note"; text: string; from?: string; to?: string }>>([]);
+  // CO_029 F8: "system" messages persist in the Inspector thread. These are
+  // events that would otherwise live only in a toast (draft updated, fix
+  // applied, pipeline error). Keeping them inline so the user can scroll
+  // back and see what happened during the session.
+  const [reedThread, setReedThread] = useState<Array<{ type: "user" | "reed" | "note" | "system"; text: string; from?: string; to?: string; tone?: "info" | "success" | "error" }>>([]);
+
+  // CO_029 F8: any part of the studio can fire "ew-reed-system-message"
+  // and the message lands in the Reed thread as a persistent system notice.
+  // Opt-in: only events that the user would want to scroll back to. Trivial
+  // toasts stay transient.
+  useEffect(() => {
+    const onMsg = (evt: Event) => {
+      const detail = (evt as CustomEvent<{ text?: string; tone?: "info" | "success" | "error" }>).detail;
+      const text = (detail?.text || "").trim();
+      if (!text) return;
+      const tone = detail?.tone || "info";
+      setReedThread(prev => [...prev, { type: "system", text, tone }]);
+    };
+    window.addEventListener("ew-reed-system-message", onMsg);
+    return () => window.removeEventListener("ew-reed-system-message", onMsg);
+  }, []);
 
   const studioGlassDense =
     location.pathname.startsWith("/studio/outputs") ||
@@ -444,6 +465,84 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
       ? "Wrap"
       : workStage;
   const stageChips = REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
+  // CO_031: Reed sidebar reads the active Work session context so Reed's
+  // Take and First Move reflect where the user actually is, not a default.
+  const workCtx = useWorkSessionContext();
+  const onWorkPath = pathname.includes("/studio/work");
+  const sessionActive = workCtx.active && onWorkPath;
+
+  // Reed's Take fallback: stage-aware when a Work session is active. The
+  // generic Watch copy only applies on the Watch page.
+  const reedTakeFallback = (() => {
+    if (stageKey === "Watch") {
+      return "Run a briefing in Watch to get Reed's take on what matters this week.";
+    }
+    if (!sessionActive) {
+      return "Open a Work session and Reed will show his take on the piece as you build.";
+    }
+    switch (workCtx.stage) {
+      case "Intake":
+        if (workCtx.intakeReady) {
+          return "The intake is strong enough. Move to the outline.";
+        }
+        if (!workCtx.hasChannel || !workCtx.hasAudience) {
+          return "Channel and audience first. Reed will not draft until both are clear.";
+        }
+        return "Reed is shaping the piece with you. Keep sharpening the angle.";
+      case "Outline":
+        return "Reed is reading your outline. When the structure holds, move to the draft.";
+      case "Edit":
+        return workCtx.hasDraft
+          ? "Reed has a draft to work on. Use the chips to tighten, expand, or fix the flagged lines."
+          : "Reed is writing the draft. Give it a second.";
+      case "Review":
+        return workCtx.hasReviewed
+          ? "The piece has cleared the gates. Pick the formats you want to ship."
+          : "The piece is heading into Review. Reed will flag anything that needs a second pass.";
+      default:
+        return "Reed is ready when you are.";
+    }
+  })();
+
+  // First Move: pick the chip that matches real session progress instead of
+  // always showing index 0. In Intake, skip questions the user has already
+  // answered. Once intake is ready, point at the outline.
+  const firstMoveChip = (() => {
+    if (!sessionActive || stageKey === "Watch" || stageKey === "Wrap") {
+      return stageChips[0] ?? null;
+    }
+    if (stageKey === "Intake") {
+      if (workCtx.intakeReady) {
+        return {
+          label: "Move to the outline",
+          prefill: "My intake is ready. Draft the outline from what we have.",
+        };
+      }
+      if (!workCtx.hasChannel) {
+        return {
+          label: "Pick the channel",
+          prefill: "Where is this going? LinkedIn, newsletter, internal memo, email, something else?",
+        };
+      }
+      if (!workCtx.hasAudience) {
+        return {
+          label: "Define the audience",
+          prefill: "Who specifically is reading this, and what do they already believe about this topic before they start?",
+        };
+      }
+      // Channel + audience in hand. Walk the user toward the next sharpening
+      // question based on how many Reed questions have been asked so far.
+      const idx = Math.min(Math.max(workCtx.reedQuestionCount - 2, 0), stageChips.length - 1);
+      return stageChips[idx] ?? stageChips[0] ?? null;
+    }
+    if (stageKey === "Edit" && !workCtx.hasDraft) {
+      return {
+        label: "Waiting on the draft",
+        prefill: "Write the draft from my outline.",
+      };
+    }
+    return stageChips[0] ?? null;
+  })();
 
   useEffect(() => {
     if (!open) return;
@@ -529,7 +628,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
             }}>
               {feedbackBody ?? (
                 <p style={{ margin: 0, color: "var(--fg-2)", fontSize: 13, lineHeight: 1.6 }}>
-                  Run a briefing in Watch to get Reed's take on what matters this week.
+                  {reedTakeFallback}
                 </p>
               )}
             </div>
@@ -540,13 +639,16 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
               type="button"
               className="liquid-glass-btn-gold"
               onClick={() => {
-                const chip = stageChips[0];
-                if (chip) {
-                  if (stageKey === "Edit") {
-                    setReedChipRequest({ id: Date.now(), text: chip.prefill });
-                  } else {
-                    setReedPrefill(chip.prefill);
-                  }
+                const chip = firstMoveChip;
+                if (!chip) return;
+                if ((chip as { action?: string }).action === "show_flagged_items") {
+                  window.dispatchEvent(new CustomEvent("ew-focus-flagged-items"));
+                  return;
+                }
+                if (stageKey === "Edit") {
+                  setReedChipRequest({ id: Date.now(), text: chip.prefill });
+                } else {
+                  setReedPrefill(chip.prefill);
                 }
               }}
               style={{
@@ -559,7 +661,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
               }}
             >
               <span className="liquid-glass-btn-gold-label">
-                {stageChips[0]?.label || "Start a new session"}
+                {firstMoveChip?.label || "Start a new session"}
               </span>
             </button>
           </div>
@@ -610,12 +712,19 @@ function ReedPanel() {
     });
   }, []);
 
-  const runChip = useCallback((text: string) => {
-    if (stageKey === "Edit") {
-      setReedChipRequest({ id: Date.now(), text });
+  // CO_029 F9: chips with an action do not prefill chat. They dispatch
+  // a window event the Work session listens for, so "What needs fixing?"
+  // focuses the on-page flagged-items card instead of starting a chat loop.
+  const runChip = useCallback((chip: { prefill: string; action?: string }) => {
+    if (chip.action === "show_flagged_items") {
+      window.dispatchEvent(new CustomEvent("ew-focus-flagged-items"));
       return;
     }
-    prefillAndFocus(text);
+    if (stageKey === "Edit") {
+      setReedChipRequest({ id: Date.now(), text: chip.prefill });
+      return;
+    }
+    prefillAndFocus(chip.prefill);
   }, [prefillAndFocus, setReedChipRequest, stageKey]);
 
   // Same path as stage chips: external pages call setReedPrefill; we only fill the one composer.
@@ -648,7 +757,7 @@ function ReedPanel() {
             <button
               key={ci}
               type="button"
-              onClick={() => runChip(chip.prefill)}
+              onClick={() => runChip(chip)}
               style={{
                 fontSize: 10, padding: "4px 10px", borderRadius: 99,
                 background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.1)",
@@ -700,6 +809,35 @@ function ReedPanel() {
                   borderRadius: "0 8px 8px 8px", padding: "8px 10px",
                   fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: "85%",
                 }}>{m.text}</div>
+              </div>
+            );
+          }
+          // CO_029 F8: persisted system notice. Stays in the thread after
+          // the transient toast disappears, so the user can scroll back.
+          if (m.type === "system") {
+            const dot = m.tone === "error"
+              ? "var(--danger, #D64545)"
+              : m.tone === "info"
+                ? "rgba(107,127,242,0.85)"
+                : "var(--gold-dark, #C8A96E)";
+            return (
+              <div key={i} style={{
+                display: "flex", alignItems: "center", gap: 8,
+                marginBottom: 8, padding: "6px 10px",
+                background: "rgba(0,0,0,0.03)",
+                border: "1px dashed rgba(0,0,0,0.12)",
+                borderRadius: 6,
+              }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%",
+                  background: dot, flexShrink: 0,
+                }} />
+                <span style={{
+                  fontSize: 10, color: "var(--fg-3)",
+                  fontFamily: "var(--font-mono, 'DM Mono', monospace)",
+                  letterSpacing: "0.04em", flexShrink: 0,
+                }}>SYSTEM</span>
+                <span style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.45 }}>{m.text}</span>
               </div>
             );
           }
@@ -845,6 +983,31 @@ function ReedPanelInputOnly() {
                     borderRadius: "8px 0 8px 8px", padding: "8px 10px",
                     fontSize: 11, color: "var(--fg)", lineHeight: 1.6, maxWidth: "85%",
                   }}>{m.text}</div>
+                </div>
+              );
+            }
+            // CO_029 F8: persisted system notice in the floating Inspector.
+            if (m.type === "system") {
+              const dot = m.tone === "error"
+                ? "var(--danger, #D64545)"
+                : m.tone === "info"
+                  ? "rgba(107,127,242,0.85)"
+                  : "var(--gold-dark, #C8A96E)";
+              return (
+                <div key={i} style={{
+                  display: "flex", alignItems: "center", gap: 8,
+                  marginBottom: 8, padding: "6px 10px",
+                  background: "rgba(0,0,0,0.03)",
+                  border: "1px dashed rgba(0,0,0,0.12)",
+                  borderRadius: 6,
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: dot, flexShrink: 0 }} />
+                  <span style={{
+                    fontSize: 10, color: "var(--fg-3)",
+                    fontFamily: "var(--font-mono, 'DM Mono', monospace)",
+                    letterSpacing: "0.04em", flexShrink: 0,
+                  }}>SYSTEM</span>
+                  <span style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.45 }}>{m.text}</span>
                 </div>
               );
             }

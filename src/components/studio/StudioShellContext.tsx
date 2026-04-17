@@ -15,7 +15,9 @@ export interface ShellCtx {
   setReedPrefill: (text: string) => void;
   reedChipRequest: { id: number; text: string } | null;
   setReedChipRequest: (req: { id: number; text: string } | null) => void;
-  reedThread: Array<{ type: "user" | "reed" | "note"; text: string; from?: string; to?: string }>;
+  // CO_029 F8: system messages persist in the Reed thread so the user can
+  // scroll back to see what happened during the session.
+  reedThread: Array<{ type: "user" | "reed" | "note" | "system"; text: string; from?: string; to?: string; tone?: "info" | "success" | "error" }>;
   setReedThread: (fn: (prev: any[]) => any[]) => void;
 }
 

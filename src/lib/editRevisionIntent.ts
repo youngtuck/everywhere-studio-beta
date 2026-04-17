@@ -2,6 +2,127 @@
  * Edit-stage revision routing: light (targeted excerpt) vs full draft regeneration.
  */
 
+/**
+ * CO_024: Draft-stage input intent classifier.
+ * The typed input at Edit/Draft stage must be routed through Reed as conversation
+ * first. Only clear directives trigger an immediate revise. Questions and
+ * ambiguous input get a Reed response, no action.
+ */
+export type DraftInputIntent = "question" | "ambiguous" | "directive";
+
+const QUESTION_OPENERS = [
+  "should",
+  "what",
+  "where",
+  "when",
+  "why",
+  "how",
+  "is",
+  "are",
+  "does",
+  "do",
+  "can",
+  "could",
+  "would",
+  "will",
+  "might",
+  "may",
+  "who",
+  "which",
+  "is it",
+  "am i",
+];
+
+const QUESTION_PHRASES = [
+  /\bwhat if\b/,
+  /\bwhat about\b/,
+  /\bwhat do you think\b/,
+  /\bany thoughts\b/,
+  /\bthoughts on\b/,
+  /\bis it (?:ok|okay|fine|alright)\b/,
+  /\bshould (?:i|we)\b/,
+  /\bdo you think\b/,
+  /\bcan you tell me\b/,
+  /\bhow does this\b/,
+];
+
+const DIRECTIVE_OPENERS = [
+  "tighten",
+  "cut",
+  "expand",
+  "shorten",
+  "lengthen",
+  "rewrite",
+  "revise",
+  "fix",
+  "remove",
+  "delete",
+  "change",
+  "replace",
+  "add",
+  "include",
+  "drop",
+  "trim",
+  "polish",
+  "simplify",
+  "clarify",
+  "strengthen",
+  "sharpen",
+  "soften",
+  "reorder",
+  "restructure",
+  "reorganize",
+  "rework",
+  "redo",
+  "make",
+  "turn",
+];
+
+const DIRECTIVE_PHRASES = [
+  /\bmake (?:it|this|the) (?:shorter|longer|tighter|punchier|simpler|clearer|crisper|bolder)\b/,
+  /\bcut (?:the|to|down)\b/,
+  /\btighten (?:to|this|the)\b/,
+  /\bexpand (?:to|this|the)\b/,
+  /\bfix (?:the|this|all|flagged)\b/,
+  /\bstart over\b/,
+  /\bfrom scratch\b/,
+  /\bchange the (?:angle|thesis|hook|opening|closing|argument)\b/,
+];
+
+/**
+ * Classify a typed input at Draft/Edit stage as a question, ambiguous, or a
+ * clear directive. Only "directive" should fire an immediate revise. The other
+ * two must be routed to Reed as a conversational message.
+ */
+export function classifyDraftInputIntent(raw: string): DraftInputIntent {
+  const text = (raw || "").trim();
+  if (!text) return "ambiguous";
+
+  const lower = text.toLowerCase();
+
+  // 1. Explicit question mark wins.
+  if (/\?\s*$/.test(text)) return "question";
+
+  // 2. Question phrases without a trailing "?" still count.
+  if (QUESTION_PHRASES.some((re) => re.test(lower))) return "question";
+
+  // 3. Question openers at start of sentence without a trailing "?".
+  const firstWord = lower.split(/\s+/)[0] || "";
+  const firstTwo = lower.split(/\s+/).slice(0, 2).join(" ");
+  if (QUESTION_OPENERS.includes(firstWord) || QUESTION_OPENERS.includes(firstTwo)) {
+    return "question";
+  }
+
+  // 4. Directive phrases are strong signals.
+  if (DIRECTIVE_PHRASES.some((re) => re.test(lower))) return "directive";
+
+  // 5. Directive verb at start of the input.
+  if (DIRECTIVE_OPENERS.includes(firstWord)) return "directive";
+
+  // 6. Everything else is ambiguous. Reed must respond, not act.
+  return "ambiguous";
+}
+
 export type EditRevisionScope = "targeted" | "full";
 
 export type DraftSectionSlice = {
