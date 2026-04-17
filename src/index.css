@@ -221,54 +221,21 @@ div:hover > .nav-tooltip { display: block !important; }
 
 /* ─── FONT SIZE PREFERENCE ────────────────────────────────────────
    Applied by Settings.tsx via data-font-size attribute on #root.
-   These multiply on top of the viewport zoom above.
    data-font-size="1" = Small  (88%)
    data-font-size="2" = Default (100%, no-op)
    data-font-size="3" = Large  (112%)
+
+   CO_032: This preference must NEVER rescale layout structure.
+   Rule: structural dimensions (sidebar width, nav item height,
+   container padding) use px. Typography (font-size, line-height)
+   uses rem or em. The viewport zoom on #root above is the only
+   mechanism that scales the canvas; the font-size preference
+   only cascades typography via root font-size and --text-scale.
 ────────────────────────────────────────────────────────────────── */
 
-#root[data-font-size="1"] { font-size: 88% !important; }
-#root[data-font-size="2"] { font-size: 100% !important; }
-#root[data-font-size="3"] { font-size: 112% !important; }
-
-/* font-size on root cascades to all rem/em values.
-   For px-based inline styles we also apply a subtle zoom adjustment. */
-@media (min-width: 1px) {
-  #root[data-font-size="1"] { zoom: calc(var(--viewport-zoom, 1) * 0.88); }
-  #root[data-font-size="3"] { zoom: calc(var(--viewport-zoom, 1) * 1.12); }
-}
-
-/* Override the viewport breakpoint zoom values to multiply with font size */
-@media (min-width: 1280px) {
-  :root { --viewport-zoom: 1.04; }
-  #root[data-font-size="1"] { zoom: calc(1.04 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.04; }
-  #root[data-font-size="3"] { zoom: calc(1.04 * 1.12); }
-}
-@media (min-width: 1440px) {
-  :root { --viewport-zoom: 1.10; }
-  #root[data-font-size="1"] { zoom: calc(1.10 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.10; }
-  #root[data-font-size="3"] { zoom: calc(1.10 * 1.12); }
-}
-@media (min-width: 1600px) {
-  :root { --viewport-zoom: 1.16; }
-  #root[data-font-size="1"] { zoom: calc(1.16 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.16; }
-  #root[data-font-size="3"] { zoom: calc(1.16 * 1.12); }
-}
-@media (min-width: 1920px) {
-  :root { --viewport-zoom: 1.26; }
-  #root[data-font-size="1"] { zoom: calc(1.26 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.26; }
-  #root[data-font-size="3"] { zoom: calc(1.26 * 1.12); }
-}
-@media (min-width: 2560px) {
-  :root { --viewport-zoom: 1.44; }
-  #root[data-font-size="1"] { zoom: calc(1.44 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.44; }
-  #root[data-font-size="3"] { zoom: calc(1.44 * 1.12); }
-}
+#root[data-font-size="1"] { font-size: 88%; --text-scale: 0.88; }
+#root[data-font-size="2"] { font-size: 100%; --text-scale: 1; }
+#root[data-font-size="3"] { font-size: 112%; --text-scale: 1.12; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {
   scroll-behavior: smooth;
