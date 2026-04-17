@@ -5690,13 +5690,17 @@ export default function WorkSession() {
               )}
 
               {/* ACTION CHIPS */}
+              {/* Disabled per CO_027 pending CO_026 implementation (propose-before-apply flow).
+                  These buttons fire silent edits with no user feedback, giving the appearance of being
+                  non-functional. Un-hide once CO_026 is implemented and these are rewired to show proposed
+                  changes before applying. */}
               <ActionChips
                 chips={[
-                  "Fix the flagged lines",
-                  "Tighten the hook",
+                  // "Fix the flagged lines",   // CO_027: hidden pending CO_026
+                  // "Tighten the hook",         // CO_027: hidden pending CO_026
                   `Tighten to ${targetWords}`,
                   "Expand, add an example",
-                  "Check the voice match",
+                  // "Check the voice match",    // CO_027: hidden pending CO_026
                   "Cut 100 words without losing the point",
                 ]}
                 onChipClick={(chip) => {
