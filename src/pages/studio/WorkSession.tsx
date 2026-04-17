@@ -3414,7 +3414,7 @@ export default function WorkSession() {
   const [draftVersions, setDraftVersions] = useState<Array<{ content: string; label: string }>>([]);
   const [activeVersionIdx, setActiveVersionIdx] = useState(0);
   const [generating, setGenerating] = useState(false);
-  const [generatingLabel, setGeneratingLabel] = useState("Writing draft...");
+  const [generatingLabel, setGeneratingLabel] = useState("Writing in your voice...");
   const [applyingSuggestion, setApplyingSuggestion] = useState(false);
   const [dismissedFlags, setDismissedFlags] = useState<Set<string>>(new Set());
   const [fixedFlags, setFixedFlags] = useState<Map<string, string>>(new Map());
@@ -5556,7 +5556,7 @@ export default function WorkSession() {
             <>
               {generating && (
                 <DpSection>
-                  <DpLabel>Generating</DpLabel>
+                  <DpLabel>Reed's Take</DpLabel>
                   <div style={{ fontSize: 11, color: "var(--gold-bright)", lineHeight: 1.6, fontWeight: 500 }}>{generatingLabel}</div>
                 </DpSection>
               )}
@@ -5686,40 +5686,39 @@ export default function WorkSession() {
                       </div>
                     </DpSection>
                   )}
+                  {/* ACTION CHIPS — CO_022: only show after generation completes */}
+                  {/* Disabled per CO_027 pending CO_026 implementation (propose-before-apply flow).
+                      These buttons fire silent edits with no user feedback, giving the appearance of being
+                      non-functional. Un-hide once CO_026 is implemented and these are rewired to show proposed
+                      changes before applying. */}
+                  <ActionChips
+                    chips={[
+                      // "Fix the flagged lines",   // CO_027: hidden pending CO_026
+                      // "Tighten the hook",         // CO_027: hidden pending CO_026
+                      `Tighten to ${targetWords}`,
+                      "Expand, add an example",
+                      // "Check the voice match",    // CO_027: hidden pending CO_026
+                      "Cut 100 words without losing the point",
+                    ]}
+                    onChipClick={(chip) => {
+                      const run = (msg: string) => {
+                        if (stage === "Edit") {
+                          void handleRevise(msg, { fromChip: true });
+                          return;
+                        }
+                        prefillReed(msg);
+                      };
+                      if (chip.startsWith("Tighten to")) {
+                        run(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
+                      } else if (chip.startsWith("Expand")) {
+                        run(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
+                      } else {
+                        run(chip);
+                      }
+                    }}
+                  />
                 </>
               )}
-
-              {/* ACTION CHIPS */}
-              {/* Disabled per CO_027 pending CO_026 implementation (propose-before-apply flow).
-                  These buttons fire silent edits with no user feedback, giving the appearance of being
-                  non-functional. Un-hide once CO_026 is implemented and these are rewired to show proposed
-                  changes before applying. */}
-              <ActionChips
-                chips={[
-                  // "Fix the flagged lines",   // CO_027: hidden pending CO_026
-                  // "Tighten the hook",         // CO_027: hidden pending CO_026
-                  `Tighten to ${targetWords}`,
-                  "Expand, add an example",
-                  // "Check the voice match",    // CO_027: hidden pending CO_026
-                  "Cut 100 words without losing the point",
-                ]}
-                onChipClick={(chip) => {
-                  const run = (msg: string) => {
-                    if (stage === "Edit") {
-                      void handleRevise(msg, { fromChip: true });
-                      return;
-                    }
-                    prefillReed(msg);
-                  };
-                  if (chip.startsWith("Tighten to")) {
-                    run(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
-                  } else if (chip.startsWith("Expand")) {
-                    run(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
-                  } else {
-                    run(chip);
-                  }
-                }}
-              />
             </>
           );
         }
