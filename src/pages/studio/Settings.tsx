@@ -10,13 +10,6 @@ import "./shared.css";
 
 const FONT = "var(--font)";
 
-// Font size zoom levels (relative to base 1.0)
-// These intentionally stack on top of the viewport zoom in index.css
-const FONT_SIZE_ZOOM: Record<number, number> = {
-  1: 0.88,   // Small — 12% smaller than base
-  2: 1.00,   // Default — no change
-  3: 1.12,   // Large — 12% larger than base
-};
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
@@ -117,16 +110,10 @@ export default function Settings() {
 
   const fontLabels = ["Small", "Default", "Large"];
 
-  // Apply font size zoom to document root
+  // Apply font size preference to document root (CO_032: font-size only, no zoom)
   useEffect(() => {
-    const zoom = FONT_SIZE_ZOOM[fontSize] ?? 1;
-    // Store as CSS var so the viewport zoom in index.css stacks on top
-    document.documentElement.style.setProperty("--font-size-zoom", String(zoom));
-    // Apply it as a zoom adjustment on #root relative to the viewport breakpoint zoom
     const root = document.getElementById("root");
     if (root) {
-      // We store the user preference; the actual zoom is computed in index.css
-      // by multiplying viewport zoom × font size zoom. We apply it via data-attr.
       root.setAttribute("data-font-size", String(fontSize));
     }
     try { localStorage.setItem("ew-font-size", String(fontSize)); } catch {}

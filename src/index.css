@@ -208,7 +208,7 @@ div:hover > .nav-tooltip { display: block !important; }
 
 /* ─── FONT SIZE PREFERENCE ────────────────────────────────────────
    Applied by Settings.tsx via data-font-size attribute on #root.
-   These multiply on top of the viewport zoom above.
+   Only affects rem/em typography. Layout (px) stays fixed.
    data-font-size="1" = Small  (88%)
    data-font-size="2" = Default (100%, no-op)
    data-font-size="3" = Large  (112%)
@@ -217,45 +217,6 @@ div:hover > .nav-tooltip { display: block !important; }
 #root[data-font-size="1"] { font-size: 88% !important; }
 #root[data-font-size="2"] { font-size: 100% !important; }
 #root[data-font-size="3"] { font-size: 112% !important; }
-
-/* font-size on root cascades to all rem/em values.
-   For px-based inline styles we also apply a subtle zoom adjustment. */
-@media (min-width: 1px) {
-  #root[data-font-size="1"] { zoom: calc(var(--viewport-zoom, 1) * 0.88); }
-  #root[data-font-size="3"] { zoom: calc(var(--viewport-zoom, 1) * 1.12); }
-}
-
-/* Override the viewport breakpoint zoom values to multiply with font size */
-@media (min-width: 1280px) {
-  :root { --viewport-zoom: 1.00; }
-  #root[data-font-size="1"] { zoom: calc(1.00 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.00; }
-  #root[data-font-size="3"] { zoom: calc(1.00 * 1.12); }
-}
-@media (min-width: 1440px) {
-  :root { --viewport-zoom: 1.06; }
-  #root[data-font-size="1"] { zoom: calc(1.06 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.06; }
-  #root[data-font-size="3"] { zoom: calc(1.06 * 1.12); }
-}
-@media (min-width: 1600px) {
-  :root { --viewport-zoom: 1.12; }
-  #root[data-font-size="1"] { zoom: calc(1.12 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.12; }
-  #root[data-font-size="3"] { zoom: calc(1.12 * 1.12); }
-}
-@media (min-width: 1920px) {
-  :root { --viewport-zoom: 1.22; }
-  #root[data-font-size="1"] { zoom: calc(1.22 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.22; }
-  #root[data-font-size="3"] { zoom: calc(1.22 * 1.12); }
-}
-@media (min-width: 2560px) {
-  :root { --viewport-zoom: 1.40; }
-  #root[data-font-size="1"] { zoom: calc(1.40 * 0.88); }
-  #root[data-font-size="2"] { zoom: 1.40; }
-  #root[data-font-size="3"] { zoom: calc(1.40 * 1.12); }
-}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {
   scroll-behavior: smooth;
