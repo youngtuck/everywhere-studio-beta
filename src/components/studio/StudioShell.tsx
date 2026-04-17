@@ -505,10 +505,13 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
   );
 }
 
+const ASK_REED_API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+
 function ReedPanel() {
   const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest } = useShell();
   const location = useLocation();
   const [input, setInput] = useState("");
+  const [sending, setSending] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const workStage = useWorkStageFromShell();
@@ -545,16 +548,63 @@ function ReedPanel() {
   // Auto-scroll
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [reedThread.length]);
+  }, [reedThread.length, sending]);
 
-  const handleSend = () => {
-    if (!input.trim()) return;
+  const handleSend = useCallback(async () => {
+    if (!input.trim() || sending) return;
     const message = input.trim();
     setInput("");
 
-    // Add to thread (no fake reply)
+    // Add user message to thread
     setReedThread(prev => [...prev, { type: "user", text: message }]);
-  };
+    setSending(true);
+
+    try {
+      // Build session context from WorkSession bridge (CO_020)
+      const ctx = window.__ewAskReedContext;
+      const sessionSummary = ctx
+        ? `[ASK REED PANEL — side conversation, not the main intake flow]\n\nCurrent stage: ${ctx.stage}\nOutput type: ${ctx.outputType}${ctx.draft ? `\nDraft word count: ${ctx.draft.split(/\s+/).length}` : ""}\n\nMain session conversation so far:\n${ctx.conversationSummary}${ctx.draft ? `\n\n---\nCurrent draft (first 2000 chars):\n${ctx.draft.slice(0, 2000)}` : ""}`
+        : "[ASK REED PANEL — side conversation]\n\nNo active session context available.";
+
+      // Build Ask Reed thread as the conversation messages.
+      // First message is the session context, then the Ask Reed exchanges.
+      const currentThread = [...reedThread, { type: "user" as const, text: message }];
+      const askReedMessages: Array<{ role: string; content: string }> = [
+        { role: "user", content: sessionSummary },
+        { role: "assistant", content: "Understood. I have full context of the active session. What do you need?" },
+      ];
+      for (const m of currentThread) {
+        if (m.type === "user") {
+          askReedMessages.push({ role: "user", content: m.text });
+        } else if (m.type === "reed") {
+          askReedMessages.push({ role: "assistant", content: m.text });
+        }
+      }
+
+      const res = await fetch(`${ASK_REED_API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: askReedMessages,
+          outputType: ctx?.outputType || "freestyle",
+          voiceDnaMd: ctx?.voiceDnaMd || "",
+          userId: ctx?.userId,
+          userName: ctx?.userName,
+          systemMode: "CONTENT_PRODUCTION",
+        }),
+      });
+
+      if (!res.ok) throw new Error(`API error ${res.status}`);
+      const data = await res.json();
+      const reply = (data.reply ?? "").replace(/\u2014/g, ",").replace(/\u2013/g, ",");
+
+      setReedThread(prev => [...prev, { type: "reed", text: reply || "No response received." }]);
+    } catch {
+      setReedThread(prev => [...prev, { type: "reed", text: "Reed couldn't respond. Try again." }]);
+    } finally {
+      setSending(false);
+    }
+  }, [input, sending, reedThread, setReedThread]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, width: "100%" }}>
@@ -630,6 +680,21 @@ function ReedPanel() {
             </div>
           );
         })}
+        {sending && (
+          <div style={{ display: "flex", gap: 6, marginBottom: 8, alignItems: "flex-start" }}>
+            <div style={{
+              display: "flex", alignItems: "flex-start", justifyContent: "center",
+              flexShrink: 0, width: 24, paddingTop: 1,
+            }}>
+              <ReedProfileIcon size={18} title="Reed" />
+            </div>
+            <div style={{
+              background: "rgba(74,144,217,0.06)", border: "1px solid rgba(74,144,217,0.2)",
+              borderRadius: "0 8px 8px 8px", padding: "8px 10px",
+              fontSize: 11, color: "var(--fg-3)", lineHeight: 1.6, fontStyle: "italic",
+            }}>Reed is thinking...</div>
+          </div>
+        )}
         <div ref={bottomRef} />
       </div>
       <div style={{
@@ -643,6 +708,7 @@ function ReedPanel() {
         borderRadius: 8,
         padding: "8px 10px",
         flexShrink: 0,
+        opacity: sending ? 0.5 : 1,
       }}
       >
         <input
@@ -653,6 +719,7 @@ function ReedPanel() {
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
           placeholder="Ask Reed..."
           aria-label="Ask Reed"
+          disabled={sending}
           style={{
             flex: 1,
             minWidth: 0,
@@ -668,7 +735,7 @@ function ReedPanel() {
         <button
           type="button"
           onClick={handleSend}
-          disabled={!input.trim()}
+          disabled={!input.trim() || sending}
           aria-label="Send message to Reed"
           style={{
             width: 28,

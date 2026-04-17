@@ -3863,6 +3863,23 @@ export default function WorkSession() {
     };
   }, [stage, goToStage]);
 
+  // Expose session context for Ask Reed panel (CO_020)
+  useEffect(() => {
+    window.__ewAskReedContext = {
+      conversationSummary: messages
+        .filter(m => m.role === "user" || m.role === "reed")
+        .map(m => `${m.role === "reed" ? "Reed" : "User"}: ${m.content}`)
+        .join("\n\n"),
+      stage,
+      draft: draft || "",
+      outputType: catalogOutputTypeForApi(outputType),
+      voiceDnaMd,
+      userId: user?.id,
+      userName: displayName || undefined,
+    };
+    return () => { delete window.__ewAskReedContext; };
+  }, [messages, stage, draft, outputType, voiceDnaMd, user?.id, displayName]);
+
   // ── Build conversation summary for API calls ──────────────────
   const buildConvSummary = useCallback(() =>
     messages

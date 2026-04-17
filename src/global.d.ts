@@ -8,4 +8,13 @@ interface Window {
   __ewWorkStage?: string;
   __ewSetWorkStage?: (stage: string) => void;
   __ewCodeId?: string;
+  __ewAskReedContext?: {
+    conversationSummary: string;
+    stage: string;
+    draft: string;
+    outputType: string;
+    voiceDnaMd: string;
+    userId: string | undefined;
+    userName: string | undefined;
+  };
 }
