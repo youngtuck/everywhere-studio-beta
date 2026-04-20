@@ -267,6 +267,7 @@ export default function StudioShell() {
   const [reedPrefill, setReedPrefill] = useState("");
   const [reedChipRequest, setReedChipRequest] = useState<{ id: number; text: string } | null>(null);
   const [reedThread, setReedThread] = useState<Array<{ type: "user" | "reed" | "note"; text: string; from?: string; to?: string }>>([]);
+  const [proposalPending, setProposalPending] = useState(false);
 
   const studioGlassDense =
     location.pathname.startsWith("/studio/outputs") ||
@@ -288,6 +289,7 @@ export default function StudioShell() {
       reedPrefill, setReedPrefill,
       reedChipRequest, setReedChipRequest,
       reedThread, setReedThread,
+      proposalPending, setProposalPending,
     }}>
       <ProjectProvider>
       <div
@@ -508,7 +510,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
 const ASK_REED_API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 
 function ReedPanel() {
-  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest } = useShell();
+  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending } = useShell();
   const location = useLocation();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -610,20 +612,27 @@ function ReedPanel() {
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, width: "100%" }}>
       {stageChips.length > 0 && (
         <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginBottom: 8, flexShrink: 0 }}>
-          {stageChips.map((chip, ci) => (
-            <button
-              key={ci}
-              type="button"
-              onClick={() => runChip(chip.prefill)}
-              style={{
-                fontSize: 10, padding: "4px 10px", borderRadius: 99,
-                background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.1)",
-                color: "var(--fg-2)", cursor: "pointer", fontFamily: "inherit",
-              }}
-            >
-              {chip.label}
-            </button>
-          ))}
+          {stageChips.map((chip, ci) => {
+            const disabled = proposalPending && stageKey === "Edit";
+            return (
+              <button
+                key={ci}
+                type="button"
+                onClick={() => { if (!disabled) runChip(chip.prefill); }}
+                disabled={disabled}
+                style={{
+                  fontSize: 10, padding: "4px 10px", borderRadius: 99,
+                  background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.1)",
+                  color: "var(--fg-2)", cursor: disabled ? "not-allowed" : "pointer",
+                  fontFamily: "inherit",
+                  opacity: disabled ? 0.4 : 1,
+                  transition: "opacity 0.15s",
+                }}
+              >
+                {chip.label}
+              </button>
+            );
+          })}
         </div>
       )}
       <div style={{ flex: 1, overflowY: "auto", marginBottom: 8, minHeight: 0, width: "100%" }}>

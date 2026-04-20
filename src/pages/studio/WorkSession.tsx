@@ -2170,11 +2170,12 @@ function OutlineRowComponent({
 // ─────────────────────────────────────────────────────────────────────────────
 
 function StageEdit({
-  draft, generating, generatingLabel, applyingSuggestion, onDraftChange, onAdvance, onRevise,
+  draft, generating, generatingLabel, applyingSuggestion, proposalLoading, onDraftChange, onAdvance, onRevise,
   versions, activeVersionIdx, onVersionSelect, onGenerateVersion, canGenerateMore,
 }: {
   draft: string; generating: boolean; generatingLabel: string;
   applyingSuggestion?: boolean;
+  proposalLoading?: boolean;
   onDraftChange: (v: string) => void; onAdvance: () => void;
   onRevise: (instructions: string, opts?: { fromChip?: boolean }) => void;
   versions: Array<{ content: string; label: string }>;
@@ -2278,7 +2279,7 @@ function StageEdit({
               overflow: "hidden",
             }}
           >
-            {applyingSuggestion && (
+            {(applyingSuggestion || proposalLoading) && (
               <div style={{
                 position: "absolute",
                 top: 0,
@@ -2293,7 +2294,7 @@ function StageEdit({
                 fontWeight: 500,
               }}
               >
-                Applying suggestion...
+                {proposalLoading ? "Reed is preparing a proposed change..." : "Applying suggestion..."}
               </div>
             )}
             {(() => {
@@ -3284,7 +3285,7 @@ function readResumeQuery(): string | null {
 }
 
 export default function WorkSession() {
-  const { setFeedbackContent, setReedPrefill, setReedThread, reedChipRequest, setReedChipRequest } = useShell();
+  const { setFeedbackContent, setReedPrefill, setReedThread, reedChipRequest, setReedChipRequest, setProposalPending } = useShell();
   const prefillReed = useCallback((text: string) => {
     setReedPrefill(text);
   }, [setReedPrefill]);
@@ -3418,6 +3419,22 @@ export default function WorkSession() {
   const [applyingSuggestion, setApplyingSuggestion] = useState(false);
   const [dismissedFlags, setDismissedFlags] = useState<Set<string>>(new Set());
   const [fixedFlags, setFixedFlags] = useState<Map<string, string>>(new Map());
+
+  // ── CO_026: Propose-before-apply state ──────────────────────
+  const [pendingProposal, setPendingProposal] = useState<{
+    instruction: string;
+    proposedDraft: string;
+    reason: string;
+    wordCountBefore: number;
+    wordCountAfter: number;
+    originalDraft: string;
+  } | null>(null);
+  const [proposalLoading, setProposalLoading] = useState(false);
+
+  // Sync proposal state to shell context so ReedPanel can disable chips
+  useEffect(() => {
+    setProposalPending(pendingProposal !== null || proposalLoading);
+  }, [pendingProposal, proposalLoading, setProposalPending]);
 
   // ── Review ───────────────────────────────────────────────────
   const [pipelineRun, setPipelineRun] = useState<PipelineRun | null>(null);
@@ -4212,7 +4229,11 @@ export default function WorkSession() {
     if (backgroundDraftRef.current && newDraft !== backgroundDraftRef.current) {
       setDraftChangedSinceBackground(true);
     }
-  }, []);
+    // CO_026: Auto-dismiss pending proposal when user manually edits draft
+    if (pendingProposal) {
+      setPendingProposal(null);
+    }
+  }, [pendingProposal]);
 
   // ── OUTLINE → EDIT: Generate draft ───────────────────────────
   const runGenerateDraftFromOutline = useCallback(async () => {
@@ -4388,16 +4409,83 @@ export default function WorkSession() {
     }
   }, [draft, buildConvSummary, outputType, talkDuration, user?.id, activeVersionIdx, toast, structuredIntakePayload]);
 
+  // ── CO_026: Propose-before-apply handlers ───────────────────
+  const handleProposeRevision = useCallback(async (instruction: string) => {
+    if (!draft || pendingProposal || proposalLoading) return;
+
+    const snapshotDraft = draft; // capture BEFORE the API call
+    setProposalLoading(true);
+
+    const resolvedOt = catalogOutputTypeForApi(outputType);
+
+    try {
+      const res = await fetchWithRetry(`${API_BASE}/api/propose-revision`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          draft: snapshotDraft,
+          instruction,
+          conversationSummary: buildConvSummary(),
+          outputType: resolvedOt,
+          userId: user?.id,
+          ...(resolvedOt === "talk" ? { talkDurationMinutes: talkDuration } : {}),
+          ...(structuredIntakePayload ? { structuredIntake: structuredIntakePayload } : {}),
+        }),
+      }, { timeout: 120000 });
+
+      if (!res.ok) throw new Error(`Proposal error ${res.status}`);
+      const data = await res.json();
+
+      setPendingProposal({
+        instruction,
+        proposedDraft: data.proposedText,
+        reason: data.reason,
+        wordCountBefore: data.wordCountBefore,
+        wordCountAfter: data.wordCountAfter,
+        originalDraft: snapshotDraft,
+      });
+    } catch (err: any) {
+      toast("Failed to generate proposal. Your draft is unchanged.", "error");
+      console.error("[WorkSession][propose]", err);
+    } finally {
+      setProposalLoading(false);
+    }
+  }, [draft, pendingProposal, proposalLoading, buildConvSummary, outputType, talkDuration, user?.id, toast, structuredIntakePayload]);
+
+  const handleApplyProposal = useCallback(() => {
+    if (!pendingProposal) return;
+
+    const { proposedDraft } = pendingProposal;
+
+    setDraft(proposedDraft);
+    setDismissedFlags(new Set());
+    setFixedFlags(new Map());
+
+    // Push new version (preserve pre-change state in existing versions)
+    const newVersions = [...draftVersions, { content: proposedDraft, label: `Version ${draftVersions.length + 1}` }];
+    // FIFO: cap at 10 versions
+    while (newVersions.length > 10) newVersions.shift();
+    setDraftVersions(newVersions);
+    setActiveVersionIdx(newVersions.length - 1);
+
+    setPendingProposal(null);
+  }, [pendingProposal, draftVersions]);
+
+  const handleSkipProposal = useCallback(() => {
+    setPendingProposal(null);
+  }, []);
+
   const lastAppliedChipRequestIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (stage !== "Edit") return;
     if (!reedChipRequest?.text || typeof reedChipRequest.id !== "number") return;
     if (lastAppliedChipRequestIdRef.current === reedChipRequest.id) return;
-    if (generating || applyingSuggestion) return;
+    if (generating || applyingSuggestion || pendingProposal || proposalLoading) return;
     lastAppliedChipRequestIdRef.current = reedChipRequest.id;
-    void handleRevise(reedChipRequest.text, { fromChip: true });
+    // CO_026: Route sidebar Edit chips through propose-before-apply
+    void handleProposeRevision(reedChipRequest.text);
     setReedChipRequest(null);
-  }, [stage, reedChipRequest, handleRevise, setReedChipRequest, generating, applyingSuggestion]);
+  }, [stage, reedChipRequest, handleProposeRevision, setReedChipRequest, generating, applyingSuggestion, pendingProposal, proposalLoading]);
 
   // ── EDIT → REVIEW: Run pipeline ──────────────────────────────
   // ── EDIT: Generate another draft version ─────────────────────
@@ -5057,6 +5145,8 @@ export default function WorkSession() {
     setProjectId(null);
     setDraftVersions([]);
     setActiveVersionIdx(0);
+    setPendingProposal(null);
+    setProposalLoading(false);
     setFormatDrafts({});
     setOutlineAngles(null);
     setSelectedAngle("a");
@@ -5703,37 +5793,98 @@ export default function WorkSession() {
                       </div>
                     </DpSection>
                   )}
-                  {/* ACTION CHIPS — CO_022: only show after generation completes */}
-                  {/* Disabled per CO_027 pending CO_026 implementation (propose-before-apply flow).
-                      These buttons fire silent edits with no user feedback, giving the appearance of being
-                      non-functional. Un-hide once CO_026 is implemented and these are rewired to show proposed
-                      changes before applying. */}
-                  <ActionChips
-                    chips={[
-                      // "Fix the flagged lines",   // CO_027: hidden pending CO_026
-                      // "Tighten the hook",         // CO_027: hidden pending CO_026
-                      `Tighten to ${targetWords}`,
-                      "Expand, add an example",
-                      // "Check the voice match",    // CO_027: hidden pending CO_026
-                      "Cut 100 words without losing the point",
-                    ]}
-                    onChipClick={(chip) => {
-                      const run = (msg: string) => {
-                        if (stage === "Edit") {
-                          void handleRevise(msg, { fromChip: true });
-                          return;
+                  {/* ACTION CHIPS — CO_026: propose-before-apply flow */}
+
+                  {/* CO_026: Proposal loading state */}
+                  {proposalLoading && (
+                    <DpSection>
+                      <div style={{ fontSize: 10, color: "var(--gold-bright)", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                        <span style={{ animation: "pulse 1.5s infinite" }}>&#9679;</span>
+                        <span>Reed is preparing a proposed change...</span>
+                      </div>
+                    </DpSection>
+                  )}
+
+                  {/* CO_026: Pending proposal card */}
+                  {pendingProposal && !proposalLoading && (
+                    <DpSection>
+                      <DpLabel>Proposed change</DpLabel>
+                      <div style={{
+                        background: "rgba(74,144,217,0.06)",
+                        border: "1px solid rgba(74,144,217,0.2)",
+                        borderRadius: 8,
+                        padding: "10px 12px",
+                        marginBottom: 8,
+                      }}>
+                        <div style={{
+                          fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6,
+                          marginBottom: 8,
+                        }}>
+                          {pendingProposal.reason}
+                        </div>
+                        <div style={{
+                          fontSize: 10, color: "var(--fg-3)", fontWeight: 500,
+                        }}>
+                          {pendingProposal.wordCountBefore} → {pendingProposal.wordCountAfter} words
+                          {pendingProposal.wordCountAfter !== pendingProposal.wordCountBefore && (
+                            <span style={{ color: "var(--gold)", marginLeft: 6 }}>
+                              ({pendingProposal.wordCountAfter > pendingProposal.wordCountBefore ? "+" : ""}
+                              {pendingProposal.wordCountAfter - pendingProposal.wordCountBefore})
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          type="button"
+                          className="liquid-glass-btn-gold"
+                          onClick={handleApplyProposal}
+                          style={{ padding: "6px 16px", fontSize: 11 }}
+                        >
+                          <span className="liquid-glass-btn-gold-label">Apply</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="liquid-glass-btn"
+                          onClick={handleSkipProposal}
+                          style={{ padding: "6px 16px", fontSize: 11 }}
+                        >
+                          <span className="liquid-glass-btn-label" style={{ fontWeight: 600 }}>Skip</span>
+                        </button>
+                      </div>
+                    </DpSection>
+                  )}
+
+                  {/* CO_026: Action chips hidden while proposal is pending or loading */}
+                  {!pendingProposal && !proposalLoading && (
+                    <ActionChips
+                      chips={[
+                        // "Fix the flagged lines",   // CO_027: hidden pending CO_026
+                        // "Tighten the hook",         // CO_027: hidden pending CO_026
+                        `Tighten to ${targetWords}`,
+                        "Expand, add an example",
+                        // "Check the voice match",    // CO_027: hidden pending CO_026
+                        "Cut 100 words without losing the point",
+                      ]}
+                      onChipClick={(chip) => {
+                        if (pendingProposal || proposalLoading) return;
+                        const propose = (msg: string) => {
+                          if (stage === "Edit") {
+                            void handleProposeRevision(msg);
+                            return;
+                          }
+                          prefillReed(msg);
+                        };
+                        if (chip.startsWith("Tighten to")) {
+                          propose(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
+                        } else if (chip.startsWith("Expand")) {
+                          propose(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
+                        } else {
+                          propose(chip);
                         }
-                        prefillReed(msg);
-                      };
-                      if (chip.startsWith("Tighten to")) {
-                        run(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
-                      } else if (chip.startsWith("Expand")) {
-                        run(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
-                      } else {
-                        run(chip);
-                      }
-                    }}
-                  />
+                      }}
+                    />
+                  )}
                 </>
               )}
             </>
@@ -5771,7 +5922,9 @@ export default function WorkSession() {
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,
-    prefillReed, handleRevise, activeReviewTab, handleReviewFix, handleExportAll,
+    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal,
+    pendingProposal, proposalLoading,
+    activeReviewTab, handleReviewFix, handleExportAll,
     dismissedFlags, fixedFlags, backgroundPipelineRun, backgroundPipelineRunning,
     formatDrafts,
     methodDnaMd, methodTermHits, methodLintLoading, methodLintInspectorError,
@@ -6236,6 +6389,7 @@ export default function WorkSession() {
           generating={generating}
           generatingLabel={generatingLabel}
           applyingSuggestion={applyingSuggestion}
+          proposalLoading={proposalLoading}
           onDraftChange={handleDraftChangeWithTracking}
           onAdvance={handleRunPipeline}
           onRevise={handleRevise}
@@ -6246,7 +6400,7 @@ export default function WorkSession() {
             setDraft(draftVersions[idx].content);
           }}
           onGenerateVersion={handleGenerateVersion}
-          canGenerateMore={draftVersions.length < 3 && !generating}
+          canGenerateMore={draftVersions.length < 10 && !generating}
         />
       )}
       {stage === "Review" && (
