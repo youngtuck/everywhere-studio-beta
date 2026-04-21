@@ -26,6 +26,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
+  try {
   const auth = await requireAuth(req, res);
   if (!auth) return;
 
@@ -62,8 +63,6 @@ export default async function handler(req, res) {
   }
 
   const G = DNA_LIMITS.generate;
-
-  try {
     const client = new Anthropic({ apiKey });
 
     // ── Step 1: Generate the revision (same logic as generate.js revision mode) ──
@@ -155,8 +154,10 @@ Output ONLY the complete revised draft. No commentary, no explanation.`;
 
   } catch (err) {
     console.error("[api/propose-revision] Error:", err);
-    return res.status(500).json({
-      error: "Failed to generate proposal. Please try again.",
-    });
+    if (!res.headersSent) {
+      return res.status(500).json({
+        error: "Failed to generate proposal. Please try again.",
+      });
+    }
   }
 }

@@ -19,7 +19,7 @@
       "maxDuration": 60
     },
     "api/propose-revision.js": {
-      "maxDuration": 60
+      "maxDuration": 120
     },
     "api/outline.js": {
       "maxDuration": 60
