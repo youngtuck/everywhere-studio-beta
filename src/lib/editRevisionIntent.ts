@@ -34,6 +34,27 @@ const SCOPED_MARKERS =
 const LIGHT_TOPIC =
   /\b(grammar|typo|spell|passive|wordy|redundant|repetition|words?|sentences?|lines?|phrasing|tone\s+down|tone\s+up)\b/;
 
+// ── CO_024: Draft-stage input intent classification ──────────────────────────
+
+export type DraftInputIntent = "question" | "directive" | "ambiguous";
+
+/** Classify whether typed draft-stage input is a question, an edit directive, or ambiguous. */
+export function classifyDraftInputIntent(text: string): DraftInputIntent {
+  const t = text.trim();
+  if (!t) return "ambiguous";
+  // Any question mark anywhere → conversation, not action
+  if (t.includes("?")) return "question";
+  const s = t.toLowerCase();
+  // Clear command verbs, scope markers, or topic keywords → directive
+  if (FULL_PATTERNS.some((re) => re.test(s))) return "directive";
+  if (LIGHT_VERBS.test(s)) return "directive";
+  if (LIGHT_TOPIC.test(s)) return "directive";
+  // Scoped structural references with an imperative feel → directive
+  if (SCOPED_MARKERS.test(s) && /\b(make|move|swap|rewrite|rework|revise|add|expand)\b/.test(s)) return "directive";
+  // Everything else → ambiguous (default to conversation)
+  return "ambiguous";
+}
+
 /** Prefer full regeneration when the user is clearly asking for a new piece or global restructure. */
 export function classifyEditRevisionScope(instructions: string): EditRevisionScope {
   const s = instructions.toLowerCase();
