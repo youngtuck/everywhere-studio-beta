@@ -18,6 +18,9 @@
     "api/generate.js": {
       "maxDuration": 60
     },
+    "api/propose-revision.js": {
+      "maxDuration": 60
+    },
     "api/outline.js": {
       "maxDuration": 60
     },
