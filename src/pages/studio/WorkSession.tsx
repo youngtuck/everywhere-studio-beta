@@ -49,6 +49,7 @@ import {
 import { publishWorkSessionMeta } from "../../lib/workSessionMetaBridge";
 import {
   classifyEditRevisionScope,
+  classifyDraftInputIntent,
   extractDraftSectionForTargetedEdit,
 } from "../../lib/editRevisionIntent";
 
@@ -2169,8 +2170,17 @@ function OutlineRowComponent({
 // STAGE: EDIT
 // ─────────────────────────────────────────────────────────────────────────────
 
+const DIRECTIVE_CONFIRMATIONS = [
+  "On it.",
+  "Got it. One moment.",
+  "Working on that now.",
+  "On it. One sec.",
+  "Got it.",
+];
+
 function StageEdit({
   draft, generating, generatingLabel, applyingSuggestion, proposalLoading, onDraftChange, onAdvance, onRevise,
+  onConverse, converseLoading, converseReply,
   versions, activeVersionIdx, onVersionSelect, onGenerateVersion, canGenerateMore,
 }: {
   draft: string; generating: boolean; generatingLabel: string;
@@ -2178,6 +2188,9 @@ function StageEdit({
   proposalLoading?: boolean;
   onDraftChange: (v: string) => void; onAdvance: () => void;
   onRevise: (instructions: string, opts?: { fromChip?: boolean }) => void;
+  onConverse: (text: string) => void;
+  converseLoading?: boolean;
+  converseReply: string | null;
   versions: Array<{ content: string; label: string }>;
   activeVersionIdx: number;
   onVersionSelect: (idx: number) => void;
@@ -2186,16 +2199,34 @@ function StageEdit({
 }) {
   const [input, setInput] = useState("");
   const titleRef = useRef<HTMLTextAreaElement>(null);
+  // CO_024: Reed response bubble state
+  const [reedResponse, setReedResponse] = useState<string | null>(null);
+
+  // Sync conversation replies from parent into local response bubble
+  useEffect(() => {
+    if (converseReply) setReedResponse(converseReply);
+  }, [converseReply]);
 
   useLayoutEffect(() => {
     const t = titleRef.current;
     if (t) { t.style.height = "auto"; t.style.height = t.scrollHeight + "px"; }
   }, [draft]);
 
-  const handleRevise = () => {
-    if (!input.trim() || generating) return;
-    onRevise(input.trim());
+  // CO_024: Classify input intent before routing
+  const handleSubmit = () => {
+    const text = input.trim();
+    if (!text || generating) return;
     setInput("");
+
+    const intent = classifyDraftInputIntent(text);
+    if (intent === "directive") {
+      const confirmation = DIRECTIVE_CONFIRMATIONS[Math.floor(Math.random() * DIRECTIVE_CONFIRMATIONS.length)];
+      setReedResponse(confirmation);
+      onRevise(text);
+    } else {
+      // question or ambiguous → conversation
+      onConverse(text);
+    }
   };
 
   return (
@@ -2356,6 +2387,49 @@ function StageEdit({
         {!generating && draft && <AdvanceButton label="Finish and Review &#8594;" onClick={onAdvance} />}
       </div>
 
+      {/* CO_024: Reed response bubble */}
+      {(reedResponse || converseLoading) && (
+        <div style={{
+          flexShrink: 0,
+          padding: "8px clamp(10px, 3vw, 14px)",
+          borderTop: "1px solid var(--glass-border)",
+        }}>
+          <div className="work-stage-content-column" style={{ position: "relative" }}>
+            <div style={{
+              display: "flex", gap: 8, alignItems: "flex-start",
+              background: "rgba(74,144,217,0.06)",
+              border: "1px solid rgba(74,144,217,0.2)",
+              borderRadius: 8,
+              padding: "8px 28px 8px 10px",
+            }}>
+              <div style={{
+                fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6, fontFamily: FONT,
+                fontStyle: converseLoading ? "italic" : "normal",
+              }}>
+                {converseLoading ? "Reed is thinking..." : reedResponse}
+              </div>
+            </div>
+            {!converseLoading && (
+              <button
+                type="button"
+                onClick={() => setReedResponse(null)}
+                aria-label="Dismiss"
+                style={{
+                  position: "absolute", top: 4, right: 4,
+                  width: 20, height: 20, borderRadius: 4,
+                  border: "none", background: "transparent",
+                  color: "var(--fg-3)", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 12, fontFamily: FONT, padding: 0,
+                }}
+              >
+                &times;
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div style={{
         borderTop: "1px solid var(--glass-border)",
         flexShrink: 0,
@@ -2370,8 +2444,8 @@ function StageEdit({
         <div className="work-stage-content-column" style={{ padding: "10px clamp(10px, 3vw, 14px)", display: "flex", alignItems: "center", gap: 6 }}>
           <input
             value={input} onChange={e => setInput(e.target.value)}
-            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleRevise(); } }}
-            placeholder="Tell Reed what to change, or edit above..."
+            onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
+            placeholder="Ask Reed anything, or give an edit instruction..."
             readOnly={generating}
             style={{ flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10, padding: "0 12px", fontSize: 12, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36, opacity: generating ? 0.5 : 1, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}
             onFocus={e => { e.target.style.borderColor = "rgba(245,198,66,0.4)"; }}
@@ -2381,7 +2455,7 @@ function StageEdit({
           <button
             type="button"
             className="liquid-glass-btn liquid-glass-btn--square"
-            onClick={handleRevise}
+            onClick={handleSubmit}
             disabled={generating}
             aria-label="Send to Reed"
             title="Send to Reed"
@@ -4512,6 +4586,50 @@ export default function WorkSession() {
     setPendingProposal(null);
   }, []);
 
+  // ── CO_024: Draft-stage conversation handler ────────────────
+  const [draftConverseLoading, setDraftConverseLoading] = useState(false);
+  const [draftConverseReply, setDraftConverseReply] = useState<string | null>(null);
+
+  const handleDraftConverse = useCallback(async (text: string) => {
+    setDraftConverseLoading(true);
+    setDraftConverseReply(null);
+
+    const ctx = window.__ewAskReedContext;
+    const sessionSummary = ctx
+      ? `[DRAFT STAGE — main input, not side panel]\n\nCurrent stage: ${ctx.stage}\nOutput type: ${ctx.outputType}${ctx.draft ? `\nDraft word count: ${ctx.draft.split(/\s+/).length}` : ""}\n\nMain session conversation so far:\n${ctx.conversationSummary}${ctx.draft ? `\n\n---\nCurrent draft (first 2000 chars):\n${ctx.draft.slice(0, 2000)}` : ""}`
+      : "[DRAFT STAGE — main input]\n\nNo active session context available.";
+
+    const chatMessages = [
+      { role: "user", content: sessionSummary },
+      { role: "assistant", content: "Understood. I have full context of the active session and the current draft. What do you need?" },
+      { role: "user", content: text },
+    ];
+
+    try {
+      const res = await fetchWithRetry(`${API_BASE}/api/chat`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          messages: chatMessages,
+          outputType: catalogOutputTypeForApi(outputType),
+          voiceDnaMd,
+          userId: user?.id,
+          userName: displayName || undefined,
+          systemMode: "CONTENT_PRODUCTION",
+        }),
+      }, { timeout: 30000 });
+
+      if (!res.ok) throw new Error(`Chat error ${res.status}`);
+      const data = await res.json();
+      const reply = (data.reply ?? "").replace(/\u2014/g, ",").replace(/\u2013/g, ",");
+      setDraftConverseReply(reply || "No response received.");
+    } catch {
+      setDraftConverseReply("Reed couldn't respond. Try again.");
+    } finally {
+      setDraftConverseLoading(false);
+    }
+  }, [outputType, voiceDnaMd, user?.id, displayName]);
+
   const lastAppliedChipRequestIdRef = useRef<number | null>(null);
   useEffect(() => {
     if (stage !== "Edit") return;
@@ -5184,6 +5302,8 @@ export default function WorkSession() {
     setActiveVersionIdx(0);
     setPendingProposal(null);
     setProposalLoading(false);
+    setDraftConverseLoading(false);
+    setDraftConverseReply(null);
     setFormatDrafts({});
     setOutlineAngles(null);
     setSelectedAngle("a");
@@ -6430,6 +6550,9 @@ export default function WorkSession() {
           onDraftChange={handleDraftChangeWithTracking}
           onAdvance={handleRunPipeline}
           onRevise={handleRevise}
+          onConverse={handleDraftConverse}
+          converseLoading={draftConverseLoading}
+          converseReply={draftConverseReply}
           versions={draftVersions}
           activeVersionIdx={activeVersionIdx}
           onVersionSelect={(idx) => {
