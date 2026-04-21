@@ -13,6 +13,7 @@ import NotificationBell from "./NotificationBell";
 import { REED_STAGE_CHIPS } from "../../lib/constants";
 import { useWorkStageFromShell } from "../../hooks/useWorkStageBridge";
 import { ReedProfileIcon } from "./ReedProfileIcon";
+import { fetchWithRetry } from "../../lib/retry";
 
 export { useShell } from "./StudioShellContext";
 
@@ -583,7 +584,7 @@ function ReedPanel() {
         }
       }
 
-      const res = await fetch(`${API_BASE}/api/chat`, {
+      const res = await fetchWithRetry(`${API_BASE}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -594,7 +595,7 @@ function ReedPanel() {
           userName: ctx?.userName,
           systemMode: "CONTENT_PRODUCTION",
         }),
-      });
+      }, { timeout: 30000 });
 
       if (!res.ok) throw new Error(`API error ${res.status}`);
       const data = await res.json();
