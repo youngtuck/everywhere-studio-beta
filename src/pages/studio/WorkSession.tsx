@@ -2281,11 +2281,7 @@ function StageEdit({
           >
             {(applyingSuggestion || proposalLoading) && (
               <div style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                zIndex: 2,
+                flexShrink: 0,
                 padding: "8px 12px",
                 background: "rgba(245,198,66,0.08)",
                 borderBottom: "1px solid rgba(245,198,66,0.2)",
