@@ -507,7 +507,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
   );
 }
 
-const ASK_REED_API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
+const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 
 function ReedPanel() {
   const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending } = useShell();
@@ -583,7 +583,7 @@ function ReedPanel() {
         }
       }
 
-      const res = await fetch(`${ASK_REED_API_BASE}/api/chat`, {
+      const res = await fetch(`${API_BASE}/api/chat`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
