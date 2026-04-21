@@ -4406,7 +4406,7 @@ export default function WorkSession() {
   }, [draft, buildConvSummary, outputType, talkDuration, user?.id, activeVersionIdx, toast, structuredIntakePayload]);
 
   // ── CO_026: Propose-before-apply handlers ───────────────────
-  const handleProposeRevision = useCallback(async (instruction: string) => {
+  const handleProposeRevision = useCallback(async (instruction: string, label?: string) => {
     if (!draft || pendingProposal || proposalLoading) return;
 
     const snapshotDraft = draft; // capture BEFORE the API call
@@ -4414,30 +4414,71 @@ export default function WorkSession() {
 
     const resolvedOt = catalogOutputTypeForApi(outputType);
 
+    // Same targeted revision classification as handleRevise
+    const revisionScope = classifyEditRevisionScope(instruction);
+    const sectionSlice =
+      revisionScope === "targeted" ? extractDraftSectionForTargetedEdit(snapshotDraft, instruction) : null;
+    const useTargeted =
+      revisionScope === "targeted" &&
+      !!sectionSlice &&
+      sectionSlice.excerpt.trim().length > 0 &&
+      sectionSlice.excerpt.length <= TARGETED_EDIT_EXCERPT_MAX_CHARS;
+
     try {
-      const res = await fetchWithRetry(`${API_BASE}/api/propose-revision`, {
+      // Reuse /api/generate (same call as handleRevise)
+      const res = await fetchWithRetry(`${API_BASE}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          draft: snapshotDraft,
-          instruction,
           conversationSummary: buildConvSummary(),
           outputType: resolvedOt,
+          revisionNotes: instruction,
+          revisionScope: useTargeted ? "targeted" : "full",
+          ...(useTargeted && sectionSlice
+            ? { sectionExcerpt: sectionSlice.excerpt }
+            : { originalDraft: snapshotDraft }),
           userId: user?.id,
+          maxTokens: useTargeted ? 2048 : 4096,
           ...(resolvedOt === "talk" ? { talkDurationMinutes: talkDuration } : {}),
-          ...(structuredIntakePayload ? { structuredIntake: structuredIntakePayload } : {}),
+          ...(structuredIntakePayload && !useTargeted ? { structuredIntake: structuredIntakePayload } : {}),
         }),
-      }, { timeout: 120000 });
+      }, { timeout: useTargeted ? 45000 : 90000 });
 
       if (!res.ok) throw new Error(`Proposal error ${res.status}`);
       const data = await res.json();
 
+      // Same response reassembly as handleRevise
+      let revised: string;
+      if (data.targeted && typeof data.revisedExcerpt === "string" && sectionSlice && useTargeted) {
+        const rep = data.revisedExcerpt.trim();
+        revised = rep
+          ? `${sectionSlice.prefix}${rep}${sectionSlice.suffix ? `\n\n${sectionSlice.suffix}` : ""}`
+          : snapshotDraft;
+      } else {
+        revised = data.content || snapshotDraft;
+      }
+
+      // Local word counts and proposal reason
+      const countWords = (t: string) => t.split(/\s+/).filter(Boolean).length;
+      const wordCountBefore = countWords(snapshotDraft);
+      const wordCountAfter = countWords(revised);
+      const displayLabel = label || instruction;
+      const delta = wordCountAfter - wordCountBefore;
+      let reason: string;
+      if (delta < -50) {
+        reason = `${displayLabel}. Cut from ${wordCountBefore} to ${wordCountAfter} words.`;
+      } else if (delta > 50) {
+        reason = `${displayLabel}. Expanded from ${wordCountBefore} to ${wordCountAfter} words.`;
+      } else {
+        reason = `${displayLabel}. Word count stayed close to target (${wordCountBefore} → ${wordCountAfter}).`;
+      }
+
       setPendingProposal({
         instruction,
-        proposedDraft: data.proposedText,
-        reason: data.reason,
-        wordCountBefore: data.wordCountBefore,
-        wordCountAfter: data.wordCountAfter,
+        proposedDraft: revised,
+        reason,
+        wordCountBefore,
+        wordCountAfter,
         originalDraft: snapshotDraft,
       });
     } catch (err: any) {
@@ -4479,7 +4520,7 @@ export default function WorkSession() {
     if (generating || applyingSuggestion || pendingProposal || proposalLoading) return;
     lastAppliedChipRequestIdRef.current = reedChipRequest.id;
     // CO_026: Route sidebar Edit chips through propose-before-apply
-    void handleProposeRevision(reedChipRequest.text);
+    void handleProposeRevision(reedChipRequest.text, reedChipRequest.label);
     setReedChipRequest(null);
   }, [stage, reedChipRequest, handleProposeRevision, setReedChipRequest, generating, applyingSuggestion, pendingProposal, proposalLoading]);
 
@@ -5864,19 +5905,19 @@ export default function WorkSession() {
                       ]}
                       onChipClick={(chip) => {
                         if (pendingProposal || proposalLoading) return;
-                        const propose = (msg: string) => {
+                        const propose = (msg: string, chipLabel: string) => {
                           if (stage === "Edit") {
-                            void handleProposeRevision(msg);
+                            void handleProposeRevision(msg, chipLabel);
                             return;
                           }
                           prefillReed(msg);
                         };
                         if (chip.startsWith("Tighten to")) {
-                          propose(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`);
+                          propose(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`, chip);
                         } else if (chip.startsWith("Expand")) {
-                          propose(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`);
+                          propose(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`, chip);
                         } else {
-                          propose(chip);
+                          propose(chip, chip);
                         }
                       }}
                     />

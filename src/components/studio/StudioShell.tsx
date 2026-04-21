@@ -265,7 +265,7 @@ export default function StudioShell() {
   const [dashContent, setDashContent] = useState<React.ReactNode | null>(null);
   const [feedbackContent, setFeedbackContent] = useState<React.ReactNode | null>(null);
   const [reedPrefill, setReedPrefill] = useState("");
-  const [reedChipRequest, setReedChipRequest] = useState<{ id: number; text: string } | null>(null);
+  const [reedChipRequest, setReedChipRequest] = useState<{ id: number; text: string; label?: string } | null>(null);
   const [reedThread, setReedThread] = useState<Array<{ type: "user" | "reed" | "note"; text: string; from?: string; to?: string }>>([]);
   const [proposalPending, setProposalPending] = useState(false);
 
@@ -531,9 +531,9 @@ function ReedPanel() {
     });
   }, []);
 
-  const runChip = useCallback((text: string) => {
+  const runChip = useCallback((text: string, label?: string) => {
     if (stageKey === "Edit") {
-      setReedChipRequest({ id: Date.now(), text });
+      setReedChipRequest({ id: Date.now(), text, label });
       return;
     }
     prefillAndFocus(text);
@@ -618,7 +618,7 @@ function ReedPanel() {
               <button
                 key={ci}
                 type="button"
-                onClick={() => { if (!disabled) runChip(chip.prefill); }}
+                onClick={() => { if (!disabled) runChip(chip.prefill, chip.label); }}
                 disabled={disabled}
                 style={{
                   fontSize: 10, padding: "4px 10px", borderRadius: 99,
