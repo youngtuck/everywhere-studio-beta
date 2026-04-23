@@ -19,6 +19,10 @@ export interface ShellCtx {
   setReedThread: (fn: (prev: any[]) => any[]) => void;
   proposalPending: boolean;
   setProposalPending: (v: boolean) => void;
+  intakeProgress: { questionCount: number; ready: boolean };
+  setIntakeProgress: (v: { questionCount: number; ready: boolean }) => void;
+  intakeAdvance: (() => void) | null;
+  setIntakeAdvance: (fn: (() => void) | null) => void;
 }
 
 export const ShellContext = createContext<ShellCtx>({
@@ -40,6 +44,10 @@ export const ShellContext = createContext<ShellCtx>({
   setReedThread: () => {},
   proposalPending: false,
   setProposalPending: () => {},
+  intakeProgress: { questionCount: 0, ready: false },
+  setIntakeProgress: () => {},
+  intakeAdvance: null,
+  setIntakeAdvance: () => {},
 });
 
 export function useShell() {

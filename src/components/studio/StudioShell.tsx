@@ -269,6 +269,8 @@ export default function StudioShell() {
   const [reedChipRequest, setReedChipRequest] = useState<{ id: number; text: string; label?: string } | null>(null);
   const [reedThread, setReedThread] = useState<Array<{ type: "user" | "reed" | "note"; text: string; from?: string; to?: string }>>([]);
   const [proposalPending, setProposalPending] = useState(false);
+  const [intakeProgress, setIntakeProgress] = useState<{ questionCount: number; ready: boolean }>({ questionCount: 0, ready: false });
+  const [intakeAdvance, setIntakeAdvance] = useState<(() => void) | null>(null);
 
   const studioGlassDense =
     location.pathname.startsWith("/studio/outputs") ||
@@ -291,6 +293,8 @@ export default function StudioShell() {
       reedChipRequest, setReedChipRequest,
       reedThread, setReedThread,
       proposalPending, setProposalPending,
+      intakeProgress, setIntakeProgress,
+      intakeAdvance, setIntakeAdvance,
     }}>
       <ProjectProvider>
       <div
@@ -511,7 +515,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
 const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 
 function ReedPanel() {
-  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending } = useShell();
+  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending, intakeProgress, intakeAdvance } = useShell();
   const location = useLocation();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -523,7 +527,14 @@ function ReedPanel() {
     : location.pathname.includes("/studio/wrap")
       ? "Wrap"
       : workStage;
-  const stageChips = REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
+  // CO_031: Dynamic Intake chips based on progress
+  const stageChips = stageKey === "Intake"
+    ? (intakeProgress.ready || intakeProgress.questionCount >= 5)
+      ? [{ label: "Ready to make an outline", prefill: "" }]
+      : intakeProgress.questionCount === 0
+        ? [{ label: "What are we working on?", prefill: "What are we working on?" }]
+        : [{ label: "Continue the conversation", prefill: "" }]
+    : REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
 
   const prefillAndFocus = useCallback((text: string) => {
     setInput(text);
@@ -533,6 +544,16 @@ function ReedPanel() {
   }, []);
 
   const runChip = useCallback((text: string, label?: string) => {
+    // CO_031: "Ready to make an outline" chip calls handleBuildOutline directly
+    if (label === "Ready to make an outline" && intakeAdvance) {
+      intakeAdvance();
+      return;
+    }
+    // CO_031: "Continue the conversation" chip focuses the main input
+    if (label === "Continue the conversation") {
+      inputRef.current?.focus();
+      return;
+    }
     if (stageKey === "Edit") {
       setReedChipRequest({ id: Date.now(), text, label });
       return;
