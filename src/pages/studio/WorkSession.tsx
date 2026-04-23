@@ -1138,7 +1138,7 @@ function ReviewDash({
                 </div>
               ) : methodLintInspectorError === "timeout" ? (
                 <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
-                  <div style={{ marginBottom: 8 }}>Check timed out. Try again.</div>
+                  <div style={{ marginBottom: 8 }}>The method terminology check timed out. This can happen with longer drafts. Hit Retry, it usually resolves in one attempt.</div>
                   <button
                     type="button"
                     className="liquid-glass-btn"
@@ -1164,7 +1164,7 @@ function ReviewDash({
                 </div>
               ) : (
                 <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
-                  <div style={{ marginBottom: 8 }}>Check could not finish. Try again.</div>
+                  <div style={{ marginBottom: 8 }}>The method terminology check did not complete. Hit Retry, it usually resolves in one attempt.</div>
                   <button
                     type="button"
                     className="liquid-glass-btn"
@@ -4832,7 +4832,7 @@ export default function WorkSession() {
       // Re-run background pipeline on the new draft
       void handleBackgroundQualityCheck(newDraft);
     } catch (err: any) {
-      toast("Draft repair failed. Your draft is unchanged.", "error");
+      toast("The repair did not complete. Your draft is unchanged. Try again or edit manually.", "error");
       console.error("[WorkSession][draftRepair]", err);
     } finally {
       setDraftRepairing(false);
@@ -5244,7 +5244,7 @@ export default function WorkSession() {
 
       // Pipeline complete - no toast, results show in Review stage silently
     } catch (err: any) {
-      toast("Pipeline encountered an error. Try again.", "error");
+      toast("The quality review could not finish. Try again.", "error");
       console.error("[WorkSession][pipeline]", err);
     } finally {
       setPipelineRunning(false);
@@ -5498,7 +5498,7 @@ export default function WorkSession() {
         } : prev);
       }
     } catch (err: any) {
-      toast("Voice test rerun failed. Try again.", "error");
+      toast("The Human Voice Test did not complete. Hit Retry, it usually resolves in one attempt.", "error");
       console.error("[WorkSession][hvt-rerun]", err);
     } finally {
       setHvtRunning(false);
@@ -5797,7 +5797,7 @@ export default function WorkSession() {
       }
     } catch (err: any) {
       console.error("[handleReviewFix]", err);
-      toast("Fix failed. Try again.", "error");
+      toast("Reed could not apply the fix. Try again or go back to Draft to edit manually.", "error");
       throw err;
     }
   }, [draft, buildConvSummary, outputType, user?.id, voiceDnaMd, brandDnaMd, activeReviewTab, toast, preWrapPresentationMins, talkDuration, structuredIntakePayload]);
@@ -5881,7 +5881,7 @@ export default function WorkSession() {
       toast("Quality pipeline refreshed.");
     } catch (err: any) {
       console.error("[handleRerunPipeline]", err);
-      toast("Pipeline refresh failed.", "error");
+      toast("The quality review could not refresh. Try again.", "error");
     } finally {
       setRerunningPipeline(false);
     }
@@ -6033,7 +6033,7 @@ export default function WorkSession() {
       }
     } catch (err: any) {
       console.error("[handleRepairPipeline]", err);
-      toast("Fix failed. Try again.", "error");
+      toast("The repair did not complete. Try again or go back to Draft to edit manually.", "error");
     } finally {
       setFixingGate(null);
     }
