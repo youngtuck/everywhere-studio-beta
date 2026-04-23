@@ -2279,6 +2279,7 @@ const DIRECTIVE_CONFIRMATIONS = [
 function StageEdit({
   draft, generating, generatingLabel, applyingSuggestion, proposalLoading, onDraftChange, onAdvance, onRevise,
   onConverse, converseLoading, converseReply,
+  hasDraftFlags, onAdvanceForced,
   versions, activeVersionIdx, onVersionSelect, onGenerateVersion, canGenerateMore,
 }: {
   draft: string; generating: boolean; generatingLabel: string;
@@ -2289,6 +2290,8 @@ function StageEdit({
   onConverse: (text: string) => void;
   converseLoading?: boolean;
   converseReply: string | null;
+  hasDraftFlags?: boolean;
+  onAdvanceForced?: () => void;
   versions: Array<{ content: string; label: string }>;
   activeVersionIdx: number;
   onVersionSelect: (idx: number) => void;
@@ -2297,6 +2300,8 @@ function StageEdit({
 }) {
   const [input, setInput] = useState("");
   const titleRef = useRef<HTMLTextAreaElement>(null);
+  // CO_029 Failure 6: Draft flags warning before advancing to Review
+  const [showFlagsWarning, setShowFlagsWarning] = useState(false);
   // CO_024: Reed response bubble state
   const [reedResponse, setReedResponse] = useState<string | null>(null);
 
@@ -2482,7 +2487,58 @@ function StageEdit({
         )}
         </div>
 
-        {!generating && draft && <AdvanceButton label="Finish and Review &#8594;" onClick={onAdvance} />}
+        {/* CO_029 Failure 6: Warn before advancing when draft has flags */}
+        {!generating && draft && !showFlagsWarning && (
+          <AdvanceButton
+            label="Finish and Review &#8594;"
+            onClick={() => {
+              if (hasDraftFlags) {
+                setShowFlagsWarning(true);
+              } else {
+                onAdvance();
+              }
+            }}
+          />
+        )}
+        {showFlagsWarning && (
+          <div style={{
+            width: "100%", boxSizing: "border-box" as const,
+            padding: "10px clamp(12px, 3vw, 20px) 10px",
+            flexShrink: 0,
+          }}>
+            <div style={{
+              padding: "10px 14px", borderRadius: 8,
+              border: "1px solid rgba(245,198,66,0.3)",
+              background: "rgba(245,198,66,0.06)",
+              marginBottom: 8,
+            }}>
+              <div style={{ fontSize: 11, color: "var(--fg)", fontWeight: 600, marginBottom: 4 }}>
+                Draft has flagged items
+              </div>
+              <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                Reed found issues during review. You can address them now or continue to Review.
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+              <button
+                type="button"
+                className="liquid-glass-btn-gold"
+                onClick={() => setShowFlagsWarning(false)}
+                style={{ padding: "8px 16px", fontSize: 11, fontFamily: FONT }}
+              >
+                <span className="liquid-glass-btn-gold-label">Address flags</span>
+              </button>
+              <button
+                type="button"
+                className="liquid-glass-btn"
+                onClick={() => { setShowFlagsWarning(false); (onAdvanceForced || onAdvance)(); }}
+                style={{ padding: "8px 16px", fontSize: 11, fontFamily: FONT }}
+              >
+                <span className="liquid-glass-btn-label" style={{ fontWeight: 600 }}>Review as-is</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* CO_024: Reed response bubble */}
@@ -6086,14 +6142,61 @@ export default function WorkSession() {
                     )}
                   </DpSection>
 
-                  {backgroundPipelineRun && (
-                    <DpSection>
-                      <div style={{ fontSize: 10, color: "#22C55E", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
-                        <span>&#10003;</span>
-                        <span>Reed has reviewed your draft.</span>
-                      </div>
-                    </DpSection>
-                  )}
+                  {backgroundPipelineRun && (() => {
+                    const bgNonPass = deriveReviewDisplayGates(
+                      backgroundPipelineRun.checkpointResults,
+                      backgroundPipelineRun.humanVoiceTest,
+                    ).filter(g => g.status !== "Pass");
+
+                    if (bgNonPass.length === 0) {
+                      return (
+                        <DpSection>
+                          <div style={{ fontSize: 10, color: "#22C55E", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                            <span>&#10003;</span>
+                            <span>Reed has reviewed your draft. No issues found.</span>
+                          </div>
+                        </DpSection>
+                      );
+                    }
+
+                    // CO_029 Failure 6: Surface draft-quality flags at Draft stage
+                    return (
+                      <DpSection>
+                        <DpLabel>Draft flags</DpLabel>
+                        {bgNonPass.map((g, i) => {
+                          const gLower = (g.name || "").toLowerCase();
+                          const src = backgroundPipelineRun.checkpointResults.find(cp => {
+                            if (gLower.includes("slop")) return cp.gate === "checkpoint-4";
+                            if (gLower.includes("dedup")) return cp.gate === "checkpoint-0";
+                            if (gLower.includes("human")) return cp.gate === "checkpoint-2";
+                            if (gLower.includes("humanization")) return cp.gate === "checkpoint-5" || cp.gate === "checkpoint-3";
+                            return false;
+                          });
+                          const summary = src?.feedback
+                            ? src.feedback.length > 120 ? src.feedback.slice(0, 117) + "..." : src.feedback
+                            : "";
+                          return (
+                            <div key={i} style={{
+                              marginBottom: 6, padding: "6px 8px", borderRadius: 5,
+                              border: `1px solid ${g.status === "Fail" ? "rgba(185,28,28,0.25)" : "rgba(245,198,66,0.3)"}`,
+                              background: g.status === "Fail" ? "rgba(185,28,28,0.04)" : "rgba(245,198,66,0.04)",
+                            }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                <span style={{
+                                  width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
+                                  background: g.status === "Fail" ? "#b91c1c" : "var(--gold-bright)",
+                                }} />
+                                <span style={{ fontSize: 10, fontWeight: 600, color: "var(--fg)" }}>{g.name}</span>
+                              </div>
+                              {summary && (
+                                <div style={{ fontSize: 9, color: "var(--fg-3)", lineHeight: 1.45, marginTop: 3 }}>{summary}</div>
+                              )}
+                            </div>
+                          );
+                        })}
+                      </DpSection>
+                    );
+                  })()}
                   {backgroundPipelineRunning && (
                     <DpSection>
                       <div style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
@@ -6705,6 +6808,12 @@ export default function WorkSession() {
           onConverse={handleDraftConverse}
           converseLoading={draftConverseLoading}
           converseReply={draftConverseReply}
+          hasDraftFlags={
+            !!(backgroundPipelineRun && !draftChangedSinceBackground &&
+              deriveReviewDisplayGates(backgroundPipelineRun.checkpointResults, backgroundPipelineRun.humanVoiceTest)
+                .some(g => g.status !== "Pass"))
+          }
+          onAdvanceForced={handleRunPipeline}
           versions={draftVersions}
           activeVersionIdx={activeVersionIdx}
           onVersionSelect={(idx) => {
