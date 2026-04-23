@@ -4778,6 +4778,67 @@ export default function WorkSession() {
     setPendingProposal(null);
   }, []);
 
+  // ── CO_029 Failure 6: Draft-stage repair handler ────────────
+  const [draftRepairing, setDraftRepairing] = useState(false);
+
+  const handleDraftRepair = useCallback(async () => {
+    if (!draft || !user || !backgroundPipelineRun || draftRepairing) return;
+
+    const issues = backgroundPipelineRun.checkpointResults
+      .filter(g => g.status !== "PASS")
+      .map(g => `[${displayGateName(g.gate)}]: ${g.feedback}`)
+      .join("\n");
+    if (!issues) return;
+
+    setDraftRepairing(true);
+    try {
+      const repairOt = catalogOutputTypeForApi(outputType);
+      const res = await fetchWithRetry(`${API_BASE}/api/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationSummary: buildConvSummary(),
+          outputType: repairOt,
+          originalDraft: draft,
+          revisionNotes: `Fix these quality checkpoint issues while preserving the voice and argument:\n\n${issues}`,
+          userId: user.id,
+          maxTokens: 4096,
+          ...(repairOt === "talk" ? { talkDurationMinutes: talkDuration } : {}),
+          ...(structuredIntakePayload ? { structuredIntake: structuredIntakePayload } : {}),
+        }),
+      }, { timeout: 90000 });
+
+      if (!res.ok) throw new Error(`Draft repair error ${res.status}`);
+      const data = await res.json();
+      const newDraft = data.content;
+
+      if (!newDraft || newDraft.trim() === draft.trim()) {
+        toast("No changes detected. Try editing manually.", "info");
+        return;
+      }
+
+      setDraft(newDraft);
+      setDismissedFlags(new Set());
+      setFixedFlags(new Map());
+      setDraftVersions(prev => {
+        const updated = [...prev, { content: newDraft, label: `Version ${prev.length + 1}` }];
+        while (updated.length > 10) updated.shift();
+        return updated;
+      });
+      setActiveVersionIdx(prev => Math.min(prev + 1, 9));
+
+      toast("Reed revised the draft. Re-checking quality...");
+
+      // Re-run background pipeline on the new draft
+      void handleBackgroundQualityCheck(newDraft);
+    } catch (err: any) {
+      toast("Draft repair failed. Your draft is unchanged.", "error");
+      console.error("[WorkSession][draftRepair]", err);
+    } finally {
+      setDraftRepairing(false);
+    }
+  }, [draft, user, backgroundPipelineRun, draftRepairing, buildConvSummary, outputType, talkDuration, structuredIntakePayload, toast, handleBackgroundQualityCheck]);
+
   // ── CO_024: Draft-stage conversation handler ────────────────
   const [draftConverseLoading, setDraftConverseLoading] = useState(false);
   const [draftConverseReply, setDraftConverseReply] = useState<string | null>(null);
@@ -6194,6 +6255,22 @@ export default function WorkSession() {
                             </div>
                           );
                         })}
+                        <button
+                          type="button"
+                          className="liquid-glass-btn-gold"
+                          onClick={handleDraftRepair}
+                          disabled={draftRepairing}
+                          style={{
+                            width: "100%", marginTop: 4, padding: "6px 12px",
+                            fontSize: 10, fontFamily: FONT,
+                            opacity: draftRepairing ? 0.6 : 1,
+                            cursor: draftRepairing ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          <span className="liquid-glass-btn-gold-label">
+                            {draftRepairing ? "Reed is working on it..." : "Let Reed address these"}
+                          </span>
+                        </button>
                       </DpSection>
                     );
                   })()}
@@ -6334,7 +6411,7 @@ export default function WorkSession() {
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,
-    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal,
+    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing,
     pendingProposal, proposalLoading,
     activeReviewTab, handleReviewFix, handleExportAll,
     dismissedFlags, fixedFlags, backgroundPipelineRun, backgroundPipelineRunning,
