@@ -941,6 +941,8 @@ function ReviewDash({
   methodLintLastCompletedFp,
   draftLintFp,
   onRetryMethodLint,
+  reedActionMessage,
+  onDismissReedAction,
 }: {
   pipelineRun: PipelineRun | null; running: boolean;
   onExportAll: () => void; allExported: boolean;
@@ -954,6 +956,8 @@ function ReviewDash({
   methodLintLastCompletedFp: string | null;
   draftLintFp: string;
   onRetryMethodLint: () => void;
+  reedActionMessage: string | null;
+  onDismissReedAction: () => void;
 }) {
   /** Internal publish readiness from pipeline; never rendered as a number. */
   const publishAggregateOk = pipelineRun?.impactScore != null && pipelineRun.impactScore.total >= 75;
@@ -1035,6 +1039,33 @@ function ReviewDash({
             }}>
               <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 6 }}>Reed</div>
               <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedMessage}</div>
+            </div>
+          )}
+
+          {/* CO_029 Failure 8: Persistent Reed action message */}
+          {reedActionMessage && (
+            <div style={{
+              position: "relative",
+              border: "1px solid rgba(74,144,217,0.25)", borderRadius: 8,
+              padding: "8px 28px 8px 10px", background: "rgba(74,144,217,0.04)",
+              marginBottom: 12,
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+            }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
+              <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
+              <button
+                type="button"
+                onClick={onDismissReedAction}
+                aria-label="Dismiss"
+                style={{
+                  position: "absolute", top: 4, right: 4,
+                  width: 18, height: 18, borderRadius: 4,
+                  border: "none", background: "transparent",
+                  color: "var(--fg-3)", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontFamily: FONT, padding: 0,
+                }}
+              >&times;</button>
             </div>
           )}
 
@@ -3654,6 +3685,9 @@ export default function WorkSession() {
   const [dismissedFlags, setDismissedFlags] = useState<Set<string>>(new Set());
   const [fixedFlags, setFixedFlags] = useState<Map<string, string>>(new Map());
 
+  // ── CO_029 Failure 8: Persistent Reed action message in Inspector ──
+  const [reedActionMessage, setReedActionMessage] = useState<string | null>(null);
+
   // ── CO_026: Propose-before-apply state ──────────────────────
   const [pendingProposal, setPendingProposal] = useState<{
     instruction: string;
@@ -3876,6 +3910,8 @@ export default function WorkSession() {
   // ── Stage navigation ──────────────────────────────────────────
   const goToStage = useCallback((s: WorkStage) => {
     setStage(s);
+    // CO_029 Failure 8: Clear persistent Reed message on stage transition
+    setReedActionMessage(null);
   }, []);
 
   useLayoutEffect(() => {
@@ -4827,7 +4863,7 @@ export default function WorkSession() {
       });
       setActiveVersionIdx(prev => Math.min(prev + 1, 9));
 
-      toast("Reed revised the draft. Re-checking quality...");
+      setReedActionMessage("Reed revised the draft. Re-checking quality...");
 
       // Re-run background pipeline on the new draft
       void handleBackgroundQualityCheck(newDraft);
@@ -5557,6 +5593,7 @@ export default function WorkSession() {
     setProposalLoading(false);
     setDraftConverseLoading(false);
     setDraftConverseReply(null);
+    setReedActionMessage(null);
     setFormatDrafts({});
     setOutlineAngles(null);
     setSelectedAngle("a");
@@ -5791,9 +5828,9 @@ export default function WorkSession() {
           } catch { /* Non-critical: format re-adaptation failed, raw draft already shown */ }
         }
 
-        toast("Draft updated.");
+        setReedActionMessage("Draft updated.");
       } else {
-        toast("No changes detected.");
+        setReedActionMessage("No changes detected.");
       }
     } catch (err: any) {
       console.error("[handleReviewFix]", err);
@@ -5838,7 +5875,7 @@ export default function WorkSession() {
           },
         }));
       }
-      toast("Fix applied.");
+      setReedActionMessage("Fix applied.");
     } else {
       toast("Could not apply fix. Try using Ask Reed instead.", "info");
     }
@@ -5878,7 +5915,7 @@ export default function WorkSession() {
         } as PipelineRun;
       });
 
-      toast("Quality pipeline refreshed.");
+      setReedActionMessage("Quality pipeline refreshed.");
     } catch (err: any) {
       console.error("[handleRerunPipeline]", err);
       toast("The quality review could not refresh. Try again.", "error");
@@ -5964,7 +6001,7 @@ export default function WorkSession() {
         .filter(g => g.status !== "PASS")
         .map(g => displayGateName(g.gate).toLowerCase());
 
-      toast(
+      setReedActionMessage(
         changes.length > 0
           ? `Reed revised the draft: ${changes.join(", ")}. Addressed: ${failingGateNames.join(", ")}. Running checks again...`
           : `Reed revised the draft to address ${failingGateNames.join(", ")}. Running checks again...`
@@ -6018,7 +6055,7 @@ export default function WorkSession() {
           } as PipelineRun;
         });
 
-        toast("Quality pipeline refreshed.");
+        setReedActionMessage("Quality pipeline refreshed.");
 
         // Update Supabase if we have an output
         if (outputId) {
@@ -6282,6 +6319,33 @@ export default function WorkSession() {
                       </div>
                     </DpSection>
                   )}
+                  {/* CO_029 Failure 8: Persistent Reed action message */}
+                  {reedActionMessage && (
+                    <DpSection>
+                      <div style={{
+                        position: "relative",
+                        border: "1px solid rgba(74,144,217,0.25)", borderRadius: 8,
+                        padding: "8px 28px 8px 10px", background: "rgba(74,144,217,0.04)",
+                      }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
+                        <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
+                        <button
+                          type="button"
+                          onClick={() => setReedActionMessage(null)}
+                          aria-label="Dismiss"
+                          style={{
+                            position: "absolute", top: 4, right: 4,
+                            width: 18, height: 18, borderRadius: 4,
+                            border: "none", background: "transparent",
+                            color: "var(--fg-3)", cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 11, fontFamily: FONT, padding: 0,
+                          }}
+                        >&times;</button>
+                      </div>
+                    </DpSection>
+                  )}
+
                   {/* ACTION CHIPS — CO_026: propose-before-apply flow */}
 
                   {/* CO_026: Proposal loading state */}
@@ -6396,6 +6460,8 @@ export default function WorkSession() {
               methodLintLastCompletedFp={methodLintLastCompletedFp}
               draftLintFp={draftLintFp}
               onRetryMethodLint={handleRetryMethodLint}
+              reedActionMessage={reedActionMessage}
+              onDismissReedAction={() => setReedActionMessage(null)}
             />
           );
         }
@@ -6411,7 +6477,7 @@ export default function WorkSession() {
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,
-    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing,
+    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing, reedActionMessage,
     pendingProposal, proposalLoading,
     activeReviewTab, handleReviewFix, handleExportAll,
     dismissedFlags, fixedFlags, backgroundPipelineRun, backgroundPipelineRunning,
