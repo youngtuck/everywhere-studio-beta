@@ -34,7 +34,6 @@ export const REED_STAGE_CHIPS: Record<string, Array<{ label: string; prefill: st
     { label: "Stronger opening", prefill: "Rewrite the opening paragraph to pass the 7-second hook test. Keep my voice." },
   ],
   Review: [
-    { label: "What needs fixing?", prefill: "What are the specific issues the checkpoints flagged? Tell me in plain language." },
     { label: "Final read", prefill: "Do a final read of this piece as an adversarial editor. What would make someone stop reading?" },
     { label: "Pull the best line", prefill: "Pull the single most quotable line from this piece for social." },
     { label: "Is this ready?", prefill: "Is this ready to publish? Give me your honest assessment in two sentences." },
