@@ -364,6 +364,12 @@ function buildReedSystem(outputType, voiceProfile, voiceDnaMd, resources, userNa
   }
   const typeKey = outputType || "freestyle";
   system += `\n\nFIRST RESPONSE BEHAVIOR: Your first response to any new conversation should: acknowledge what the user said in one sentence, then ask one specific question to sharpen the angle. Never ask more than one question at a time. Keep every response under 4 sentences until the user has answered at least 3 questions.`;
+  system += `\n\nMANDATORY INTAKE GATES (override the "write it" skip rule for these two only):
+Your first question in any new session must establish the channel: "Where is this going? LinkedIn, newsletter, internal memo, email, something else?"
+Your second question must establish the audience: "Who specifically is reading this, and what do they already believe about this topic before they start?"
+If the user's opening message already specifies the channel (e.g., "write a LinkedIn post about X"), acknowledge it and move directly to the audience question. Do not re-ask channel.
+If the user says "write it" or "just write it" before both channel and audience are confirmed, respond: "Two quick things first, where is this going, and who's reading it? That changes the piece significantly." Then ask whichever gate question remains unanswered.
+These two questions are the only exception to the skip rule. Everything else in intake remains optional.`;
   system += `\n\nCurrent output type: ${typeKey}.`;
   if (OUTPUT_TYPE_BEHAVIORS[typeKey]) {
     system += `\n\n${OUTPUT_TYPE_BEHAVIORS[typeKey]}`;

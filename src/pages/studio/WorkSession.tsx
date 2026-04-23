@@ -4032,7 +4032,18 @@ export default function WorkSession() {
           reedLower.includes("here is what i will produce") ||
           reedLower.includes("here's what i'll produce");
 
-        if ((userWantsToGenerate && userMsgs.length >= 2) || reedSignalsReady || userMsgs.length >= 5) {
+        // CO_023: Channel + audience must be answered before skip is allowed.
+        // Heuristic: user's first message is the topic, messages 2 and 3 are
+        // answers to channel and audience. Require 3+ user messages.
+        const hasChannelAndAudience = userMsgs.length >= 3;
+
+        if (userWantsToGenerate && !hasChannelAndAudience) {
+          // Block skip: inject Reed's redirect message
+          setMessages(prev => [...prev, {
+            role: "reed",
+            content: "Two quick things first, where is this going, and who's reading it? That changes the piece significantly.",
+          }]);
+        } else if ((userWantsToGenerate && hasChannelAndAudience) || reedSignalsReady || userMsgs.length >= 5) {
           setIntakeReady(true);
           setReadySummary(reply);
         }
@@ -4312,7 +4323,18 @@ export default function WorkSession() {
     setIntakeMainFadeOut(false);
     setOutlineEnterActive(false);
     setGenerating(true);
-    setGeneratingLabel("Generating draft...");
+
+    // CO_023: Confirmation line showing channel + audience before generation
+    const channel = structuredIntake?.format
+      || outputTypeDisplayLabel(catalogOutputTypeForApi(outputType))
+      || "content piece";
+    const rawAudience = structuredIntake?.audience || "";
+    const audienceSummary = rawAudience.length > 80 ? rawAudience.slice(0, 77) + "..." : rawAudience;
+    setGeneratingLabel(
+      audienceSummary
+        ? `Writing a ${channel} for ${audienceSummary}...`
+        : `Writing a ${channel}...`
+    );
     setDraft("");
 
     const convSummary = buildConvSummary();
@@ -4382,7 +4404,7 @@ export default function WorkSession() {
     } finally {
       setGenerating(false);
     }
-  }, [buildConvSummary, outlineRows, user?.id, toast, goToStage, handleBackgroundQualityCheck, outputType, talkDuration, structuredIntakePayload]);
+  }, [buildConvSummary, outlineRows, user?.id, toast, goToStage, handleBackgroundQualityCheck, outputType, talkDuration, structuredIntakePayload, structuredIntake]);
 
   const handleGenerateDraft = useCallback(() => {
     if (outputType === "talk" && !talkLengthGatePassed) {
