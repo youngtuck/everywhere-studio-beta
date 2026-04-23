@@ -3355,7 +3355,7 @@ function readResumeQuery(): string | null {
 }
 
 export default function WorkSession() {
-  const { setFeedbackContent, setReedPrefill, setReedThread, reedChipRequest, setReedChipRequest, setProposalPending } = useShell();
+  const { setFeedbackContent, setReedPrefill, setReedThread, reedChipRequest, setReedChipRequest, setProposalPending, setIntakeProgress, setIntakeAdvance } = useShell();
   const prefillReed = useCallback((text: string) => {
     setReedPrefill(text);
   }, [setReedPrefill]);
@@ -3406,6 +3406,12 @@ export default function WorkSession() {
     const rq = messages.filter(m => m.role === "reed" && m.content.trim().endsWith("?")).length;
     if (rq >= 5 && !intakeReady) setIntakeReady(true);
   }, [messages, stage, intakeReady]);
+
+  // CO_031: Sync intake progress to shell context for sidebar
+  const intakeReedQCountForShell = messages.filter(m => m.role === "reed" && m.content.trim().endsWith("?")).length;
+  useEffect(() => {
+    setIntakeProgress({ questionCount: intakeReedQCountForShell, ready: intakeReady });
+  }, [intakeReedQCountForShell, intakeReady, setIntakeProgress]);
 
   // ── Output type (CO-003) ─────────────────────────────────────
   const [outputType, setOutputType] = useState<string | null>(() => persisted?.outputTypeId ?? null);
@@ -4189,6 +4195,12 @@ export default function WorkSession() {
       }
     })();
   }, [messages, goToStage, outputType, user?.id, toast]);
+
+  // CO_031: Expose handleBuildOutline to sidebar via shell context
+  useEffect(() => {
+    setIntakeAdvance(() => handleBuildOutline);
+    return () => setIntakeAdvance(null);
+  }, [handleBuildOutline, setIntakeAdvance]);
 
   // ── BACKGROUND: Silent quality check after draft generation (Redesign 2) ──
   const handleBackgroundQualityCheck = useCallback(async (generatedDraft: string) => {
@@ -5823,8 +5835,24 @@ export default function WorkSession() {
   useLayoutEffect(() => {
     const dashNode = (() => {
       switch (stage) {
-        case "Intake":
-          return null;
+        case "Intake": {
+          // CO_031: Session-aware intake feedback instead of static fallback
+          const iqCount = messages.filter(m => m.role === "reed" && m.content.trim().endsWith("?")).length;
+          let intakeTakeText: string;
+          if (intakeReady || iqCount >= 5) {
+            intakeTakeText = "Reed has what he needs. Click 'Ready to make an outline' below to continue.";
+          } else if (iqCount === 0) {
+            intakeTakeText = "Reed is getting to know your idea. Answer a few questions to sharpen the brief.";
+          } else {
+            intakeTakeText = `Intake in progress. ${iqCount} of ~5 questions answered.`;
+          }
+          return (
+            <DpSection>
+              <DpLabel>Reed's Take</DpLabel>
+              <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{intakeTakeText}</div>
+            </DpSection>
+          );
+        }
         case "Outline":
           return <OutlineDash selectedFormats={selectedFormats} />;
         case "Edit": {
@@ -6097,7 +6125,7 @@ export default function WorkSession() {
     setFeedbackContent(dashNode);
     return () => setFeedbackContent(null);
   }, [
-    stage, selectedFormats, selectedTemplate, draft, generating, generatingLabel,
+    stage, selectedFormats, selectedTemplate, draft, generating, generatingLabel, messages, intakeReady,
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,

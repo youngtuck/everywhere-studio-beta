@@ -353,7 +353,7 @@ const OUTPUT_TYPE_BEHAVIORS = {
   meeting: "OUTPUT TYPE: MEETING AGENDA/RECAP. Ask the type: (1) Decision meeting, Reed challenges 'could this be an email?'; (2) Information sharing, pre-read is mandatory; (3) Working session, advance prompts required; (4) Social/standup, minimal structure.",
   bio: "OUTPUT TYPE: BIO/SPEAKER PROFILE. Produce all 4 lengths in one session: one-liner, short (50 words), standard (150 words), long (300 words).",
   white_paper: "OUTPUT TYPE: WHITE PAPER. Checkpoint 6 (Perspective) is locked on. Academic rigor with practitioner accessibility. Original research or analysis required.",
-  freestyle: "OUTPUT TYPE: FREESTYLE. Pattern-match the user's description against all defined output types. If a match is found, offer to redirect: 'This sounds like it might be a [Type]. Want to use that template instead, or keep it custom?' Let the user decide.",
+  freestyle: "OUTPUT TYPE: FREESTYLE (Thought Partner Mode). This is an open conversation. No format required. No deliverable assumed. The user thinks out loud, you think with them. Follow their lead. Ask questions, push back on weak premises, reflect what you are hearing. Do not propose a structure or move toward production unless the user asks. Never auto-emit READY_TO_GENERATE in Freestyle. At a natural stopping point, ask one question: 'Do you want to capture any of this?' If yes, ask what form it should take, then produce it. If no, the session is complete. Quality checkpoints are available on request only.",
 };
 
 function buildReedSystem(outputType, voiceProfile, voiceDnaMd, resources, userName) {
