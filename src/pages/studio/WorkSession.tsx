@@ -308,8 +308,20 @@ const PRE_WRAP_PICK_GROUPS: Record<PreWrapPickCategory, { id: string; label: str
   ],
 };
 
+/** All valid wrap format IDs from PRE_WRAP_PICK_GROUPS. */
+const VALID_WRAP_IDS = new Set([
+  "essay", "talk", "podcast", "video_script", "email",
+  "social_media", "newsletter",
+  "presentation", "proposal", "one_pager", "report",
+  "executive_summary", "case_study", "sow", "meeting", "bio", "white_paper",
+]);
+
 /** Heuristic primary output type for Pre-Wrap highlight (not a model call). */
-function inferRecommendedWrapOutputId(draft: string): string {
+function inferRecommendedWrapOutputId(draft: string, outputType?: string | null): string {
+  // CO_029 Failure 4: Prefer the user's chosen output type when it's a valid wrap format
+  if (outputType && outputType !== "freestyle" && VALID_WRAP_IDS.has(outputType)) {
+    return outputType;
+  }
   const t = draft.slice(0, 14000).toLowerCase();
   const head = draft.slice(0, 1200).trim();
   if (/\[(pause|beat)\]/i.test(t)) return "talk";
@@ -2953,6 +2965,16 @@ function PreWrapOutputGate({
   talkDuration: number;
   onTalkDurationChange: (n: number) => void;
 }) {
+  // CO_029 Failure 4: First-use Wrap explanation
+  const [showWrapExplainer] = useState(() => {
+    try { return !localStorage.getItem("ew-wrap-explained"); } catch { return false; }
+  });
+  useEffect(() => {
+    if (showWrapExplainer) {
+      try { localStorage.setItem("ew-wrap-explained", "1"); } catch { /* noop */ }
+    }
+  }, [showWrapExplainer]);
+
   // CO_029 Failure 1: Conditional header based on flag state
   const hvtHasFlags = pipelineRun?.humanVoiceTest && pipelineRun.humanVoiceTest.flaggedLines.length > 0;
   const reviewStatusLine = !pipelineRun
@@ -3038,6 +3060,11 @@ function PreWrapOutputGate({
             {hvtLine}
           </p>
         ) : null}
+        {showWrapExplainer && (
+          <p style={{ fontSize: 12, color: "var(--gold)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT, fontWeight: 500 }}>
+            Wrap formats and delivers your piece for the channel you choose.
+          </p>
+        )}
         <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 22px", lineHeight: 1.5, fontFamily: FONT }}>
           Select exactly one Catalog format to start Wrap, or turn on Add another format and pick two.
         </p>
@@ -3084,6 +3111,8 @@ function PreWrapOutputGate({
                 const isRec = item.id === recommendedId;
                 const isSel = selectedIds.includes(item.id);
                 const suggestOnly = isRec && !isSel;
+                // CO_029 Failure 4: Non-recommended, non-selected items are visually secondary
+                const isSecondary = !isRec && !isSel;
                 const selectedStyle: CSSProperties = isSel
                   ? {
                     border: "2px solid var(--gold-bright, #F5C642)",
@@ -3102,7 +3131,7 @@ function PreWrapOutputGate({
                     type="button"
                     aria-pressed={isSel}
                     onClick={() => onPickFormat(item.id)}
-                    style={{ ...baseCard, ...selectedStyle }}
+                    style={{ ...baseCard, ...selectedStyle, ...(isSecondary ? { opacity: 0.7 } : {}) }}
                   >
                     {isSel ? <PreWrapCornerCheck /> : null}
                     <span style={{ paddingRight: isSel ? 24 : 0 }}>{item.label}</span>
@@ -5492,8 +5521,8 @@ export default function WorkSession() {
     && !allExported;
 
   const recommendedWrapOutputId = useMemo(
-    () => inferRecommendedWrapOutputId(draft || ""),
-    [draft],
+    () => inferRecommendedWrapOutputId(draft || "", catalogOutputTypeForApi(outputType)),
+    [draft, outputType],
   );
 
   useEffect(() => {
