@@ -887,6 +887,50 @@ function deriveReviewDisplayGates(
   ];
 }
 
+// CO_029 Failure 1: HVT flagged lines with optional collapse
+function HvtFlaggedSection({ lines, initialShow }: { lines: HVTFlaggedLine[]; initialShow: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? lines : lines.slice(0, initialShow);
+  const remaining = lines.length - initialShow;
+
+  return (
+    <DpSection>
+      <DpLabel>Voice test flags</DpLabel>
+      {visible.map((fl, i) => (
+        <div key={i} style={{
+          marginBottom: 8, padding: "8px 10px", borderRadius: 6,
+          border: "1px solid rgba(74,144,217,0.2)",
+          background: "rgba(74,144,217,0.04)",
+        }}>
+          <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5, marginBottom: 4, fontStyle: "italic" }}>
+            "{fl.original}"
+          </div>
+          <div style={{ fontSize: 10, color: "var(--fg-3)", lineHeight: 1.5 }}>
+            {fl.issue}
+          </div>
+          {fl.suggestion && (
+            <div style={{ fontSize: 10, color: "var(--blue, #4A90D9)", lineHeight: 1.5, marginTop: 2 }}>
+              Suggestion: {fl.suggestion}
+            </div>
+          )}
+        </div>
+      ))}
+      {!expanded && remaining > 0 && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          style={{
+            fontSize: 10, color: "var(--blue, #4A90D9)", cursor: "pointer",
+            background: "none", border: "none", padding: 0, fontFamily: FONT,
+          }}
+        >
+          Show {remaining} more
+        </button>
+      )}
+    </DpSection>
+  );
+}
+
 // ── Review dashboard ──────────────────────────────────────────
 function ReviewDash({
   pipelineRun, running, onExportAll, allExported, onRepairPipeline, fixingGate, rerunning,
@@ -993,6 +1037,60 @@ function ReviewDash({
               <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedMessage}</div>
             </div>
           )}
+
+          {/* CO_029 Failure 1: Flagged checkpoint items */}
+          {nonPassGates.length > 0 && (
+            <DpSection>
+              <DpLabel>Flagged items</DpLabel>
+              {nonPassGates.map((g, i) => {
+                // Map display gate name back to checkpoint feedback
+                const gateNameLower = (g.name || "").toLowerCase();
+                const sourceCheckpoint = pipelineRun.checkpointResults.find(cp => {
+                  if (gateNameLower.includes("slop")) return cp.gate === "checkpoint-4";
+                  if (gateNameLower.includes("dedup")) return cp.gate === "checkpoint-0";
+                  if (gateNameLower.includes("human")) return cp.gate === "checkpoint-2";
+                  if (gateNameLower.includes("humanization")) return cp.gate === "checkpoint-5" || cp.gate === "checkpoint-3";
+                  return false;
+                });
+                return (
+                  <div key={i} style={{
+                    marginBottom: 8, padding: "8px 10px", borderRadius: 6,
+                    border: `1px solid ${g.status === "Fail" ? "rgba(185,28,28,0.25)" : "rgba(245,198,66,0.3)"}`,
+                    background: g.status === "Fail" ? "rgba(185,28,28,0.04)" : "rgba(245,198,66,0.04)",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                      <span style={{
+                        width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                        background: g.status === "Fail" ? "#b91c1c" : "var(--gold-bright)",
+                      }} />
+                      <span style={{ fontSize: 11, fontWeight: 600, color: "var(--fg)" }}>{g.name}</span>
+                      <span style={{ fontSize: 9, color: "var(--fg-3)", marginLeft: "auto" }}>{g.status}</span>
+                    </div>
+                    {sourceCheckpoint?.feedback && (
+                      <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5, marginBottom: sourceCheckpoint.issues?.length ? 4 : 0 }}>
+                        {sourceCheckpoint.feedback}
+                      </div>
+                    )}
+                    {sourceCheckpoint?.issues && sourceCheckpoint.issues.length > 0 && (
+                      <ul style={{ margin: "4px 0 0", paddingLeft: 16, fontSize: 10, color: "var(--fg-3)", lineHeight: 1.5 }}>
+                        {sourceCheckpoint.issues.map((issue, j) => <li key={j}>{issue}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </DpSection>
+          )}
+
+          {/* CO_029 Failure 1: HVT flagged lines */}
+          {pipelineRun.humanVoiceTest && pipelineRun.humanVoiceTest.flaggedLines.length > 0 && (() => {
+            const lines = pipelineRun.humanVoiceTest.flaggedLines;
+            const INITIAL_SHOW = 3;
+            const needsCollapse = lines.length > 5;
+            return (
+              <HvtFlaggedSection lines={lines} initialShow={needsCollapse ? INITIAL_SHOW : lines.length} />
+            );
+          })()}
 
           {/* Primary action buttons */}
           {!publishAggregateOk && (
@@ -2768,11 +2866,15 @@ function PreWrapOutputGate({
   talkDuration: number;
   onTalkDurationChange: (n: number) => void;
 }) {
+  // CO_029 Failure 1: Conditional header based on flag state
+  const hvtHasFlags = pipelineRun?.humanVoiceTest && pipelineRun.humanVoiceTest.flaggedLines.length > 0;
   const reviewStatusLine = !pipelineRun
     ? "When you are ready, continue below."
-    : pipelineRun.status === "PASSED"
-      ? "Checks passed."
-      : "Quality review finished. Address any items Reed flagged before you continue.";
+    : (pipelineRun.status === "PASSED" && !hvtHasFlags)
+      ? "No flags. You're clear to continue."
+      : pipelineRun.status === "PASSED"
+        ? "Checks passed."
+        : "Quality review finished. Address any items Reed flagged before you continue.";
   const hvtLine = !pipelineRun
     ? ""
     : pipelineRun.humanVoiceTest?.verdict === "PASSES"
