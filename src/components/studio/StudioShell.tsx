@@ -532,7 +532,7 @@ function ReedPanel() {
   // CO_031: Dynamic Intake chips based on progress
   // CO_025: Dynamic Edit chips from getDraftInspectorActions
   const stageChips = stageKey === "Intake"
-    ? (intakeProgress.ready || intakeProgress.questionCount >= 5)
+    ? (intakeProgress.ready || intakeProgress.questionCount >= 4)
       ? [{ label: "Ready to make an outline", prefill: "" }]
       : intakeProgress.questionCount === 0
         ? [{ label: "What are we working on?", prefill: "What are we working on?" }]
