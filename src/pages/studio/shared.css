@@ -54,14 +54,11 @@ html:has(.studio-app-shell--viewport-lock) #root {
 .studio-app-shell--document-scroll .studio-app-sidebar-wrap {
   display: flex;
   flex-direction: column;
-  align-self: stretch;
-  min-height: 100vh;
-}
-
-@supports (height: 100dvh) {
-  .studio-app-shell--document-scroll .studio-app-sidebar-wrap {
-    min-height: 100dvh;
-  }
+  align-self: flex-start;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100dvh;
 }
 
 .studio-app-shell--document-scroll .studio-app-sidebar-wrap > .studio-sidebar-rail {
@@ -99,7 +96,14 @@ html:has(.studio-app-shell--viewport-lock) #root {
 
 .studio-app-shell--document-scroll .studio-sidebar-glass-inner {
   overflow-x: hidden;
-  overflow-y: visible;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.studio-app-shell--document-scroll .studio-sidebar-glass-inner::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* Work: fixed viewport, inner main scroll (WorkSession pins chat separately) */

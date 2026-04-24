@@ -1309,6 +1309,31 @@ function StageIntake({
     }
   }, [messages.length, sending]);
 
+  // Scroll fade indicators for discoverability
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  const updateScrollFades = useCallback(() => {
+    const el = messagesScrollRef.current;
+    if (!el) { setCanScrollUp(false); setCanScrollDown(false); return; }
+    setCanScrollUp(el.scrollTop > 4);
+    setCanScrollDown(el.scrollHeight - el.clientHeight - el.scrollTop > 4);
+  }, []);
+
+  useEffect(() => {
+    const el = messagesScrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => updateScrollFades());
+    ro.observe(el);
+    updateScrollFades();
+    return () => ro.disconnect();
+  }, [updateScrollFades]);
+
+  // Update fades when messages change
+  useEffect(() => {
+    requestAnimationFrame(updateScrollFades);
+  }, [messages.length, updateScrollFades]);
+
   // Re-focus input after Reed finishes responding
   const prevSending = useRef(sending);
   useEffect(() => {
@@ -1421,7 +1446,6 @@ function StageIntake({
       flexDirection: "column",
       flex: 1,
       minHeight: 0,
-      height: "100%",
       overflow: "hidden",
       width: "100%",
     }}
@@ -1434,31 +1458,50 @@ function StageIntake({
         width: "100%",
         overflow: "hidden",
         alignItems: "stretch",
-        height: "100%",
       }}
       >
       <div
         className="work-stage-content-column"
         style={{
-          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignSelf: "stretch",
+          position: "relative",
         }}
       >
-        {/* Messages: bounded flex child so overflow-y scrolls instead of growing the stage. */}
+        {/* Scroll fade indicators */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 40, zIndex: 1,
+          background: "linear-gradient(to bottom, var(--bg), transparent)",
+          pointerEvents: "none",
+          opacity: canScrollUp ? 1 : 0,
+          transition: "opacity 150ms",
+        }} />
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: 40, zIndex: 1,
+          background: "linear-gradient(to top, var(--bg), transparent)",
+          pointerEvents: "none",
+          opacity: canScrollDown ? 1 : 0,
+          transition: "opacity 150ms",
+        }} />
+        {/* Messages: block-level overflow container; inner flex wrapper handles bottom-pinning */}
         <div
           ref={messagesScrollRef}
           className="work-intake-messages-scroll"
+          onScroll={updateScrollFades}
           style={{
             flex: 1,
             minHeight: 0,
             overflowY: "auto",
-            padding: "20px clamp(12px, 4vw, 24px)",
-            display: "flex", flexDirection: "column",
-            justifyContent: messages.length <= 8 ? "flex-end" : "flex-start",
           }}
         >
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: messages.length <= 8 ? "flex-end" : "flex-start",
+            minHeight: "100%",
+            padding: "20px clamp(12px, 4vw, 24px)",
+          }}>
           <div style={{
             width: "100%",
             display: "flex",
@@ -1474,6 +1517,7 @@ function StageIntake({
               </div>
             )}
             <div ref={bottomRef} style={{ height: 1 }} />
+          </div>
           </div>
         </div>
 
@@ -1898,10 +1942,9 @@ function ChatInputBar({
           <textarea
             ref={textareaRef}
             value={value}
-            onChange={e => { if (!disabled) onChange(e.target.value); }}
-            onKeyDown={e => { if (!disabled) handleKey(e); }}
+            onChange={e => onChange(e.target.value)}
+            onKeyDown={handleKey}
             placeholder={placeholder}
-            readOnly={disabled}
             rows={1}
             className="reed-input"
             style={{
@@ -1911,7 +1954,6 @@ function ChatInputBar({
               color: "var(--fg)", fontFamily: FONT,
               maxHeight: "min(72vh, 800px)",
               overflowY: "hidden",
-              opacity: disabled ? 0.5 : 1,
               minHeight: 40,
               padding: "6px 4px 6px 0",
             }}
@@ -6634,7 +6676,6 @@ export default function WorkSession() {
     const base = {
       display: "flex" as const,
       flexDirection: "column" as const,
-      overflow: "hidden" as const,
       opacity: intakeMainFadeOut ? 0 : 1,
       transition: (ioTransitionStep === 1 ? `opacity ${IO_INTAKE_FADE_MS}ms ease` : "none") as const,
     };
