@@ -1484,7 +1484,7 @@ function StageIntake({
           opacity: canScrollDown ? 1 : 0,
           transition: "opacity 150ms",
         }} />
-        {/* Messages: bounded flex child so overflow-y scrolls instead of growing the stage. */}
+        {/* Messages: block-level overflow container; inner flex wrapper handles bottom-pinning */}
         <div
           ref={messagesScrollRef}
           className="work-intake-messages-scroll"
@@ -1493,11 +1493,15 @@ function StageIntake({
             flex: 1,
             minHeight: 0,
             overflowY: "auto",
-            padding: "20px clamp(12px, 4vw, 24px)",
-            display: "flex", flexDirection: "column",
-            justifyContent: messages.length <= 8 ? "flex-end" : "flex-start",
           }}
         >
+          <div style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: messages.length <= 8 ? "flex-end" : "flex-start",
+            minHeight: "100%",
+            padding: "20px clamp(12px, 4vw, 24px)",
+          }}>
           <div style={{
             width: "100%",
             display: "flex",
@@ -1513,6 +1517,7 @@ function StageIntake({
               </div>
             )}
             <div ref={bottomRef} style={{ height: 1 }} />
+          </div>
           </div>
         </div>
 
