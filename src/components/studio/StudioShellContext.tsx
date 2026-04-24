@@ -23,6 +23,8 @@ export interface ShellCtx {
   setIntakeProgress: (v: { questionCount: number; ready: boolean }) => void;
   intakeAdvance: (() => void) | null;
   setIntakeAdvance: (fn: (() => void) | null) => void;
+  draftChips: Array<{ label: string; prefill: string }>;
+  setDraftChips: (chips: Array<{ label: string; prefill: string }>) => void;
 }
 
 export const ShellContext = createContext<ShellCtx>({
@@ -48,6 +50,8 @@ export const ShellContext = createContext<ShellCtx>({
   setIntakeProgress: () => {},
   intakeAdvance: null,
   setIntakeAdvance: () => {},
+  draftChips: [],
+  setDraftChips: () => {},
 });
 
 export function useShell() {
