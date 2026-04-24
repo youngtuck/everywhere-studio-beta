@@ -1446,7 +1446,6 @@ function StageIntake({
       flexDirection: "column",
       flex: 1,
       minHeight: 0,
-      height: "100%",
       overflow: "hidden",
       width: "100%",
     }}
@@ -1459,13 +1458,11 @@ function StageIntake({
         width: "100%",
         overflow: "hidden",
         alignItems: "stretch",
-        height: "100%",
       }}
       >
       <div
         className="work-stage-content-column"
         style={{
-          height: "100%",
           display: "flex",
           flexDirection: "column",
           alignSelf: "stretch",
