@@ -271,6 +271,7 @@ export default function StudioShell() {
   const [proposalPending, setProposalPending] = useState(false);
   const [intakeProgress, setIntakeProgress] = useState<{ questionCount: number; ready: boolean }>({ questionCount: 0, ready: false });
   const [intakeAdvance, setIntakeAdvance] = useState<(() => void) | null>(null);
+  const [draftChips, setDraftChips] = useState<Array<{ label: string; prefill: string }>>([]);
 
   const studioGlassDense =
     location.pathname.startsWith("/studio/outputs") ||
@@ -295,6 +296,7 @@ export default function StudioShell() {
       proposalPending, setProposalPending,
       intakeProgress, setIntakeProgress,
       intakeAdvance, setIntakeAdvance,
+      draftChips, setDraftChips,
     }}>
       <ProjectProvider>
       <div
@@ -515,7 +517,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
 const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 
 function ReedPanel() {
-  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending, intakeProgress, intakeAdvance } = useShell();
+  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending, intakeProgress, intakeAdvance, draftChips } = useShell();
   const location = useLocation();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -528,13 +530,16 @@ function ReedPanel() {
       ? "Wrap"
       : workStage;
   // CO_031: Dynamic Intake chips based on progress
+  // CO_025: Dynamic Edit chips from getDraftInspectorActions
   const stageChips = stageKey === "Intake"
     ? (intakeProgress.ready || intakeProgress.questionCount >= 5)
       ? [{ label: "Ready to make an outline", prefill: "" }]
       : intakeProgress.questionCount === 0
         ? [{ label: "What are we working on?", prefill: "What are we working on?" }]
         : [{ label: "Continue the conversation", prefill: "" }]
-    : REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
+    : stageKey === "Edit" && draftChips.length > 0
+      ? draftChips
+      : REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
 
   const prefillAndFocus = useCallback((text: string) => {
     setInput(text);

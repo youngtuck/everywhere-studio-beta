@@ -899,6 +899,57 @@ function deriveReviewDisplayGates(
   ];
 }
 
+// ── CO_025: Context-aware Draft Inspector chips ──────────────
+interface DraftAction { label: string; instruction: string }
+
+function getDraftInspectorActions(
+  wordCount: number,
+  targetWords: number,
+  flagCounts: { must: number; style: number },
+  bgNonPass: Array<{ name: string; status: string }>,
+  hookGateStatus: "PASS" | "FAIL" | "FLAG" | null,
+): { firstMove: DraftAction | null; chips: DraftAction[] } {
+  const hasHardFlags = flagCounts.must > 0 || bgNonPass.length > 0;
+  const delta = wordCount - targetWords;
+
+  // Priority 1: hard flags (must-fix heuristic or pipeline non-pass)
+  if (hasHardFlags) {
+    return {
+      firstMove: { label: "Fix the flagged lines", instruction: "Fix the flagged lines. Address must-fix issues while preserving the voice." },
+      chips: [{ label: "Fix the flagged lines", instruction: "Fix the flagged lines. Address must-fix issues while preserving the voice." }],
+    };
+  }
+
+  // Priority 2: significantly below target
+  if (delta < -50) {
+    return {
+      firstMove: { label: `Expand to ${targetWords} words`, instruction: `Expand this to ${targetWords} words. Add a second example and deepen the stakes.` },
+      chips: [
+        { label: `Expand to ${targetWords} words`, instruction: `Expand this to ${targetWords} words. Add a second example and deepen the stakes.` },
+        { label: "Add an example or evidence", instruction: "Add a concrete example or piece of evidence to strengthen the argument." },
+      ],
+    };
+  }
+
+  // Priority 3: significantly above target
+  if (delta > 50) {
+    const chips: DraftAction[] = [
+      { label: `Tighten to ${targetWords} words`, instruction: `Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.` },
+      { label: "Cut 100 words without losing the point", instruction: "Cut 100 words without losing the point" },
+    ];
+    return { firstMove: chips[0], chips };
+  }
+
+  // Priority 4: near target, no hard flags
+  const chips: DraftAction[] = [
+    { label: "Check the voice match", instruction: "Check the voice match. Does this sound like me? Flag anything that drifts." },
+  ];
+  if (hookGateStatus !== "PASS") {
+    chips.push({ label: "Tighten the hook", instruction: "Tighten the opening hook. Make the first line earn the second." });
+  }
+  return { firstMove: chips[0], chips };
+}
+
 // CO_029 Failure 1: HVT flagged lines with optional collapse
 function HvtFlaggedSection({ lines, initialShow }: { lines: HVTFlaggedLine[]; initialShow: number }) {
   const [expanded, setExpanded] = useState(false);
@@ -3667,7 +3718,7 @@ function readResumeQuery(): string | null {
 }
 
 export default function WorkSession() {
-  const { setFeedbackContent, setReedPrefill, setReedThread, reedChipRequest, setReedChipRequest, setProposalPending, setIntakeProgress, setIntakeAdvance } = useShell();
+  const { setFeedbackContent, setReedPrefill, setReedThread, reedChipRequest, setReedChipRequest, setProposalPending, setIntakeProgress, setIntakeAdvance, setDraftChips } = useShell();
   const prefillReed = useCallback((text: string) => {
     setReedPrefill(text);
   }, [setReedPrefill]);
@@ -6248,6 +6299,47 @@ export default function WorkSession() {
     setEditWordTargetEditorOpen(false);
   }, [editWordTargetDraftInput, toast]);
 
+  // ── CO_025: Memoized draft actions + Reed's Take (single source for Inspector + sidebar) ──
+  const memoWordCount = useMemo(() => (draft || "").split(/\s+/).filter(Boolean).length, [draft]);
+  const memoTargetWords = useMemo(() => {
+    const baseline = baselineEditWordTarget(outputType, talkDuration, preWrapPresentationMins);
+    return editWordTargetOverride != null ? editWordTargetOverride : baseline;
+  }, [outputType, talkDuration, preWrapPresentationMins, editWordTargetOverride]);
+  const memoFlagCounts = useMemo(() => countDraftFlags(draft, dismissedFlags, fixedFlags), [draft, dismissedFlags, fixedFlags]);
+
+  const memoDraftActions = useMemo(() => {
+    if (stage !== "Edit" || !draft?.trim()) return null;
+    const bgNonPass = backgroundPipelineRun
+      ? deriveReviewDisplayGates(backgroundPipelineRun.checkpointResults, backgroundPipelineRun.humanVoiceTest).filter(g => g.status !== "Pass")
+      : [];
+    const hookGate = backgroundPipelineRun?.checkpointResults.find(cp => cp.gate === "checkpoint-3");
+    return getDraftInspectorActions(memoWordCount, memoTargetWords, memoFlagCounts, bgNonPass, hookGate?.status ?? null);
+  }, [stage, draft, memoWordCount, memoTargetWords, memoFlagCounts, backgroundPipelineRun]);
+
+  const memoReedTakeText = useMemo(() => {
+    if (stage !== "Edit" || !draft?.trim()) return "";
+    if (backgroundPipelineRunning) return "Reed is reviewing in the background. Edit freely.";
+    const bgNonPass = backgroundPipelineRun
+      ? deriveReviewDisplayGates(backgroundPipelineRun.checkpointResults, backgroundPipelineRun.humanVoiceTest).filter(g => g.status !== "Pass")
+      : [];
+    const hasHardFlags = memoFlagCounts.must > 0 || bgNonPass.length > 0;
+    const delta = memoWordCount - memoTargetWords;
+    if (hasHardFlags && bgNonPass.length > 0) return `Draft has ${bgNonPass.length} checkpoint flag${bgNonPass.length > 1 ? "s" : ""} to address.`;
+    if (hasHardFlags) { const t = memoFlagCounts.must + memoFlagCounts.style; return `Draft has ${t} style flag${t > 1 ? "s" : ""} to address.`; }
+    if (delta < -50) return `Draft is ${memoWordCount} words, ${memoTargetWords - memoWordCount} short of target.`;
+    if (delta > 50) return `Draft is ${memoWordCount} words, ${memoWordCount - memoTargetWords} over target.`;
+    return "Draft is at length and clean. Check the voice match before you finish.";
+  }, [stage, draft, memoWordCount, memoTargetWords, memoFlagCounts, backgroundPipelineRun, backgroundPipelineRunning]);
+
+  // Sync derived chips to sidebar via ShellContext (useLayoutEffect = before paint, no visible gap)
+  useLayoutEffect(() => {
+    if (memoDraftActions) {
+      setDraftChips(memoDraftActions.chips.map(c => ({ label: c.label, prefill: c.instruction })));
+    } else if (stage !== "Edit") {
+      setDraftChips([]);
+    }
+  }, [memoDraftActions, stage, setDraftChips]);
+
   // ── Inject dashboard panel ────────────────────────────────────
   useLayoutEffect(() => {
     const dashNode = (() => {
@@ -6273,14 +6365,15 @@ export default function WorkSession() {
         case "Outline":
           return <OutlineDash selectedFormats={selectedFormats} />;
         case "Edit": {
-          const wordCount = (draft || "").split(/\s+/).filter(Boolean).length;
+          const wordCount = memoWordCount;
+          const targetWords = memoTargetWords;
+          const flagCounts = memoFlagCounts;
+          const draftActions = memoDraftActions;
+          const reedTakeText = memoReedTakeText;
           const hasCatalogOutputType = outputType != null && String(outputType).trim().length > 0;
-          const baselineWords = baselineEditWordTarget(outputType, talkDuration, preWrapPresentationMins);
-          const targetWords = editWordTargetOverride != null ? editWordTargetOverride : baselineWords;
           const typeLabel = hasCatalogOutputType
             ? outputTypeDisplayLabel(catalogOutputTypeForApi(outputType))
             : "";
-          const flagCounts = countDraftFlags(draft, dismissedFlags, fixedFlags);
           const hasDraftText = (draft || "").trim().length > 0;
 
           return (
@@ -6289,6 +6382,14 @@ export default function WorkSession() {
                 <DpSection>
                   <DpLabel>Reed's Take</DpLabel>
                   <div style={{ fontSize: 11, color: "var(--gold-bright)", lineHeight: 1.6, fontWeight: 500 }}>{generatingLabel}</div>
+                </DpSection>
+              )}
+
+              {/* CO_025: Reed's Take diagnosis */}
+              {!generating && hasDraftText && reedTakeText && (
+                <DpSection>
+                  <DpLabel>Reed's Take</DpLabel>
+                  <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedTakeText}</div>
                 </DpSection>
               )}
 
@@ -6590,32 +6691,15 @@ export default function WorkSession() {
                     </DpSection>
                   )}
 
-                  {/* CO_026: Action chips hidden while proposal is pending or loading */}
-                  {!pendingProposal && !proposalLoading && (
+                  {/* CO_025: Context-aware action chips */}
+                  {!pendingProposal && !proposalLoading && draftActions && draftActions.chips.length > 0 && (
                     <ActionChips
-                      chips={[
-                        // "Fix the flagged lines",   // CO_027: hidden pending CO_026
-                        // "Tighten the hook",         // CO_027: hidden pending CO_026
-                        `Tighten to ${targetWords}`,
-                        "Expand, add an example",
-                        // "Check the voice match",    // CO_027: hidden pending CO_026
-                        "Cut 100 words without losing the point",
-                      ]}
-                      onChipClick={(chip) => {
-                        if (pendingProposal || proposalLoading) return;
-                        const propose = (msg: string, chipLabel: string) => {
-                          if (stage === "Edit") {
-                            void handleProposeRevision(msg, chipLabel);
-                            return;
-                          }
-                          prefillReed(msg);
-                        };
-                        if (chip.startsWith("Tighten to")) {
-                          propose(`Tighten this to ${targetWords}. Cut what doesn't earn its place. Keep the voice.`, chip);
-                        } else if (chip.startsWith("Expand")) {
-                          propose(`Expand this. Add a second example and deepen the stakes. Stay under ${Math.round(targetWords * 1.3)} words.`, chip);
-                        } else {
-                          propose(chip, chip);
+                      chips={draftActions.chips.map(c => c.label)}
+                      onChipClick={(chipLabel) => {
+                        if (pendingProposal || proposalLoading || !draftActions) return;
+                        const action = draftActions.chips.find(c => c.label === chipLabel);
+                        if (action && stage === "Edit") {
+                          void handleProposeRevision(action.instruction, action.label);
                         }
                       }}
                     />
@@ -6659,7 +6743,7 @@ export default function WorkSession() {
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,
-    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing, draftRepairAttempts, reedActionMessage, handleRunPipeline,
+    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing, draftRepairAttempts, reedActionMessage, handleRunPipeline, memoDraftActions, memoReedTakeText,
     pendingProposal, proposalLoading,
     activeReviewTab, handleReviewFix, handleExportAll,
     dismissedFlags, fixedFlags, backgroundPipelineRun, backgroundPipelineRunning,
