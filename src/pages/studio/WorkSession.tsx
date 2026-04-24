@@ -2967,6 +2967,8 @@ function PreWrapOutputGate({
   onTalkDurationChange: (n: number) => void;
   userTemplates: Array<{ id: string; name: string; outputType: string }>;
 }) {
+  const isMobile = useMobile();
+
   // CO_029 Failure 4: First-use Wrap explanation
   const [showWrapExplainer] = useState(() => {
     try { return !localStorage.getItem("ew-wrap-explained"); } catch { return false; }
@@ -3091,7 +3093,7 @@ function PreWrapOutputGate({
           }}
         >
           <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "#9A7030", marginBottom: 6, textTransform: "uppercase" as const }}>
-            Reed recommends (tap to select)
+            {isMobile ? "Reed recommends (tap to select)" : "Reed recommends"}
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)" }}>{recLabel}</div>
           <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 6, lineHeight: 1.45 }}>
