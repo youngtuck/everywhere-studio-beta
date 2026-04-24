@@ -27,12 +27,7 @@ export const REED_STAGE_CHIPS: Record<string, Array<{ label: string; prefill: st
     { label: "Is the close strong?", prefill: "Does my closing section deliver on what the hook promised?" },
     { label: "What's missing?", prefill: "What's the one thing this outline is missing that would make it significantly stronger?" },
   ],
-  Edit: [
-    { label: "Tighten this", prefill: "This piece is running long. Cut to the target word count without losing the argument. Show me what to remove." },
-    { label: "Find my weakest sentence", prefill: "Find the single weakest sentence in this draft and tell me why it is weak." },
-    { label: "Fix passive voice", prefill: "Find every passive construction and rewrite them as active voice." },
-    { label: "Stronger opening", prefill: "Rewrite the opening paragraph to pass the 7-second hook test. Keep my voice." },
-  ],
+  Edit: [], // CO_028: Edit chips derived from getDraftInspectorActions via draftChips context
   Review: [
     { label: "Final read", prefill: "Do a final read of this piece as an adversarial editor. What would make someone stop reading?" },
     { label: "Pull the best line", prefill: "Pull the single most quotable line from this piece for social." },

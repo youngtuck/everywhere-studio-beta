@@ -537,7 +537,7 @@ function ReedPanel() {
       : intakeProgress.questionCount === 0
         ? [{ label: "What are we working on?", prefill: "What are we working on?" }]
         : [{ label: "Continue the conversation", prefill: "" }]
-    : stageKey === "Edit" && draftChips.length > 0
+    : stageKey === "Edit"
       ? draftChips
       : REED_STAGE_CHIPS[stageKey] || REED_STAGE_CHIPS.Review;
 
