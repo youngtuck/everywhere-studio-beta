@@ -3843,6 +3843,8 @@ export default function WorkSession() {
   }, [selectedFormats]);
   const [hvtAttempts, setHvtAttempts] = useState(0);
   const [hvtRunning, setHvtRunning] = useState(false);
+  const [draftRepairing, setDraftRepairing] = useState(false);
+  const [draftRepairAttempts, setDraftRepairAttempts] = useState(0);
   /** Chosen OUTPUT_TYPES ids on the Pre-Wrap full screen (user toggles only; no auto-selection). */
   const [preWrapPickIds, setPreWrapPickIds] = useState<string[]>([]);
   /** When true, Start Wrap requires two Catalog picks; when false, exactly one. */
@@ -4056,6 +4058,7 @@ export default function WorkSession() {
     setStage(s);
     // CO_029 Failure 8: Clear persistent Reed message on stage transition
     setReedActionMessage(null);
+    setDraftRepairAttempts(0);
   }, []);
 
   useLayoutEffect(() => {
@@ -4664,7 +4667,11 @@ export default function WorkSession() {
     if (pendingProposal) {
       setPendingProposal(null);
     }
-  }, [pendingProposal]);
+    // Reset repair attempt counter on manual edit
+    if (draftRepairAttempts > 0) {
+      setDraftRepairAttempts(0);
+    }
+  }, [pendingProposal, draftRepairAttempts]);
 
   // ── OUTLINE → EDIT: Generate draft ───────────────────────────
   const runGenerateDraftFromOutline = useCallback(async () => {
@@ -4959,10 +4966,8 @@ export default function WorkSession() {
   }, []);
 
   // ── CO_029 Failure 6: Draft-stage repair handler ────────────
-  const [draftRepairing, setDraftRepairing] = useState(false);
-
   const handleDraftRepair = useCallback(async () => {
-    if (!draft || !user || !backgroundPipelineRun || draftRepairing) return;
+    if (!draft || !user || !backgroundPipelineRun || draftRepairing || draftRepairAttempts >= 3) return;
 
     const issues = backgroundPipelineRun.checkpointResults
       .filter(g => g.status !== "PASS")
@@ -5007,7 +5012,9 @@ export default function WorkSession() {
       });
       setActiveVersionIdx(prev => Math.min(prev + 1, 9));
 
-      setReedActionMessage("Reed revised the draft. Re-checking quality...");
+      const nextAttempt = draftRepairAttempts + 1;
+      setDraftRepairAttempts(nextAttempt);
+      setReedActionMessage(nextAttempt >= 3 ? "I've tried three times. Your turn." : "Reed revised the draft. Re-checking quality...");
 
       // Re-run background pipeline on the new draft
       void handleBackgroundQualityCheck(newDraft);
@@ -5017,7 +5024,7 @@ export default function WorkSession() {
     } finally {
       setDraftRepairing(false);
     }
-  }, [draft, user, backgroundPipelineRun, draftRepairing, buildConvSummary, outputType, talkDuration, structuredIntakePayload, toast, handleBackgroundQualityCheck]);
+  }, [draft, user, backgroundPipelineRun, draftRepairing, draftRepairAttempts, buildConvSummary, outputType, talkDuration, structuredIntakePayload, toast, handleBackgroundQualityCheck]);
 
   // ── CO_024: Draft-stage conversation handler ────────────────
   const [draftConverseLoading, setDraftConverseLoading] = useState(false);
@@ -5747,6 +5754,7 @@ export default function WorkSession() {
     setDraftConverseLoading(false);
     setDraftConverseReply(null);
     setReedActionMessage(null);
+    setDraftRepairAttempts(0);
     setFormatDrafts({});
     setOutlineAngles(null);
     setSelectedAngle("a");
@@ -6445,22 +6453,43 @@ export default function WorkSession() {
                             </div>
                           );
                         })}
-                        <button
-                          type="button"
-                          className="liquid-glass-btn-gold"
-                          onClick={handleDraftRepair}
-                          disabled={draftRepairing}
-                          style={{
-                            width: "100%", marginTop: 4, padding: "6px 12px",
-                            fontSize: 10, fontFamily: FONT,
-                            opacity: draftRepairing ? 0.6 : 1,
-                            cursor: draftRepairing ? "not-allowed" : "pointer",
-                          }}
-                        >
-                          <span className="liquid-glass-btn-gold-label">
-                            {draftRepairing ? "Reed is working on it..." : "Let Reed address these"}
-                          </span>
-                        </button>
+                        {draftRepairAttempts >= 3 ? (
+                          <>
+                            <div style={{
+                              marginTop: 6, padding: "8px 10px", borderRadius: 6,
+                              border: "1px solid rgba(74,144,217,0.2)",
+                              background: "rgba(74,144,217,0.04)",
+                              fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5,
+                            }}>
+                              Reed addressed these three times. Some issues still remain. Edit the draft directly, or continue to Review.
+                            </div>
+                            <button
+                              type="button"
+                              className="liquid-glass-btn-gold"
+                              onClick={handleRunPipeline}
+                              style={{ width: "100%", marginTop: 6, padding: "6px 12px", fontSize: 10, fontFamily: FONT }}
+                            >
+                              <span className="liquid-glass-btn-gold-label">Continue to Review</span>
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            type="button"
+                            className="liquid-glass-btn-gold"
+                            onClick={handleDraftRepair}
+                            disabled={draftRepairing}
+                            style={{
+                              width: "100%", marginTop: 4, padding: "6px 12px",
+                              fontSize: 10, fontFamily: FONT,
+                              opacity: draftRepairing ? 0.6 : 1,
+                              cursor: draftRepairing ? "not-allowed" : "pointer",
+                            }}
+                          >
+                            <span className="liquid-glass-btn-gold-label">
+                              {draftRepairing ? "Reed is working on it..." : draftRepairAttempts === 0 ? "Let Reed address these" : draftRepairAttempts === 1 ? "Have Reed try again" : "One more attempt"}
+                            </span>
+                          </button>
+                        )}
                       </DpSection>
                     );
                   })()}
@@ -6630,7 +6659,7 @@ export default function WorkSession() {
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,
-    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing, reedActionMessage,
+    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing, draftRepairAttempts, reedActionMessage, handleRunPipeline,
     pendingProposal, proposalLoading,
     activeReviewTab, handleReviewFix, handleExportAll,
     dismissedFlags, fixedFlags, backgroundPipelineRun, backgroundPipelineRunning,
