@@ -1309,6 +1309,31 @@ function StageIntake({
     }
   }, [messages.length, sending]);
 
+  // Scroll fade indicators for discoverability
+  const [canScrollUp, setCanScrollUp] = useState(false);
+  const [canScrollDown, setCanScrollDown] = useState(false);
+
+  const updateScrollFades = useCallback(() => {
+    const el = messagesScrollRef.current;
+    if (!el) { setCanScrollUp(false); setCanScrollDown(false); return; }
+    setCanScrollUp(el.scrollTop > 4);
+    setCanScrollDown(el.scrollHeight - el.clientHeight - el.scrollTop > 4);
+  }, []);
+
+  useEffect(() => {
+    const el = messagesScrollRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => updateScrollFades());
+    ro.observe(el);
+    updateScrollFades();
+    return () => ro.disconnect();
+  }, [updateScrollFades]);
+
+  // Update fades when messages change
+  useEffect(() => {
+    requestAnimationFrame(updateScrollFades);
+  }, [messages.length, updateScrollFades]);
+
   // Re-focus input after Reed finishes responding
   const prevSending = useRef(sending);
   useEffect(() => {
@@ -1444,12 +1469,29 @@ function StageIntake({
           display: "flex",
           flexDirection: "column",
           alignSelf: "stretch",
+          position: "relative",
         }}
       >
+        {/* Scroll fade indicators */}
+        <div style={{
+          position: "absolute", top: 0, left: 0, right: 0, height: 40, zIndex: 1,
+          background: "linear-gradient(to bottom, var(--bg), transparent)",
+          pointerEvents: "none",
+          opacity: canScrollUp ? 1 : 0,
+          transition: "opacity 150ms",
+        }} />
+        <div style={{
+          position: "absolute", bottom: 0, left: 0, right: 0, height: 40, zIndex: 1,
+          background: "linear-gradient(to top, var(--bg), transparent)",
+          pointerEvents: "none",
+          opacity: canScrollDown ? 1 : 0,
+          transition: "opacity 150ms",
+        }} />
         {/* Messages: bounded flex child so overflow-y scrolls instead of growing the stage. */}
         <div
           ref={messagesScrollRef}
           className="work-intake-messages-scroll"
+          onScroll={updateScrollFades}
           style={{
             flex: 1,
             minHeight: 0,
