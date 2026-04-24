@@ -308,8 +308,20 @@ const PRE_WRAP_PICK_GROUPS: Record<PreWrapPickCategory, { id: string; label: str
   ],
 };
 
+/** All valid wrap format IDs from PRE_WRAP_PICK_GROUPS. */
+const VALID_WRAP_IDS = new Set([
+  "essay", "talk", "podcast", "video_script", "email",
+  "social_media", "newsletter",
+  "presentation", "proposal", "one_pager", "report",
+  "executive_summary", "case_study", "sow", "meeting", "bio", "white_paper",
+]);
+
 /** Heuristic primary output type for Pre-Wrap highlight (not a model call). */
-function inferRecommendedWrapOutputId(draft: string): string {
+function inferRecommendedWrapOutputId(draft: string, outputType?: string | null): string {
+  // CO_029 Failure 4: Prefer the user's chosen output type when it's a valid wrap format
+  if (outputType && outputType !== "freestyle" && VALID_WRAP_IDS.has(outputType)) {
+    return outputType;
+  }
   const t = draft.slice(0, 14000).toLowerCase();
   const head = draft.slice(0, 1200).trim();
   if (/\[(pause|beat)\]/i.test(t)) return "talk";
@@ -887,6 +899,50 @@ function deriveReviewDisplayGates(
   ];
 }
 
+// CO_029 Failure 1: HVT flagged lines with optional collapse
+function HvtFlaggedSection({ lines, initialShow }: { lines: HVTFlaggedLine[]; initialShow: number }) {
+  const [expanded, setExpanded] = useState(false);
+  const visible = expanded ? lines : lines.slice(0, initialShow);
+  const remaining = lines.length - initialShow;
+
+  return (
+    <DpSection>
+      <DpLabel>Voice test flags</DpLabel>
+      {visible.map((fl, i) => (
+        <div key={i} style={{
+          marginBottom: 8, padding: "8px 10px", borderRadius: 6,
+          border: "1px solid rgba(74,144,217,0.2)",
+          background: "rgba(74,144,217,0.04)",
+        }}>
+          <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5, marginBottom: 4, fontStyle: "italic" }}>
+            "{fl.original}"
+          </div>
+          <div style={{ fontSize: 10, color: "var(--fg-3)", lineHeight: 1.5 }}>
+            {fl.issue}
+          </div>
+          {fl.suggestion && (
+            <div style={{ fontSize: 10, color: "var(--blue, #4A90D9)", lineHeight: 1.5, marginTop: 2 }}>
+              Suggestion: {fl.suggestion}
+            </div>
+          )}
+        </div>
+      ))}
+      {!expanded && remaining > 0 && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          style={{
+            fontSize: 10, color: "var(--blue, #4A90D9)", cursor: "pointer",
+            background: "none", border: "none", padding: 0, fontFamily: FONT,
+          }}
+        >
+          Show {remaining} more
+        </button>
+      )}
+    </DpSection>
+  );
+}
+
 // ── Review dashboard ──────────────────────────────────────────
 function ReviewDash({
   pipelineRun, running, onExportAll, allExported, onRepairPipeline, fixingGate, rerunning,
@@ -897,6 +953,8 @@ function ReviewDash({
   methodLintLastCompletedFp,
   draftLintFp,
   onRetryMethodLint,
+  reedActionMessage,
+  onDismissReedAction,
 }: {
   pipelineRun: PipelineRun | null; running: boolean;
   onExportAll: () => void; allExported: boolean;
@@ -910,6 +968,8 @@ function ReviewDash({
   methodLintLastCompletedFp: string | null;
   draftLintFp: string;
   onRetryMethodLint: () => void;
+  reedActionMessage: string | null;
+  onDismissReedAction: () => void;
 }) {
   /** Internal publish readiness from pipeline; never rendered as a number. */
   const publishAggregateOk = pipelineRun?.impactScore != null && pipelineRun.impactScore.total >= 75;
@@ -994,6 +1054,87 @@ function ReviewDash({
             </div>
           )}
 
+          {/* CO_029 Failure 8: Persistent Reed action message */}
+          {reedActionMessage && (
+            <div style={{
+              position: "relative",
+              border: "1px solid rgba(74,144,217,0.25)", borderRadius: 8,
+              padding: "8px 28px 8px 10px", background: "rgba(74,144,217,0.04)",
+              marginBottom: 12,
+              backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
+            }}>
+              <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
+              <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
+              <button
+                type="button"
+                onClick={onDismissReedAction}
+                aria-label="Dismiss"
+                style={{
+                  position: "absolute", top: 4, right: 4,
+                  width: 18, height: 18, borderRadius: 4,
+                  border: "none", background: "transparent",
+                  color: "var(--fg-3)", cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 11, fontFamily: FONT, padding: 0,
+                }}
+              >&times;</button>
+            </div>
+          )}
+
+          {/* CO_029 Failure 1: Flagged checkpoint items */}
+          {nonPassGates.length > 0 && (
+            <DpSection>
+              <DpLabel>Flagged items</DpLabel>
+              {nonPassGates.map((g, i) => {
+                // Map display gate name back to checkpoint feedback
+                const gateNameLower = (g.name || "").toLowerCase();
+                const sourceCheckpoint = pipelineRun.checkpointResults.find(cp => {
+                  if (gateNameLower.includes("slop")) return cp.gate === "checkpoint-4";
+                  if (gateNameLower.includes("dedup")) return cp.gate === "checkpoint-0";
+                  if (gateNameLower.includes("human")) return cp.gate === "checkpoint-2";
+                  if (gateNameLower.includes("humanization")) return cp.gate === "checkpoint-5" || cp.gate === "checkpoint-3";
+                  return false;
+                });
+                return (
+                  <div key={i} style={{
+                    marginBottom: 8, padding: "8px 10px", borderRadius: 6,
+                    border: `1px solid ${g.status === "Fail" ? "rgba(185,28,28,0.25)" : "rgba(245,198,66,0.3)"}`,
+                    background: g.status === "Fail" ? "rgba(185,28,28,0.04)" : "rgba(245,198,66,0.04)",
+                  }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                      <span style={{
+                        width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                        background: g.status === "Fail" ? "#b91c1c" : "var(--gold-bright)",
+                      }} />
+                      <span style={{ fontSize: 11, fontWeight: 600, color: "var(--fg)" }}>{g.name}</span>
+                      <span style={{ fontSize: 9, color: "var(--fg-3)", marginLeft: "auto" }}>{g.status}</span>
+                    </div>
+                    {sourceCheckpoint?.feedback && (
+                      <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5, marginBottom: sourceCheckpoint.issues?.length ? 4 : 0 }}>
+                        {sourceCheckpoint.feedback}
+                      </div>
+                    )}
+                    {sourceCheckpoint?.issues && sourceCheckpoint.issues.length > 0 && (
+                      <ul style={{ margin: "4px 0 0", paddingLeft: 16, fontSize: 10, color: "var(--fg-3)", lineHeight: 1.5 }}>
+                        {sourceCheckpoint.issues.map((issue, j) => <li key={j}>{issue}</li>)}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </DpSection>
+          )}
+
+          {/* CO_029 Failure 1: HVT flagged lines */}
+          {pipelineRun.humanVoiceTest && pipelineRun.humanVoiceTest.flaggedLines.length > 0 && (() => {
+            const lines = pipelineRun.humanVoiceTest.flaggedLines;
+            const INITIAL_SHOW = 3;
+            const needsCollapse = lines.length > 5;
+            return (
+              <HvtFlaggedSection lines={lines} initialShow={needsCollapse ? INITIAL_SHOW : lines.length} />
+            );
+          })()}
+
           {/* Primary action buttons */}
           {!publishAggregateOk && (
             <button
@@ -1040,7 +1181,7 @@ function ReviewDash({
                 </div>
               ) : methodLintInspectorError === "timeout" ? (
                 <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
-                  <div style={{ marginBottom: 8 }}>Check timed out. Try again.</div>
+                  <div style={{ marginBottom: 8 }}>The method terminology check timed out. This can happen with longer drafts. Hit Retry, it usually resolves in one attempt.</div>
                   <button
                     type="button"
                     className="liquid-glass-btn"
@@ -1066,7 +1207,7 @@ function ReviewDash({
                 </div>
               ) : (
                 <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
-                  <div style={{ marginBottom: 8 }}>Check could not finish. Try again.</div>
+                  <div style={{ marginBottom: 8 }}>The method terminology check did not complete. Hit Retry, it usually resolves in one attempt.</div>
                   <button
                     type="button"
                     className="liquid-glass-btn"
@@ -2181,6 +2322,7 @@ const DIRECTIVE_CONFIRMATIONS = [
 function StageEdit({
   draft, generating, generatingLabel, applyingSuggestion, proposalLoading, onDraftChange, onAdvance, onRevise,
   onConverse, converseLoading, converseReply,
+  hasDraftFlags, onAdvanceForced,
   versions, activeVersionIdx, onVersionSelect, onGenerateVersion, canGenerateMore,
 }: {
   draft: string; generating: boolean; generatingLabel: string;
@@ -2191,6 +2333,8 @@ function StageEdit({
   onConverse: (text: string) => void;
   converseLoading?: boolean;
   converseReply: string | null;
+  hasDraftFlags?: boolean;
+  onAdvanceForced?: () => void;
   versions: Array<{ content: string; label: string }>;
   activeVersionIdx: number;
   onVersionSelect: (idx: number) => void;
@@ -2199,6 +2343,8 @@ function StageEdit({
 }) {
   const [input, setInput] = useState("");
   const titleRef = useRef<HTMLTextAreaElement>(null);
+  // CO_029 Failure 6: Draft flags warning before advancing to Review
+  const [showFlagsWarning, setShowFlagsWarning] = useState(false);
   // CO_024: Reed response bubble state
   const [reedResponse, setReedResponse] = useState<string | null>(null);
 
@@ -2384,7 +2530,58 @@ function StageEdit({
         )}
         </div>
 
-        {!generating && draft && <AdvanceButton label="Finish and Review &#8594;" onClick={onAdvance} />}
+        {/* CO_029 Failure 6: Warn before advancing when draft has flags */}
+        {!generating && draft && !showFlagsWarning && (
+          <AdvanceButton
+            label="Finish and Review &#8594;"
+            onClick={() => {
+              if (hasDraftFlags) {
+                setShowFlagsWarning(true);
+              } else {
+                onAdvance();
+              }
+            }}
+          />
+        )}
+        {showFlagsWarning && (
+          <div style={{
+            width: "100%", boxSizing: "border-box" as const,
+            padding: "10px clamp(12px, 3vw, 20px) 10px",
+            flexShrink: 0,
+          }}>
+            <div style={{
+              padding: "10px 14px", borderRadius: 8,
+              border: "1px solid rgba(245,198,66,0.3)",
+              background: "rgba(245,198,66,0.06)",
+              marginBottom: 8,
+            }}>
+              <div style={{ fontSize: 11, color: "var(--fg)", fontWeight: 600, marginBottom: 4 }}>
+                Draft has flagged items
+              </div>
+              <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                Reed found issues during review. You can address them now or continue to Review.
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, justifyContent: "center" }}>
+              <button
+                type="button"
+                className="liquid-glass-btn-gold"
+                onClick={() => setShowFlagsWarning(false)}
+                style={{ padding: "8px 16px", fontSize: 11, fontFamily: FONT }}
+              >
+                <span className="liquid-glass-btn-gold-label">Address flags</span>
+              </button>
+              <button
+                type="button"
+                className="liquid-glass-btn"
+                onClick={() => { setShowFlagsWarning(false); (onAdvanceForced || onAdvance)(); }}
+                style={{ padding: "8px 16px", fontSize: 11, fontFamily: FONT }}
+              >
+                <span className="liquid-glass-btn-label" style={{ fontWeight: 600 }}>Review as-is</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* CO_024: Reed response bubble */}
@@ -2754,6 +2951,7 @@ function PreWrapOutputGate({
   onPresentationMinutesChange,
   talkDuration,
   onTalkDurationChange,
+  userTemplates,
 }: {
   pipelineRun: PipelineRun | null;
   recommendedId: string;
@@ -2767,12 +2965,29 @@ function PreWrapOutputGate({
   onPresentationMinutesChange: (n: number) => void;
   talkDuration: number;
   onTalkDurationChange: (n: number) => void;
+  userTemplates: Array<{ id: string; name: string; outputType: string }>;
 }) {
+  const isMobile = useMobile();
+
+  // CO_029 Failure 4: First-use Wrap explanation
+  const [showWrapExplainer] = useState(() => {
+    try { return !localStorage.getItem("ew-wrap-explained"); } catch { return false; }
+  });
+  useEffect(() => {
+    if (showWrapExplainer) {
+      try { localStorage.setItem("ew-wrap-explained", "1"); } catch { /* noop */ }
+    }
+  }, [showWrapExplainer]);
+
+  // CO_029 Failure 1: Conditional header based on flag state
+  const hvtHasFlags = pipelineRun?.humanVoiceTest && pipelineRun.humanVoiceTest.flaggedLines.length > 0;
   const reviewStatusLine = !pipelineRun
     ? "When you are ready, continue below."
-    : pipelineRun.status === "PASSED"
-      ? "Checks passed."
-      : "Quality review finished. Address any items Reed flagged before you continue.";
+    : (pipelineRun.status === "PASSED" && !hvtHasFlags)
+      ? "No flags. You're clear to continue."
+      : pipelineRun.status === "PASSED"
+        ? "Checks passed."
+        : "Quality review finished. Address any items Reed flagged before you continue.";
   const hvtLine = !pipelineRun
     ? ""
     : pipelineRun.humanVoiceTest?.verdict === "PASSES"
@@ -2783,16 +2998,19 @@ function PreWrapOutputGate({
   const wrapReady =
     (!allowSecondFormat && selectedIds.length === 1)
     || (allowSecondFormat && selectedIds.length === 2);
+  // CO_029 Failure 5: Resolve label for both system formats and template picks
+  const resolvePickLabel = (id: string): string => {
+    if (id.startsWith("tmpl:")) {
+      const tmpl = userTemplates.find(t => t.id === id.slice(5));
+      return tmpl?.name || id;
+    }
+    return OUTPUT_TYPES.find(t => t.id === id)?.label || id;
+  };
   const startLabel = (() => {
     if (allowSecondFormat && selectedIds.length === 1) return "Pick second format";
     if (!wrapReady) return "Start Wrap";
-    if (selectedIds.length === 1) {
-      const one = OUTPUT_TYPES.find(t => t.id === selectedIds[0])?.label || selectedIds[0];
-      return `Start Wrap with ${one}`;
-    }
-    const a = OUTPUT_TYPES.find(t => t.id === selectedIds[0])?.label || selectedIds[0];
-    const b = OUTPUT_TYPES.find(t => t.id === selectedIds[1])?.label || selectedIds[1];
-    return `Start Wrap with ${a} and ${b}`;
+    if (selectedIds.length === 1) return `Start Wrap with ${resolvePickLabel(selectedIds[0])}`;
+    return `Start Wrap with ${resolvePickLabel(selectedIds[0])} and ${resolvePickLabel(selectedIds[1])}`;
   })();
 
   const categories: { key: PreWrapPickCategory; title: string; items: { id: string; label: string }[] }[] = [
@@ -2841,7 +3059,7 @@ function PreWrapOutputGate({
         }}>
           Where is this going?
         </h1>
-        <p style={{ fontSize: 13, color: "var(--fg-2)", margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT }}>
+        <p style={{ fontSize: 12, color: "var(--fg-2)", margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT }}>
           {reviewStatusLine}
         </p>
         {hvtLine ? (
@@ -2849,6 +3067,11 @@ function PreWrapOutputGate({
             {hvtLine}
           </p>
         ) : null}
+        {showWrapExplainer && (
+          <p style={{ fontSize: 12, color: "var(--gold)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT, fontWeight: 500 }}>
+            Wrap formats and delivers your piece for the channel you choose.
+          </p>
+        )}
         <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 22px", lineHeight: 1.5, fontFamily: FONT }}>
           Select exactly one Catalog format to start Wrap, or turn on Add another format and pick two.
         </p>
@@ -2870,7 +3093,7 @@ function PreWrapOutputGate({
           }}
         >
           <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "#9A7030", marginBottom: 6, textTransform: "uppercase" as const }}>
-            Reed recommends (tap to select)
+            {isMobile ? "Reed recommends (tap to select)" : "Reed recommends"}
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)" }}>{recLabel}</div>
           <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 6, lineHeight: 1.45 }}>
@@ -2881,7 +3104,7 @@ function PreWrapOutputGate({
         {categories.map(({ key, title, items }) => (
           <div key={key} style={{ marginBottom: 28 }}>
             <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "var(--fg-3)",
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--fg-3)",
               marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
             }}>
               {title}
@@ -2895,6 +3118,8 @@ function PreWrapOutputGate({
                 const isRec = item.id === recommendedId;
                 const isSel = selectedIds.includes(item.id);
                 const suggestOnly = isRec && !isSel;
+                // CO_029 Failure 4: Non-recommended, non-selected items are visually secondary
+                const isSecondary = !isRec && !isSel;
                 const selectedStyle: CSSProperties = isSel
                   ? {
                     border: "2px solid var(--gold-bright, #F5C642)",
@@ -2913,7 +3138,7 @@ function PreWrapOutputGate({
                     type="button"
                     aria-pressed={isSel}
                     onClick={() => onPickFormat(item.id)}
-                    style={{ ...baseCard, ...selectedStyle }}
+                    style={{ ...baseCard, ...selectedStyle, ...(isSecondary ? { opacity: 0.7 } : {}) }}
                   >
                     {isSel ? <PreWrapCornerCheck /> : null}
                     <span style={{ paddingRight: isSel ? 24 : 0 }}>{item.label}</span>
@@ -2928,6 +3153,51 @@ function PreWrapOutputGate({
             </div>
           </div>
         ))}
+
+        {/* CO_029 Failure 5: User templates section */}
+        {userTemplates.length > 0 && (
+          <div style={{ marginBottom: 28 }}>
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--fg-3)",
+              marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
+            }}>
+              Your Templates
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+              gap: 10,
+            }}>
+              {userTemplates.map(tmpl => {
+                const tmplPickId = `tmpl:${tmpl.id}`;
+                const isSel = selectedIds.includes(tmplPickId);
+                const isSecondary = !isSel;
+                const selectedStyle: CSSProperties = isSel
+                  ? {
+                    border: "2px solid var(--gold-bright, #F5C642)",
+                    background: "rgba(245,198,66,0.18)",
+                    boxShadow: "0 4px 18px rgba(245,198,66,0.15)",
+                  }
+                  : {};
+                return (
+                  <button
+                    key={tmplPickId}
+                    type="button"
+                    aria-pressed={isSel}
+                    onClick={() => onPickFormat(tmplPickId)}
+                    style={{ ...baseCard, ...selectedStyle, ...(isSecondary ? { opacity: 0.7 } : {}) }}
+                  >
+                    {isSel ? <PreWrapCornerCheck /> : null}
+                    <span style={{ paddingRight: isSel ? 24 : 0 }}>{tmpl.name}</span>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: "var(--fg-3)", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
+                      Template
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div style={{ marginBottom: 20, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" as const }}>
           <button
@@ -3496,6 +3766,9 @@ export default function WorkSession() {
   const [dismissedFlags, setDismissedFlags] = useState<Set<string>>(new Set());
   const [fixedFlags, setFixedFlags] = useState<Map<string, string>>(new Map());
 
+  // ── CO_029 Failure 8: Persistent Reed action message in Inspector ──
+  const [reedActionMessage, setReedActionMessage] = useState<string | null>(null);
+
   // ── CO_026: Propose-before-apply state ──────────────────────
   const [pendingProposal, setPendingProposal] = useState<{
     instruction: string;
@@ -3532,6 +3805,27 @@ export default function WorkSession() {
   const [preWrapPickIds, setPreWrapPickIds] = useState<string[]>([]);
   /** When true, Start Wrap requires two Catalog picks; when false, exactly one. */
   const [preWrapAllowSecond, setPreWrapAllowSecond] = useState(false);
+
+  // CO_029 Failure 5: User templates for Review format grid
+  const [userTemplates, setUserTemplates] = useState<Array<{ id: string; name: string; outputType: string }>>([]);
+  useEffect(() => {
+    if (stage !== "Review" || !user?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("templates")
+          .select("id, name, output_type")
+          .eq("user_id", user.id)
+          .eq("is_hidden", false)
+          .order("updated_at", { ascending: false });
+        if (!cancelled && data) {
+          setUserTemplates(data.map(r => ({ id: r.id, name: r.name, outputType: r.output_type })));
+        }
+      } catch { /* non-critical */ }
+    })();
+    return () => { cancelled = true; };
+  }, [stage, user?.id]);
   /** Talk length for presentation output type (Wrap target words = minutes × 300). */
   const [preWrapPresentationMins, setPreWrapPresentationMins] = useState<number>(DEFAULT_PRESENTATION_MINUTES);
 
@@ -3718,6 +4012,8 @@ export default function WorkSession() {
   // ── Stage navigation ──────────────────────────────────────────
   const goToStage = useCallback((s: WorkStage) => {
     setStage(s);
+    // CO_029 Failure 8: Clear persistent Reed message on stage transition
+    setReedActionMessage(null);
   }, []);
 
   useLayoutEffect(() => {
@@ -4620,6 +4916,67 @@ export default function WorkSession() {
     setPendingProposal(null);
   }, []);
 
+  // ── CO_029 Failure 6: Draft-stage repair handler ────────────
+  const [draftRepairing, setDraftRepairing] = useState(false);
+
+  const handleDraftRepair = useCallback(async () => {
+    if (!draft || !user || !backgroundPipelineRun || draftRepairing) return;
+
+    const issues = backgroundPipelineRun.checkpointResults
+      .filter(g => g.status !== "PASS")
+      .map(g => `[${displayGateName(g.gate)}]: ${g.feedback}`)
+      .join("\n");
+    if (!issues) return;
+
+    setDraftRepairing(true);
+    try {
+      const repairOt = catalogOutputTypeForApi(outputType);
+      const res = await fetchWithRetry(`${API_BASE}/api/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          conversationSummary: buildConvSummary(),
+          outputType: repairOt,
+          originalDraft: draft,
+          revisionNotes: `Fix these quality checkpoint issues while preserving the voice and argument:\n\n${issues}`,
+          userId: user.id,
+          maxTokens: 4096,
+          ...(repairOt === "talk" ? { talkDurationMinutes: talkDuration } : {}),
+          ...(structuredIntakePayload ? { structuredIntake: structuredIntakePayload } : {}),
+        }),
+      }, { timeout: 90000 });
+
+      if (!res.ok) throw new Error(`Draft repair error ${res.status}`);
+      const data = await res.json();
+      const newDraft = data.content;
+
+      if (!newDraft || newDraft.trim() === draft.trim()) {
+        toast("No changes detected. Try editing manually.", "info");
+        return;
+      }
+
+      setDraft(newDraft);
+      setDismissedFlags(new Set());
+      setFixedFlags(new Map());
+      setDraftVersions(prev => {
+        const updated = [...prev, { content: newDraft, label: `Version ${prev.length + 1}` }];
+        while (updated.length > 10) updated.shift();
+        return updated;
+      });
+      setActiveVersionIdx(prev => Math.min(prev + 1, 9));
+
+      setReedActionMessage("Reed revised the draft. Re-checking quality...");
+
+      // Re-run background pipeline on the new draft
+      void handleBackgroundQualityCheck(newDraft);
+    } catch (err: any) {
+      toast("The repair did not complete. Your draft is unchanged. Try again or edit manually.", "error");
+      console.error("[WorkSession][draftRepair]", err);
+    } finally {
+      setDraftRepairing(false);
+    }
+  }, [draft, user, backgroundPipelineRun, draftRepairing, buildConvSummary, outputType, talkDuration, structuredIntakePayload, toast, handleBackgroundQualityCheck]);
+
   // ── CO_024: Draft-stage conversation handler ────────────────
   const [draftConverseLoading, setDraftConverseLoading] = useState(false);
   const [draftConverseReply, setDraftConverseReply] = useState<string | null>(null);
@@ -5025,7 +5382,7 @@ export default function WorkSession() {
 
       // Pipeline complete - no toast, results show in Review stage silently
     } catch (err: any) {
-      toast("Pipeline encountered an error. Try again.", "error");
+      toast("The quality review could not finish. Try again.", "error");
       console.error("[WorkSession][pipeline]", err);
     } finally {
       setPipelineRunning(false);
@@ -5214,8 +5571,17 @@ export default function WorkSession() {
       (!preWrapAllowSecond && preWrapPickIds.length === 1)
       || (preWrapAllowSecond && preWrapPickIds.length === 2);
     if (!ok) return;
-    void handleExportAll(preWrapPickIds);
-  }, [preWrapAllowSecond, preWrapPickIds, handleExportAll]);
+    // CO_029 Failure 5: Resolve template IDs to output_type for downstream
+    const resolved = preWrapPickIds.map(id => {
+      if (id.startsWith("tmpl:")) {
+        const tmplId = id.slice(5);
+        const tmpl = userTemplates.find(t => t.id === tmplId);
+        return tmpl?.outputType || "freestyle";
+      }
+      return id;
+    });
+    void handleExportAll(resolved);
+  }, [preWrapAllowSecond, preWrapPickIds, handleExportAll, userTemplates]);
 
   const reviewChannelTabs = useMemo((): Format[] => selectedFormats, [selectedFormats]);
 
@@ -5237,8 +5603,8 @@ export default function WorkSession() {
     && !allExported;
 
   const recommendedWrapOutputId = useMemo(
-    () => inferRecommendedWrapOutputId(draft || ""),
-    [draft],
+    () => inferRecommendedWrapOutputId(draft || "", catalogOutputTypeForApi(outputType)),
+    [draft, outputType],
   );
 
   useEffect(() => {
@@ -5279,7 +5645,7 @@ export default function WorkSession() {
         } : prev);
       }
     } catch (err: any) {
-      toast("Voice test rerun failed. Try again.", "error");
+      toast("The Human Voice Test did not complete. Hit Retry, it usually resolves in one attempt.", "error");
       console.error("[WorkSession][hvt-rerun]", err);
     } finally {
       setHvtRunning(false);
@@ -5338,6 +5704,7 @@ export default function WorkSession() {
     setProposalLoading(false);
     setDraftConverseLoading(false);
     setDraftConverseReply(null);
+    setReedActionMessage(null);
     setFormatDrafts({});
     setOutlineAngles(null);
     setSelectedAngle("a");
@@ -5572,13 +5939,13 @@ export default function WorkSession() {
           } catch { /* Non-critical: format re-adaptation failed, raw draft already shown */ }
         }
 
-        toast("Draft updated.");
+        setReedActionMessage("Draft updated.");
       } else {
-        toast("No changes detected.");
+        setReedActionMessage("No changes detected.");
       }
     } catch (err: any) {
       console.error("[handleReviewFix]", err);
-      toast("Fix failed. Try again.", "error");
+      toast("Reed could not apply the fix. Try again or go back to Draft to edit manually.", "error");
       throw err;
     }
   }, [draft, buildConvSummary, outputType, user?.id, voiceDnaMd, brandDnaMd, activeReviewTab, toast, preWrapPresentationMins, talkDuration, structuredIntakePayload]);
@@ -5619,7 +5986,7 @@ export default function WorkSession() {
           },
         }));
       }
-      toast("Fix applied.");
+      setReedActionMessage("Fix applied.");
     } else {
       toast("Could not apply fix. Try using Ask Reed instead.", "info");
     }
@@ -5659,10 +6026,10 @@ export default function WorkSession() {
         } as PipelineRun;
       });
 
-      toast("Quality pipeline refreshed.");
+      setReedActionMessage("Quality pipeline refreshed.");
     } catch (err: any) {
       console.error("[handleRerunPipeline]", err);
-      toast("Pipeline refresh failed.", "error");
+      toast("The quality review could not refresh. Try again.", "error");
     } finally {
       setRerunningPipeline(false);
     }
@@ -5745,7 +6112,7 @@ export default function WorkSession() {
         .filter(g => g.status !== "PASS")
         .map(g => displayGateName(g.gate).toLowerCase());
 
-      toast(
+      setReedActionMessage(
         changes.length > 0
           ? `Reed revised the draft: ${changes.join(", ")}. Addressed: ${failingGateNames.join(", ")}. Running checks again...`
           : `Reed revised the draft to address ${failingGateNames.join(", ")}. Running checks again...`
@@ -5799,7 +6166,7 @@ export default function WorkSession() {
           } as PipelineRun;
         });
 
-        toast("Quality pipeline refreshed.");
+        setReedActionMessage("Quality pipeline refreshed.");
 
         // Update Supabase if we have an output
         if (outputId) {
@@ -5814,7 +6181,7 @@ export default function WorkSession() {
       }
     } catch (err: any) {
       console.error("[handleRepairPipeline]", err);
-      toast("Fix failed. Try again.", "error");
+      toast("The repair did not complete. Try again or go back to Draft to edit manually.", "error");
     } finally {
       setFixingGate(null);
     }
@@ -5984,14 +6351,77 @@ export default function WorkSession() {
                     )}
                   </DpSection>
 
-                  {backgroundPipelineRun && (
-                    <DpSection>
-                      <div style={{ fontSize: 10, color: "#22C55E", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
-                        <span>&#10003;</span>
-                        <span>Reed has reviewed your draft.</span>
-                      </div>
-                    </DpSection>
-                  )}
+                  {backgroundPipelineRun && (() => {
+                    const bgNonPass = deriveReviewDisplayGates(
+                      backgroundPipelineRun.checkpointResults,
+                      backgroundPipelineRun.humanVoiceTest,
+                    ).filter(g => g.status !== "Pass");
+
+                    if (bgNonPass.length === 0) {
+                      return (
+                        <DpSection>
+                          <div style={{ fontSize: 10, color: "#22C55E", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                            <span>&#10003;</span>
+                            <span>Reed has reviewed your draft. No issues found.</span>
+                          </div>
+                        </DpSection>
+                      );
+                    }
+
+                    // CO_029 Failure 6: Surface draft-quality flags at Draft stage
+                    return (
+                      <DpSection>
+                        <DpLabel>Draft flags</DpLabel>
+                        {bgNonPass.map((g, i) => {
+                          const gLower = (g.name || "").toLowerCase();
+                          const src = backgroundPipelineRun.checkpointResults.find(cp => {
+                            if (gLower.includes("slop")) return cp.gate === "checkpoint-4";
+                            if (gLower.includes("dedup")) return cp.gate === "checkpoint-0";
+                            if (gLower.includes("human")) return cp.gate === "checkpoint-2";
+                            if (gLower.includes("humanization")) return cp.gate === "checkpoint-5" || cp.gate === "checkpoint-3";
+                            return false;
+                          });
+                          const summary = src?.feedback
+                            ? src.feedback.length > 120 ? src.feedback.slice(0, 117) + "..." : src.feedback
+                            : "";
+                          return (
+                            <div key={i} style={{
+                              marginBottom: 6, padding: "6px 8px", borderRadius: 5,
+                              border: `1px solid ${g.status === "Fail" ? "rgba(185,28,28,0.25)" : "rgba(245,198,66,0.3)"}`,
+                              background: g.status === "Fail" ? "rgba(185,28,28,0.04)" : "rgba(245,198,66,0.04)",
+                            }}>
+                              <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                                <span style={{
+                                  width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
+                                  background: g.status === "Fail" ? "#b91c1c" : "var(--gold-bright)",
+                                }} />
+                                <span style={{ fontSize: 10, fontWeight: 600, color: "var(--fg)" }}>{g.name}</span>
+                              </div>
+                              {summary && (
+                                <div style={{ fontSize: 9, color: "var(--fg-3)", lineHeight: 1.45, marginTop: 3 }}>{summary}</div>
+                              )}
+                            </div>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          className="liquid-glass-btn-gold"
+                          onClick={handleDraftRepair}
+                          disabled={draftRepairing}
+                          style={{
+                            width: "100%", marginTop: 4, padding: "6px 12px",
+                            fontSize: 10, fontFamily: FONT,
+                            opacity: draftRepairing ? 0.6 : 1,
+                            cursor: draftRepairing ? "not-allowed" : "pointer",
+                          }}
+                        >
+                          <span className="liquid-glass-btn-gold-label">
+                            {draftRepairing ? "Reed is working on it..." : "Let Reed address these"}
+                          </span>
+                        </button>
+                      </DpSection>
+                    );
+                  })()}
                   {backgroundPipelineRunning && (
                     <DpSection>
                       <div style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
@@ -6000,6 +6430,33 @@ export default function WorkSession() {
                       </div>
                     </DpSection>
                   )}
+                  {/* CO_029 Failure 8: Persistent Reed action message */}
+                  {reedActionMessage && (
+                    <DpSection>
+                      <div style={{
+                        position: "relative",
+                        border: "1px solid rgba(74,144,217,0.25)", borderRadius: 8,
+                        padding: "8px 28px 8px 10px", background: "rgba(74,144,217,0.04)",
+                      }}>
+                        <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
+                        <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
+                        <button
+                          type="button"
+                          onClick={() => setReedActionMessage(null)}
+                          aria-label="Dismiss"
+                          style={{
+                            position: "absolute", top: 4, right: 4,
+                            width: 18, height: 18, borderRadius: 4,
+                            border: "none", background: "transparent",
+                            color: "var(--fg-3)", cursor: "pointer",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 11, fontFamily: FONT, padding: 0,
+                          }}
+                        >&times;</button>
+                      </div>
+                    </DpSection>
+                  )}
+
                   {/* ACTION CHIPS — CO_026: propose-before-apply flow */}
 
                   {/* CO_026: Proposal loading state */}
@@ -6114,6 +6571,8 @@ export default function WorkSession() {
               methodLintLastCompletedFp={methodLintLastCompletedFp}
               draftLintFp={draftLintFp}
               onRetryMethodLint={handleRetryMethodLint}
+              reedActionMessage={reedActionMessage}
+              onDismissReedAction={() => setReedActionMessage(null)}
             />
           );
         }
@@ -6129,7 +6588,7 @@ export default function WorkSession() {
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,
-    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal,
+    prefillReed, handleRevise, handleProposeRevision, handleApplyProposal, handleSkipProposal, handleDraftRepair, draftRepairing, reedActionMessage,
     pendingProposal, proposalLoading,
     activeReviewTab, handleReviewFix, handleExportAll,
     dismissedFlags, fixedFlags, backgroundPipelineRun, backgroundPipelineRunning,
@@ -6603,6 +7062,12 @@ export default function WorkSession() {
           onConverse={handleDraftConverse}
           converseLoading={draftConverseLoading}
           converseReply={draftConverseReply}
+          hasDraftFlags={
+            !!(backgroundPipelineRun && !draftChangedSinceBackground &&
+              deriveReviewDisplayGates(backgroundPipelineRun.checkpointResults, backgroundPipelineRun.humanVoiceTest)
+                .some(g => g.status !== "Pass"))
+          }
+          onAdvanceForced={handleRunPipeline}
           versions={draftVersions}
           activeVersionIdx={activeVersionIdx}
           onVersionSelect={(idx) => {
@@ -6628,6 +7093,7 @@ export default function WorkSession() {
             onPresentationMinutesChange={setPreWrapPresentationMins}
             talkDuration={talkDuration}
             onTalkDurationChange={setTalkDuration}
+            userTemplates={userTemplates}
           />
         ) : (
           <StageReview
