@@ -2951,6 +2951,7 @@ function PreWrapOutputGate({
   onPresentationMinutesChange,
   talkDuration,
   onTalkDurationChange,
+  userTemplates,
 }: {
   pipelineRun: PipelineRun | null;
   recommendedId: string;
@@ -2964,6 +2965,7 @@ function PreWrapOutputGate({
   onPresentationMinutesChange: (n: number) => void;
   talkDuration: number;
   onTalkDurationChange: (n: number) => void;
+  userTemplates: Array<{ id: string; name: string; outputType: string }>;
 }) {
   // CO_029 Failure 4: First-use Wrap explanation
   const [showWrapExplainer] = useState(() => {
@@ -2994,16 +2996,19 @@ function PreWrapOutputGate({
   const wrapReady =
     (!allowSecondFormat && selectedIds.length === 1)
     || (allowSecondFormat && selectedIds.length === 2);
+  // CO_029 Failure 5: Resolve label for both system formats and template picks
+  const resolvePickLabel = (id: string): string => {
+    if (id.startsWith("tmpl:")) {
+      const tmpl = userTemplates.find(t => t.id === id.slice(5));
+      return tmpl?.name || id;
+    }
+    return OUTPUT_TYPES.find(t => t.id === id)?.label || id;
+  };
   const startLabel = (() => {
     if (allowSecondFormat && selectedIds.length === 1) return "Pick second format";
     if (!wrapReady) return "Start Wrap";
-    if (selectedIds.length === 1) {
-      const one = OUTPUT_TYPES.find(t => t.id === selectedIds[0])?.label || selectedIds[0];
-      return `Start Wrap with ${one}`;
-    }
-    const a = OUTPUT_TYPES.find(t => t.id === selectedIds[0])?.label || selectedIds[0];
-    const b = OUTPUT_TYPES.find(t => t.id === selectedIds[1])?.label || selectedIds[1];
-    return `Start Wrap with ${a} and ${b}`;
+    if (selectedIds.length === 1) return `Start Wrap with ${resolvePickLabel(selectedIds[0])}`;
+    return `Start Wrap with ${resolvePickLabel(selectedIds[0])} and ${resolvePickLabel(selectedIds[1])}`;
   })();
 
   const categories: { key: PreWrapPickCategory; title: string; items: { id: string; label: string }[] }[] = [
@@ -3146,6 +3151,51 @@ function PreWrapOutputGate({
             </div>
           </div>
         ))}
+
+        {/* CO_029 Failure 5: User templates section */}
+        {userTemplates.length > 0 && (
+          <div style={{ marginBottom: 28 }}>
+            <div style={{
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "var(--fg-3)",
+              marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
+            }}>
+              Your Templates
+            </div>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(140px, 1fr))",
+              gap: 10,
+            }}>
+              {userTemplates.map(tmpl => {
+                const tmplPickId = `tmpl:${tmpl.id}`;
+                const isSel = selectedIds.includes(tmplPickId);
+                const isSecondary = !isSel;
+                const selectedStyle: CSSProperties = isSel
+                  ? {
+                    border: "2px solid var(--gold-bright, #F5C642)",
+                    background: "rgba(245,198,66,0.18)",
+                    boxShadow: "0 4px 18px rgba(245,198,66,0.15)",
+                  }
+                  : {};
+                return (
+                  <button
+                    key={tmplPickId}
+                    type="button"
+                    aria-pressed={isSel}
+                    onClick={() => onPickFormat(tmplPickId)}
+                    style={{ ...baseCard, ...selectedStyle, ...(isSecondary ? { opacity: 0.7 } : {}) }}
+                  >
+                    {isSel ? <PreWrapCornerCheck /> : null}
+                    <span style={{ paddingRight: isSel ? 24 : 0 }}>{tmpl.name}</span>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: "var(--fg-3)", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
+                      Template
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div style={{ marginBottom: 20, display: "flex", justifyContent: "center", gap: 10, flexWrap: "wrap" as const }}>
           <button
@@ -3753,6 +3803,27 @@ export default function WorkSession() {
   const [preWrapPickIds, setPreWrapPickIds] = useState<string[]>([]);
   /** When true, Start Wrap requires two Catalog picks; when false, exactly one. */
   const [preWrapAllowSecond, setPreWrapAllowSecond] = useState(false);
+
+  // CO_029 Failure 5: User templates for Review format grid
+  const [userTemplates, setUserTemplates] = useState<Array<{ id: string; name: string; outputType: string }>>([]);
+  useEffect(() => {
+    if (stage !== "Review" || !user?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { data } = await supabase
+          .from("templates")
+          .select("id, name, output_type")
+          .eq("user_id", user.id)
+          .eq("is_hidden", false)
+          .order("updated_at", { ascending: false });
+        if (!cancelled && data) {
+          setUserTemplates(data.map(r => ({ id: r.id, name: r.name, outputType: r.output_type })));
+        }
+      } catch { /* non-critical */ }
+    })();
+    return () => { cancelled = true; };
+  }, [stage, user?.id]);
   /** Talk length for presentation output type (Wrap target words = minutes × 300). */
   const [preWrapPresentationMins, setPreWrapPresentationMins] = useState<number>(DEFAULT_PRESENTATION_MINUTES);
 
@@ -5498,8 +5569,17 @@ export default function WorkSession() {
       (!preWrapAllowSecond && preWrapPickIds.length === 1)
       || (preWrapAllowSecond && preWrapPickIds.length === 2);
     if (!ok) return;
-    void handleExportAll(preWrapPickIds);
-  }, [preWrapAllowSecond, preWrapPickIds, handleExportAll]);
+    // CO_029 Failure 5: Resolve template IDs to output_type for downstream
+    const resolved = preWrapPickIds.map(id => {
+      if (id.startsWith("tmpl:")) {
+        const tmplId = id.slice(5);
+        const tmpl = userTemplates.find(t => t.id === tmplId);
+        return tmpl?.outputType || "freestyle";
+      }
+      return id;
+    });
+    void handleExportAll(resolved);
+  }, [preWrapAllowSecond, preWrapPickIds, handleExportAll, userTemplates]);
 
   const reviewChannelTabs = useMemo((): Format[] => selectedFormats, [selectedFormats]);
 
@@ -7011,6 +7091,7 @@ export default function WorkSession() {
             onPresentationMinutesChange={setPreWrapPresentationMins}
             talkDuration={talkDuration}
             onTalkDurationChange={setTalkDuration}
+            userTemplates={userTemplates}
           />
         ) : (
           <StageReview
