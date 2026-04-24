@@ -1334,12 +1334,12 @@ function StageIntake({
   const isMobile = useMobile();
 
   const reedQuestionCount = messages.filter(m => m.role === "reed" && m.content.trim().endsWith("?")).length;
-  const totalQuestions = 5;
+  const totalQuestions = 4;
   const progress = Math.min(reedQuestionCount / totalQuestions, 1);
   /** Prominent outline CTA: API ready, or full question arc in the UI. */
   const showProminentOutlineCta = isReady || reedQuestionCount >= totalQuestions;
-  /** Early-only skip link: hide after a few questions so the path forward is clearer. */
-  const showJustWriteEscape = reedQuestionCount < 3 && !showProminentOutlineCta;
+  /** Early-only skip link: hide after 2 questions (past halfway of 4). */
+  const showJustWriteEscape = reedQuestionCount < 2 && !showProminentOutlineCta;
 
   // Welcome state: show centered greeting until user sends first message
   const hasUserMessage = messages.some(m => m.role === "user");
@@ -1632,31 +1632,31 @@ function StageIntake({
                 transition: "width 0.3s ease",
               }} />
             </div>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
+            <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
               <span style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, letterSpacing: "0.04em" }}>
                 {reedQuestionCount >= totalQuestions
                   ? `${totalQuestions} of ${totalQuestions} questions answered`
                   : `Question ${Math.min(reedQuestionCount, totalQuestions)} of ${totalQuestions}`}
               </span>
-              {showJustWriteEscape ? (
-                <button
-                  type="button"
-                  onClick={onAdvance}
-                  style={{
-                    fontSize: 10, color: "var(--blue, #4A90D9)", background: "none",
-                    border: "none", cursor: "pointer", padding: "4px 2px", fontFamily: FONT,
-                    letterSpacing: "0.01em",
-                  }}
-                >
-                  Just write it →
-                </button>
-              ) : null}
             </div>
           </div>
         )}
 
         {!useDockedComposer ? (
           <div style={{ ...INTAKE_DOCKED_COMPOSER_WRAP }}>
+            {showJustWriteEscape && (
+              <button
+                type="button"
+                onClick={onAdvance}
+                style={{
+                  fontSize: 10, color: "var(--fg-3)", background: "none",
+                  border: "none", cursor: "pointer", padding: "2px 0", fontFamily: FONT,
+                  marginBottom: 6, textAlign: "left" as const, display: "block",
+                }}
+              >
+                Just write it →
+              </button>
+            )}
             <ChatInputBar
               placeholder="What's on your mind?"
               value={input}
@@ -3767,7 +3767,7 @@ export default function WorkSession() {
   useEffect(() => {
     if (stage !== "Intake") return;
     const rq = messages.filter(m => m.role === "reed" && m.content.trim().endsWith("?")).length;
-    if (rq >= 5 && !intakeReady) setIntakeReady(true);
+    if (rq >= 4 && !intakeReady) setIntakeReady(true);
   }, [messages, stage, intakeReady]);
 
   // CO_031: Sync intake progress to shell context for sidebar
@@ -6759,9 +6759,9 @@ export default function WorkSession() {
 
   const hasUserMessage = messages.some(m => m.role === "user");
   const intakeReedQCount = messages.filter(m => m.role === "reed" && m.content.trim().endsWith("?")).length;
-  const intakeTotalQ = 5;
+  const intakeTotalQ = 4;
   const intakeProgressValue = Math.min(intakeReedQCount / intakeTotalQ, 1);
-  const intakeShowJustWrite = intakeReedQCount < 3 && !(intakeReady || intakeReedQCount >= intakeTotalQ);
+  const intakeShowJustWrite = intakeReedQCount < 2 && !(intakeReady || intakeReedQCount >= intakeTotalQ);
   const dockIntakeOutlineShell = (stage === "Intake" && hasUserMessage) || stage === "Outline";
   const showOutlineBridgeLoading = stage === "Outline" && buildingOutline && ioTransitionStep === 2;
   const showOutlineMain = stage === "Outline" && !(buildingOutline && ioTransitionStep === 2);
@@ -7066,27 +7066,27 @@ export default function WorkSession() {
                       transition: "width 0.3s ease",
                     }} />
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", marginTop: 4 }}>
                     <span style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, letterSpacing: "0.04em" }}>
                       {intakeReedQCount >= intakeTotalQ
                         ? `${intakeTotalQ} of ${intakeTotalQ} questions answered`
                         : `Question ${Math.min(intakeReedQCount, intakeTotalQ)} of ${intakeTotalQ}`}
                     </span>
-                    {intakeShowJustWrite ? (
-                      <button
-                        type="button"
-                        onClick={handleBuildOutline}
-                        style={{
-                          fontSize: 10, color: "var(--blue, #4A90D9)", background: "none",
-                          border: "none", cursor: "pointer", padding: "4px 2px", fontFamily: FONT,
-                          letterSpacing: "0.01em",
-                        }}
-                      >
-                        Just write it →
-                      </button>
-                    ) : null}
                   </div>
                 </div>
+                {intakeShowJustWrite && (
+                  <button
+                    type="button"
+                    onClick={handleBuildOutline}
+                    style={{
+                      fontSize: 10, color: "var(--fg-3)", background: "none",
+                      border: "none", cursor: "pointer", padding: "2px 0", fontFamily: FONT,
+                      marginBottom: 6, textAlign: "left" as const, display: "block",
+                    }}
+                  >
+                    Just write it →
+                  </button>
+                )}
                 <ChatInputBar
                   placeholder="What's on your mind?"
                   value={intakeBarInput}
