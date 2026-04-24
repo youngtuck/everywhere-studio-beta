@@ -6634,7 +6634,6 @@ export default function WorkSession() {
     const base = {
       display: "flex" as const,
       flexDirection: "column" as const,
-      overflow: "hidden" as const,
       opacity: intakeMainFadeOut ? 0 : 1,
       transition: (ioTransitionStep === 1 ? `opacity ${IO_INTAKE_FADE_MS}ms ease` : "none") as const,
     };
