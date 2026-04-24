@@ -1942,10 +1942,9 @@ function ChatInputBar({
           <textarea
             ref={textareaRef}
             value={value}
-            onChange={e => { if (!disabled) onChange(e.target.value); }}
-            onKeyDown={e => { if (!disabled) handleKey(e); }}
+            onChange={e => onChange(e.target.value)}
+            onKeyDown={handleKey}
             placeholder={placeholder}
-            readOnly={disabled}
             rows={1}
             className="reed-input"
             style={{
@@ -1955,7 +1954,6 @@ function ChatInputBar({
               color: "var(--fg)", fontFamily: FONT,
               maxHeight: "min(72vh, 800px)",
               overflowY: "hidden",
-              opacity: disabled ? 0.5 : 1,
               minHeight: 40,
               padding: "6px 4px 6px 0",
             }}
