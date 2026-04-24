@@ -219,7 +219,6 @@ div:hover > .nav-tooltip { display: block !important; }
 #root[data-font-size="3"] { font-size: 112% !important; }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html {
-  scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
