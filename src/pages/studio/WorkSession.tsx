@@ -1064,7 +1064,7 @@ function ReviewDash({
               backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
-              <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
+              <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
               <button
                 type="button"
                 onClick={onDismissReedAction}
@@ -3059,7 +3059,7 @@ function PreWrapOutputGate({
         }}>
           Where is this going?
         </h1>
-        <p style={{ fontSize: 13, color: "var(--fg-2)", margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT }}>
+        <p style={{ fontSize: 12, color: "var(--fg-2)", margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT }}>
           {reviewStatusLine}
         </p>
         {hvtLine ? (
@@ -3104,7 +3104,7 @@ function PreWrapOutputGate({
         {categories.map(({ key, title, items }) => (
           <div key={key} style={{ marginBottom: 28 }}>
             <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "var(--fg-3)",
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--fg-3)",
               marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
             }}>
               {title}
@@ -3158,7 +3158,7 @@ function PreWrapOutputGate({
         {userTemplates.length > 0 && (
           <div style={{ marginBottom: 28 }}>
             <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "var(--fg-3)",
+              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--fg-3)",
               marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
             }}>
               Your Templates
