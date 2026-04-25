@@ -796,12 +796,46 @@ function DpSection({ children }: { children: React.ReactNode }) {
 }
 
 // ── Outline dashboard ─────────────────────────────────────────
-function OutlineDash({ selectedFormats }: { selectedFormats: Format[] }) {
+function OutlineDash({ selectedFormats, outlineRows }: { selectedFormats: Format[]; outlineRows?: Array<{ label: string; content: string; indent?: boolean }> }) {
+  // CO_021 Fix 2: Reed's Take heuristic from outline structure
+  const reedOutlineTake = (() => {
+    if (!outlineRows || outlineRows.length === 0) return null;
+    const sections: Array<{ label: string; subCount: number }> = [];
+    let currentLabel = "";
+    let currentSubs = 0;
+    for (const row of outlineRows) {
+      if (row.label && !row.indent) {
+        if (currentLabel) sections.push({ label: currentLabel, subCount: currentSubs });
+        currentLabel = row.label;
+        currentSubs = 0;
+      } else if (row.indent) {
+        currentSubs++;
+      }
+    }
+    if (currentLabel) sections.push({ label: currentLabel, subCount: currentSubs });
+    // Exclude Title from assessment
+    const assessed = sections.filter(s => s.label !== "Title");
+    if (assessed.length === 0) return null;
+    const maxSubs = Math.max(...assessed.map(s => s.subCount));
+    const minSubs = Math.min(...assessed.map(s => s.subCount));
+    if (maxSubs === minSubs) return "Structure looks balanced across sections. Review and adjust before writing.";
+    const strongest = assessed.find(s => s.subCount === maxSubs)!;
+    const weakest = assessed.find(s => s.subCount === minSubs)!;
+    return `The ${strongest.label} section is your strongest. ${weakest.label} could use more development.`;
+  })();
+
   const wordMap: Partial<Record<Format, string>> = {
     LinkedIn: "700 words", Newsletter: "800 words",
     Podcast: "1,200 words", "Sunday Story": "1,500 words",
   };
   return (
+    <>
+    {reedOutlineTake && (
+      <DpSection>
+        <DpLabel>Reed's Take</DpLabel>
+        <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedOutlineTake}</div>
+      </DpSection>
+    )}
     <DpSection>
       <DpLabel>Selected outputs</DpLabel>
       {selectedFormats.length === 0 ? (
@@ -822,6 +856,7 @@ function OutlineDash({ selectedFormats }: { selectedFormats: Format[] }) {
         ))}
       </div>
     </DpSection>
+    </>
   );
 }
 
@@ -2200,17 +2235,41 @@ function StageOutline({
             <LoadingDots label="Building outline from your conversation..." />
           ) : (
             <>
-              {/* Lens cards: two angles side by side */}
-              <p style={{
-                fontSize: 12,
-                fontWeight: 400,
-                color: "rgba(255,255,255,0.45)",
-                margin: "0 0 12px",
-                lineHeight: 1.45,
+              {/* CO_021 Fix 3: Orientation line with Reed avatar */}
+              <div style={{
+                display: "flex", alignItems: "center", gap: 8,
+                margin: "0 0 10px",
                 maxWidth: 560,
               }}>
-                Here are two ways to look at your idea.
-              </p>
+                <ReedProfileIcon size={18} title="Reed" />
+                <p style={{
+                  fontSize: 12,
+                  fontWeight: 400,
+                  color: "var(--fg-3)",
+                  margin: 0,
+                  lineHeight: 1.45,
+                }}>
+                  Here's your outline. I've selected the stronger angle. Review the structure, make any changes, then hit Write Draft.
+                </p>
+              </div>
+
+              {/* CO_021 Fix 1A: Auto-selection narration */}
+              {angles && (
+                <p style={{
+                  fontSize: 11,
+                  color: "var(--fg-3)",
+                  margin: "0 0 12px",
+                  lineHeight: 1.45,
+                  maxWidth: 560,
+                  fontFamily: FONT,
+                }}>
+                  {activeAngle === "a"
+                    ? `I went with ${lensA.title}. ${lensA.desc}`
+                    : `Switched to ${lensB.title}. ${lensB.desc}`}
+                </p>
+              )}
+
+              {/* Lens cards: two angles side by side */}
               <div className="lens-row">
               <div
                 className={`lens-card${activeAngle === "a" ? " selected" : ""}`}
@@ -6380,7 +6439,7 @@ export default function WorkSession() {
           );
         }
         case "Outline":
-          return <OutlineDash selectedFormats={selectedFormats} />;
+          return <OutlineDash selectedFormats={selectedFormats} outlineRows={outlineRows} />;
         case "Edit": {
           const wordCount = memoWordCount;
           const targetWords = memoTargetWords;
@@ -6756,7 +6815,7 @@ export default function WorkSession() {
     setFeedbackContent(dashNode);
     return () => setFeedbackContent(null);
   }, [
-    stage, selectedFormats, selectedTemplate, draft, generating, generatingLabel, messages, intakeReady,
+    stage, selectedFormats, selectedTemplate, draft, generating, generatingLabel, messages, intakeReady, outlineRows,
     pipelineRun, pipelineRunning, allExported, outputId,
     hvtAttempts, handleRerunHVT, hvtRunning, outputType, talkDuration, preWrapPresentationMins,
     handleRepairPipeline, fixingGate, handleRerunPipeline, rerunningPipeline,
