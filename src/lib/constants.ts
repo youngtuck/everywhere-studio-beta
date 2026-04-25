@@ -22,7 +22,6 @@ export const REED_STAGE_CHIPS: Record<string, Array<{ label: string; prefill: st
     { label: "What is my angle?", prefill: "I have a general topic. Help me find the sharpest angle into it." },
   ],
   Outline: [
-    { label: "Does the structure hold?", prefill: "Read my outline and tell me if the structure holds. Where is the logic weakest?" },
     { label: "Sharpen my hook", prefill: "How can I sharpen the opening hook? What's the strongest way to start this?" },
     { label: "Is the close strong?", prefill: "Does my closing section deliver on what the hook promised?" },
     { label: "What's missing?", prefill: "What's the one thing this outline is missing that would make it significantly stronger?" },
