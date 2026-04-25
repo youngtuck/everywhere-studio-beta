@@ -1399,9 +1399,13 @@ function StageIntake({
     prevSending.current = sending;
   }, [sending]);
 
+  // CO_018: Track whether the input was seeded from a Watch signal
+  const [seededFromWatch, setSeededFromWatch] = useState(false);
+
   useEffect(() => {
     if (composerSeed == null || composerSeed === "") return;
     setInput(composerSeed);
+    setSeededFromWatch(true);
     onConsumeComposerSeed?.();
   }, [composerSeed, setInput, onConsumeComposerSeed]);
 
@@ -1469,6 +1473,19 @@ function StageIntake({
           }}>
             {firstName ? `Hey ${firstName}, what are we working on?` : "What are we working on?"}
           </div>
+
+          {/* CO_018: Reed attribution for Watch signal pre-fill */}
+          {seededFromWatch && input.trim() && (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 8,
+              marginBottom: 14, fontFamily: FONT,
+            }}>
+              <ReedProfileIcon size={18} title="Reed" />
+              <span style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                I pulled your top signal from Watch. Ready to build. Hit send.
+              </span>
+            </div>
+          )}
 
           {/* Centered input bar */}
           <div style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}>
