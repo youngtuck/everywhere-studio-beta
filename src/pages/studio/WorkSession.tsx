@@ -2245,7 +2245,7 @@ function StageOutline({
                 <p style={{
                   fontSize: 12,
                   fontWeight: 400,
-                  color: "rgba(255,255,255,0.45)",
+                  color: "var(--fg-3)",
                   margin: 0,
                   lineHeight: 1.45,
                 }}>
@@ -2257,7 +2257,7 @@ function StageOutline({
               {angles && (
                 <p style={{
                   fontSize: 11,
-                  color: "rgba(255,255,255,0.38)",
+                  color: "var(--fg-3)",
                   margin: "0 0 12px",
                   lineHeight: 1.45,
                   maxWidth: 560,
