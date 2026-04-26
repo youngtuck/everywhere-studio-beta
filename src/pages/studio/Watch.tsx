@@ -353,7 +353,6 @@ export default function Watch() {
   const [hasSetup, setHasSetup] = useState(true); // assume true until profile loads
 
   const [frequency, setFrequency] = useState<"daily" | "weekly" | "realtime">("daily");
-  const [saving, setSaving] = useState(false);
   const [searching, setSearching] = useState(false);
   const [searchResults, setSearchResults] = useState<Array<{ title?: string; url?: string; description?: string }>>([]);
 
@@ -539,48 +538,54 @@ export default function Watch() {
       return updated;
     });
   };
-  const addItem = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (v: string) => {
-    if (!v) return;
-    setter(prev => prev.includes(v) ? prev : [...prev, v]);
-  };
-  const removeItem = (setter: React.Dispatch<React.SetStateAction<string[]>>) => (v: string) => {
-    setter(prev => prev.filter(x => x !== v));
-  };
-
-  // Save all settings to Supabase
-  const handleSaveSettings = useCallback(async () => {
+  // Auto-save helpers: profiles.watch_config for config items, watch_sources for media
+  const saveWatchConfig = useCallback((patch: Record<string, unknown>) => {
     if (!user) return;
-    setSaving(true);
-    try {
-      await supabase.from("profiles").update({
-        sentinel_topics: keywords,
-        watch_config: {
-          competitors,
-          thoughtLeaders,
-          frequency,
-          reddit: redditCommunities,
-        },
-      }).eq("id", user.id);
+    // Read latest values from state refs isn't possible here, so callers pass the updated slice
+    supabase.from("profiles").update({ watch_config: patch }).eq("id", user.id)
+      .then(({ error }) => { if (error) toast("Couldn't save. Try again.", "error"); });
+  }, [user, toast]);
 
-      // Sync watch_sources: delete existing and re-insert
-      await supabase.from("watch_sources").delete().eq("user_id", user.id);
-      const sourceRows = [
-        ...newsletters.map(name => ({ user_id: user.id, type: "Newsletter" as const, name })),
-        ...podcasts.map(name => ({ user_id: user.id, type: "Podcast" as const, name })),
-        ...publications.map(name => ({ user_id: user.id, type: "Publication" as const, name })),
-        ...substacks.map(name => ({ user_id: user.id, type: "Substack" as const, name })),
-      ];
-      if (sourceRows.length > 0) {
-        await supabase.from("watch_sources").insert(sourceRows);
-      }
-      toast("Settings saved.");
-    } catch (err) {
-      console.error("[Watch] Save settings error:", err);
-      toast("Failed to save settings.", "error");
-    } finally {
-      setSaving(false);
-    }
-  }, [user, keywords, competitors, thoughtLeaders, frequency, redditCommunities, newsletters, podcasts, publications, substacks, toast]);
+  const buildWatchConfig = useCallback(() => ({
+    competitors, thoughtLeaders, frequency, reddit: redditCommunities,
+  }), [competitors, thoughtLeaders, frequency, redditCommunities]);
+
+  const addWatchSource = (type: string, name: string) => {
+    if (!user) return;
+    supabase.from("watch_sources").insert({ user_id: user.id, type, name })
+      .then(({ error }) => { if (error) toast("Couldn't save. Try again.", "error"); });
+  };
+
+  const deleteWatchSource = (type: string, name: string) => {
+    if (!user) return;
+    supabase.from("watch_sources").delete().eq("user_id", user.id).eq("type", type).eq("name", name)
+      .then(({ error }) => { if (error) toast("Couldn't save. Try again.", "error"); });
+  };
+
+  // Config-backed lists: auto-save the full watch_config on each change
+  // Persistence calls are OUTSIDE the setState updater (React purity contract)
+  const addConfigItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, field: string) => (v: string) => {
+    if (!v || currentList.includes(v)) return;
+    const updated = [...currentList, v];
+    setter(updated);
+    saveWatchConfig({ ...buildWatchConfig(), [field]: updated });
+  };
+  const removeConfigItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, field: string) => (v: string) => {
+    const updated = currentList.filter(x => x !== v);
+    setter(updated);
+    saveWatchConfig({ ...buildWatchConfig(), [field]: updated });
+  };
+
+  // Source-backed lists: auto-save with targeted insert/delete
+  const addSourceItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, type: string) => (v: string) => {
+    if (!v || currentList.includes(v)) return;
+    setter(prev => [...prev, v]);
+    addWatchSource(type, v);
+  };
+  const removeSourceItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, type: string) => (v: string) => {
+    setter(prev => prev.filter(x => x !== v));
+    deleteWatchSource(type, v);
+  };
 
   // Research via Firecrawl
   const handleResearch = useCallback(async () => {
@@ -736,7 +741,10 @@ export default function Watch() {
                     <button
                       key={val}
                       type="button"
-                      onClick={() => setFrequency(val)}
+                      onClick={() => {
+                        setFrequency(val);
+                        saveWatchConfig({ ...buildWatchConfig(), frequency: val });
+                      }}
                       style={{
                         fontSize: 11, fontWeight: frequency === val ? 600 : 500,
                         padding: "6px 12px", borderRadius: 9, border: "1px solid var(--glass-border)",
@@ -748,17 +756,6 @@ export default function Watch() {
                   ))}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={handleSaveSettings}
-                disabled={saving}
-                style={{
-                  fontSize: 11, fontWeight: 600, padding: "8px 18px", borderRadius: 10,
-                  background: "var(--fg)", color: "var(--gold, #F5C642)", border: "none",
-                  cursor: saving ? "not-allowed" : "pointer", fontFamily: FONT, letterSpacing: "0.02em",
-                  opacity: saving ? 0.5 : 1, flexShrink: 0,
-                }}
-              >{saving ? "Saving..." : "Save settings"}</button>
           </>
           )}
       </header>
@@ -957,7 +954,7 @@ export default function Watch() {
                         type="button"
                         onClick={() => {
                           const name = result.title || result.url || "";
-                          if (name) { addItem(setPublications)(name); toast("Added as source."); }
+                          if (name) { addSourceItem(publications, setPublications, "Publication")(name); toast("Added as source."); }
                         }}
                         style={{
                           fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
@@ -969,7 +966,7 @@ export default function Watch() {
                         type="button"
                         onClick={() => {
                           const name = result.title || result.url || "";
-                          if (name) { addItem(setCompetitors)(name); toast("Added as competitor."); }
+                          if (name) { addConfigItem(competitors, setCompetitors, "competitors")(name); toast("Added as competitor."); }
                         }}
                         style={{
                           fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
@@ -1039,8 +1036,8 @@ export default function Watch() {
                           type="button"
                           onClick={() => {
                             if (!isAdded) {
-                              if (s.type === "newsletter") addItem(setNewsletters)(s.name);
-                              else addItem(setSubstacks)(s.name);
+                              if (s.type === "newsletter") addSourceItem(newsletters, setNewsletters, "Newsletter")(s.name);
+                              else addSourceItem(substacks, setSubstacks, "Substack")(s.name);
                             }
                           }}
                           disabled={isAdded}
@@ -1079,8 +1076,8 @@ export default function Watch() {
                   </div>
                   <div>
                     <WatchFieldGroup title="Reddit communities" description="Use full paths like r/consulting.">
-                      <TagChips items={redditCommunities} onRemove={removeItem(setRedditCommunities)} />
-                      <AddRow placeholder="e.g. r/consulting..." onAdd={addItem(setRedditCommunities)} />
+                      <TagChips items={redditCommunities} onRemove={removeConfigItem(redditCommunities, setRedditCommunities, "reddit")} />
+                      <AddRow placeholder="e.g. r/consulting..." onAdd={addConfigItem(redditCommunities, setRedditCommunities, "reddit")} />
                     </WatchFieldGroup>
                   </div>
                 </div>
@@ -1097,25 +1094,25 @@ export default function Watch() {
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 22 }}>
                   <div>
                     <WatchFieldGroup title="Newsletters" description="Named editions you subscribe to or skim regularly.">
-                      <SourceRows items={newsletters} onRemove={removeItem(setNewsletters)} borderColor="rgba(74,144,217,0.4)" />
-                      <AddRow placeholder="Add newsletter..." onAdd={addItem(setNewsletters)} />
+                      <SourceRows items={newsletters} onRemove={removeSourceItem(newsletters, setNewsletters, "Newsletter")} borderColor="rgba(74,144,217,0.4)" />
+                      <AddRow placeholder="Add newsletter..." onAdd={addSourceItem(newsletters, setNewsletters, "Newsletter")} />
                     </WatchFieldGroup>
                     <div style={{ marginTop: 20 }}>
                       <WatchFieldGroup title="Podcasts" description="Shows and feeds where your buyers show up.">
-                        <SourceRows items={podcasts} onRemove={removeItem(setPodcasts)} borderColor="rgba(196,154,32,0.4)" />
-                        <AddRow placeholder="Add podcast..." onAdd={addItem(setPodcasts)} />
+                        <SourceRows items={podcasts} onRemove={removeSourceItem(podcasts, setPodcasts, "Podcast")} borderColor="rgba(196,154,32,0.4)" />
+                        <AddRow placeholder="Add podcast..." onAdd={addSourceItem(podcasts, setPodcasts, "Podcast")} />
                       </WatchFieldGroup>
                     </div>
                   </div>
                   <div>
                     <WatchFieldGroup title="Publications" description="Sites, columns, and trade desks worth tracking.">
-                      <SourceRows items={publications} onRemove={removeItem(setPublications)} borderColor="rgba(74,144,217,0.3)" />
-                      <AddRow placeholder="Add publication..." onAdd={addItem(setPublications)} />
+                      <SourceRows items={publications} onRemove={removeSourceItem(publications, setPublications, "Publication")} borderColor="rgba(74,144,217,0.3)" />
+                      <AddRow placeholder="Add publication..." onAdd={addSourceItem(publications, setPublications, "Publication")} />
                     </WatchFieldGroup>
                     <div style={{ marginTop: 20 }}>
                       <WatchFieldGroup title="Substack" description="Individual writers publishing on Substack.">
-                        <SourceRows items={substacks} onRemove={removeItem(setSubstacks)} borderColor="rgba(168,85,247,0.3)" />
-                        <AddRow placeholder="Add Substack..." onAdd={addItem(setSubstacks)} />
+                        <SourceRows items={substacks} onRemove={removeSourceItem(substacks, setSubstacks, "Substack")} borderColor="rgba(168,85,247,0.3)" />
+                        <AddRow placeholder="Add Substack..." onAdd={addSourceItem(substacks, setSubstacks, "Substack")} />
                       </WatchFieldGroup>
                     </div>
                   </div>
@@ -1132,12 +1129,12 @@ export default function Watch() {
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 22 }}>
                   <WatchFieldGroup title="Competitors" description="Companies you win against or watch for moves.">
-                    <TagChips items={competitors} onRemove={removeItem(setCompetitors)} chipStyle={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#991B1B" }} />
-                    <AddRow placeholder="Add competitor..." onAdd={addItem(setCompetitors)} />
+                    <TagChips items={competitors} onRemove={removeConfigItem(competitors, setCompetitors, "competitors")} chipStyle={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)", color: "#991B1B" }} />
+                    <AddRow placeholder="Add competitor..." onAdd={addConfigItem(competitors, setCompetitors, "competitors")} />
                   </WatchFieldGroup>
                   <WatchFieldGroup title="Thought leaders" description="Voices your audience already trusts.">
-                    <TagChips items={thoughtLeaders} onRemove={removeItem(setThoughtLeaders)} chipStyle={{ background: "rgba(245,198,66,0.08)", border: "1px solid rgba(245,198,66,0.3)", color: "#92400E" }} />
-                    <AddRow placeholder="Add thought leader..." onAdd={addItem(setThoughtLeaders)} />
+                    <TagChips items={thoughtLeaders} onRemove={removeConfigItem(thoughtLeaders, setThoughtLeaders, "thoughtLeaders")} chipStyle={{ background: "rgba(245,198,66,0.08)", border: "1px solid rgba(245,198,66,0.3)", color: "#92400E" }} />
+                    <AddRow placeholder="Add thought leader..." onAdd={addConfigItem(thoughtLeaders, setThoughtLeaders, "thoughtLeaders")} />
                   </WatchFieldGroup>
                 </div>
               </div>
