@@ -34,7 +34,7 @@
   --success: #4CAF82;
 
   /* Font */
-  --font: 'Afacad Flux', sans-serif;
+  --font: 'Inter', sans-serif;
 
   /* Shadows */
   --shadow-xs: 0 1px 2px rgba(0,0,0,0.03);
@@ -234,6 +234,7 @@ body {
   color: var(--fg);
   font-size: 16px;
   line-height: 1.6;
+  letter-spacing: -0.01em;
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -274,7 +275,7 @@ body {
   font-family: var(--font);
   font-size: 18px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
   margin: 0 0 16px;
 }
@@ -387,7 +388,7 @@ button { font-family: var(--font); }
   --studio-radius: 6px;
   --studio-radius-lg: 8px;
   --studio-sidebar-width: 240px;
-  --studio-font: 'Afacad Flux', sans-serif;
+  --studio-font: 'Inter', sans-serif;
   --studio-page-title-size: 28px;
   --studio-section-label-size: 11px;
   --studio-section-label-spacing: 2px;
@@ -402,10 +403,10 @@ button { font-family: var(--font); }
   --studio-interactive-color: #475569;
   --studio-interactive-hover: #4A90D9;
   /* Typography scale (Option C) */
-  --studio-display-font: 'Instrument Sans', 'Afacad Flux', sans-serif;
+  --studio-display-font: 'Inter', sans-serif;
   --studio-display-size: clamp(24px, 3vw, 32px);
   --studio-display-weight: 600;
-  --studio-display-spacing: -0.02em;
+  --studio-display-spacing: -0.05em;
   --studio-heading-size: 18px;
   --studio-heading-weight: 600;
   --studio-subhead-size: 14px;

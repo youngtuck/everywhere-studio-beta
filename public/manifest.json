@@ -1,7 +1,7 @@
 {
-  "name": "EVERYWHERE Studio",
-  "short_name": "EVERYWHERE",
-  "description": "Your thinking. Composed. AI-powered content operating system for thought leaders.",
+  "name": "IdeasOut",
+  "short_name": "IdeasOut",
+  "description": "Structured Intelligence for Thought Leaders. Out of your head and into the world.",
   "start_url": "/studio/dashboard",
   "scope": "/",
   "display": "standalone",

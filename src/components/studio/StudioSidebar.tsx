@@ -4,6 +4,7 @@ import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 import { APP_VERSION } from "../../lib/constants";
 import { StudioUserAccountMenu } from "./StudioUserAccountMenu";
+import Logo from "../Logo";
 
 type NavItemDef = {
   path: string;
@@ -169,10 +170,11 @@ export default function StudioSidebar({ collapsed = false, onToggleCollapsed, on
     >
       <div className="studio-sidebar-glass">
         <div className="studio-sidebar-glass-inner">
-          {/* Rail top: project selector + collapse / mobile close */}
+          {/* Rail top: wordmark + collapse / mobile close */}
           <div className="studio-sidebar-header">
             {!collapsed && !onMobileClose && (
               <>
+                <Logo size="sm" variant="dark" onClick={() => nav("/studio/dashboard")} />
                 <div style={{ flex: 1, minWidth: 0 }} />
                 <button
                   type="button"

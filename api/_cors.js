@@ -7,6 +7,8 @@ const ALLOWED_ORIGINS = [
   "https://everywherestudio.ai",
   "https://www.everywherestudio.ai",
   "https://everywherestudio-one.vercel.app",
+  "https://ideasout.com",
+  "https://www.ideasout.com",
 ];
 
 function isAllowedOrigin(origin) {

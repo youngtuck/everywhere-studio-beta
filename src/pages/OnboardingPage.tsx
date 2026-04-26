@@ -425,7 +425,7 @@ export default function OnboardingPage() {
       }}
     >
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;400;500;600;700&display=swap');
         body { background: #07090f; }
         @keyframes onboarding-progress-voice {
           from { width: 0%; }
@@ -476,7 +476,7 @@ export default function OnboardingPage() {
             }}
           >
             <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <span style={{ letterSpacing: "-1px", fontFamily: "'Afacad Flux', sans-serif", display: "inline-flex", alignItems: "baseline" }}>
+              <span style={{ letterSpacing: "-1px", fontFamily: "'Inter', sans-serif", display: "inline-flex", alignItems: "baseline" }}>
                 <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>EVERYWHERE</span>
                 <span style={{ color: "#0D1B2A", fontWeight: 300, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>STUDIO<span style={{ color: "#0D1B2A", fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>™</span></span>
               </span>
@@ -502,7 +502,7 @@ export default function OnboardingPage() {
             </div>
             <p
               style={{
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 14,
                 color: "rgba(0,0,0,0.65)",
                 margin: "0 0 8px",
@@ -513,7 +513,7 @@ export default function OnboardingPage() {
             </p>
             <p
               style={{
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 12,
                 color: "rgba(0,0,0,0.4)",
                 margin: 0,
@@ -548,7 +548,7 @@ export default function OnboardingPage() {
             border: "none",
             color: "rgba(255,255,255,0.45)",
             fontSize: 13,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             cursor: "pointer",
             display: "flex",
             alignItems: "center",
@@ -574,7 +574,7 @@ export default function OnboardingPage() {
               borderRadius: 8,
               border: "1px solid rgba(220,38,38,0.6)",
               background: "rgba(220,38,38,0.12)",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 13,
               color: "#fee2e2",
             }}
@@ -608,15 +608,15 @@ export default function OnboardingPage() {
         {/* ── STEP 0: PROFILE ──────────────────────── */}
         {showStep0 && (
           <section style={{ minHeight: "60vh", display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 480 }}>
-            <h1 style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 32, fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
+            <h1 style={{ fontFamily: "'Inter', sans-serif", fontSize: 32, fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
               Welcome to EVERYWHERE Studio
             </h1>
-            <p style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 16, color: "rgba(255,255,255,0.55)", marginBottom: 32, lineHeight: 1.6 }}>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 16, color: "rgba(255,255,255,0.55)", marginBottom: 32, lineHeight: 1.6 }}>
               Let's set up your studio. This takes about 10 minutes.
             </p>
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <label style={{ display: "block", fontFamily: "'Afacad Flux', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>
+                <label style={{ display: "block", fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>
                   Full Name
                 </label>
                 <input
@@ -624,11 +624,11 @@ export default function OnboardingPage() {
                   value={profileName}
                   onChange={(e) => setProfileName(e.target.value)}
                   placeholder="Your name"
-                  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Afacad Flux', sans-serif", fontSize: 15, outline: "none" }}
+                  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: 15, outline: "none" }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontFamily: "'Afacad Flux', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>
+                <label style={{ display: "block", fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>
                   What do you do?
                 </label>
                 <input
@@ -636,11 +636,11 @@ export default function OnboardingPage() {
                   value={profileRole}
                   onChange={(e) => setProfileRole(e.target.value)}
                   placeholder="Executive coach, consultant, keynote speaker..."
-                  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Afacad Flux', sans-serif", fontSize: 15, outline: "none" }}
+                  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: 15, outline: "none" }}
                 />
               </div>
               <div>
-                <label style={{ display: "block", fontFamily: "'Afacad Flux', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>
+                <label style={{ display: "block", fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.5)", letterSpacing: "2px", textTransform: "uppercase", marginBottom: 8 }}>
                   Who is your audience?
                 </label>
                 <input
@@ -648,7 +648,7 @@ export default function OnboardingPage() {
                   value={profileAudience}
                   onChange={(e) => setProfileAudience(e.target.value)}
                   placeholder="Senior leaders, entrepreneurs, HR executives..."
-                  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Afacad Flux', sans-serif", fontSize: 15, outline: "none" }}
+                  style={{ width: "100%", padding: "12px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: 15, outline: "none" }}
                 />
               </div>
             </div>
@@ -665,7 +665,7 @@ export default function OnboardingPage() {
                 color: profileName.trim() ? "#F5C642" : "rgba(255,255,255,0.3)",
                 backdropFilter: profileName.trim() ? "blur(12px)" : undefined,
                 WebkitBackdropFilter: profileName.trim() ? "blur(12px)" : undefined,
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 15,
                 fontWeight: 700,
                 cursor: profileName.trim() ? "pointer" : "default",
@@ -689,7 +689,7 @@ export default function OnboardingPage() {
           >
             <h1
               style={{
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 36,
                 fontWeight: 600,
                 color: "#ffffff",
@@ -701,7 +701,7 @@ export default function OnboardingPage() {
             <p
               style={{
                 marginTop: 12,
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 16,
                 fontStyle: "normal",
                 color: "rgba(255,255,255,0.55)",
@@ -713,7 +713,7 @@ export default function OnboardingPage() {
             <p
               style={{
                 marginTop: 40,
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 20,
                 fontWeight: 600,
                 color: "#ffffff",
@@ -748,7 +748,7 @@ export default function OnboardingPage() {
                 <div
                   style={{
                     marginTop: 16,
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 16,
                     fontWeight: 600,
                     color: "#ffffff",
@@ -759,7 +759,7 @@ export default function OnboardingPage() {
                 <p
                   style={{
                     marginTop: 8,
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 13,
                     color: "rgba(255,255,255,0.55)",
                   }}
@@ -769,7 +769,7 @@ export default function OnboardingPage() {
                 <p
                   style={{
                     marginTop: 12,
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 12,
                     color: "#C8961A",
                   }}
@@ -796,7 +796,7 @@ export default function OnboardingPage() {
                 <div
                   style={{
                     marginTop: 16,
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 16,
                     fontWeight: 600,
                     color: "#ffffff",
@@ -807,7 +807,7 @@ export default function OnboardingPage() {
                 <p
                   style={{
                     marginTop: 8,
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 13,
                     color: "rgba(255,255,255,0.55)",
                   }}
@@ -817,7 +817,7 @@ export default function OnboardingPage() {
                 <p
                   style={{
                     marginTop: 12,
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 12,
                     color: "#C8961A",
                   }}
@@ -830,7 +830,7 @@ export default function OnboardingPage() {
             <p
               style={{
                 marginTop: 32,
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 14,
                 color: "rgba(255,255,255,0.35)",
                 textAlign: "center",
@@ -893,7 +893,7 @@ export default function OnboardingPage() {
             >
               <div
                 style={{
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 13,
                   fontWeight: 600,
                   color: "rgba(255,255,255,0.85)",
@@ -918,7 +918,7 @@ export default function OnboardingPage() {
                     backdropFilter: "blur(8px) saturate(140%)",
                     WebkitBackdropFilter: "blur(8px) saturate(140%)",
                     color: "#ffffff",
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 13,
                   }}
                 />
@@ -934,7 +934,7 @@ export default function OnboardingPage() {
                     backdropFilter: "blur(8px)",
                     WebkitBackdropFilter: "blur(8px)",
                     color: "#ffffff",
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 13,
                     fontWeight: 600,
                     cursor: brandUrlLoading ? "wait" : "pointer",
@@ -946,7 +946,7 @@ export default function OnboardingPage() {
               {brandUrlError && (
                 <p
                   style={{
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 12,
                     color: "#FCA5A5",
                     marginTop: 6,
@@ -973,7 +973,7 @@ export default function OnboardingPage() {
                 type="button"
                 onClick={handleSkipBrandDna}
                 style={{
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 13,
                   color: "rgba(255,255,255,0.4)",
                   background: "none",
@@ -991,15 +991,15 @@ export default function OnboardingPage() {
         {/* ── STEP 5: WATCH TOPICS ──────────────────── */}
         {showStep5 && (
           <section style={{ minHeight: "50vh", display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 520 }}>
-            <h2 style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 28, fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
+            <h2 style={{ fontFamily: "'Inter', sans-serif", fontSize: 28, fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
               What should Sentinel watch?
             </h2>
-            <p style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 24, lineHeight: 1.6 }}>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 24, lineHeight: 1.6 }}>
               Add 3-8 topics for your daily intelligence briefing. These can be industries, trends, competitors, or areas of{"\u00A0"}expertise.
             </p>
             <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 16 }}>
               {watchTopics.map((topic, i) => (
-                <span key={`${topic}-${i}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, fontSize: 13, color: "rgba(255,255,255,0.8)", fontFamily: "'Afacad Flux', sans-serif" }}>
+                <span key={`${topic}-${i}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "6px 12px", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 20, fontSize: 13, color: "rgba(255,255,255,0.8)", fontFamily: "'Inter', sans-serif" }}>
                   {topic}
                   <button type="button" onClick={() => setWatchTopics(prev => prev.filter((_, idx) => idx !== i))} style={{ background: "none", border: "none", padding: 0, cursor: "pointer", color: "rgba(255,255,255,0.4)", fontSize: 16, lineHeight: 1 }}>x</button>
                 </span>
@@ -1012,9 +1012,9 @@ export default function OnboardingPage() {
                 onChange={(e) => setWatchInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter" && watchInput.trim()) { e.preventDefault(); setWatchTopics(prev => [...prev, watchInput.trim()]); setWatchInput(""); } }}
                 placeholder="Type a topic and press Enter"
-                style={{ flex: 1, padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Afacad Flux', sans-serif", fontSize: 14, outline: "none" }}
+                style={{ flex: 1, padding: "10px 14px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px) saturate(140%)", WebkitBackdropFilter: "blur(8px) saturate(140%)", color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: 14, outline: "none" }}
               />
-              <button type="button" onClick={() => { if (watchInput.trim()) { setWatchTopics(prev => [...prev, watchInput.trim()]); setWatchInput(""); } }} style={{ padding: "10px 16px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", color: "#fff", fontFamily: "'Afacad Flux', sans-serif", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+              <button type="button" onClick={() => { if (watchInput.trim()) { setWatchTopics(prev => [...prev, watchInput.trim()]); setWatchInput(""); } }} style={{ padding: "10px 16px", borderRadius: 8, border: "1px solid rgba(255,255,255,0.15)", background: "rgba(255,255,255,0.08)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)", color: "#fff", fontFamily: "'Inter', sans-serif", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
                 Add
               </button>
             </div>
@@ -1023,7 +1023,7 @@ export default function OnboardingPage() {
                 <p style={{ fontSize: 12, color: "rgba(255,255,255,0.4)", marginBottom: 8 }}>Suggested based on your role:</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {["thought leadership", "content strategy", "executive communication", "industry trends", "audience growth"].map(s => (
-                    <button key={s} type="button" onClick={() => setWatchTopics(prev => [...prev, s])} style={{ padding: "5px 10px", borderRadius: 16, border: "1px solid rgba(255,255,255,0.08)", background: "transparent", color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontFamily: "'Afacad Flux', sans-serif" }}>+ {s}</button>
+                    <button key={s} type="button" onClick={() => setWatchTopics(prev => [...prev, s])} style={{ padding: "5px 10px", borderRadius: 16, border: "1px solid rgba(255,255,255,0.08)", background: "transparent", color: "rgba(255,255,255,0.5)", fontSize: 12, cursor: "pointer", fontFamily: "'Inter', sans-serif" }}>+ {s}</button>
                   ))}
                 </div>
               </div>
@@ -1041,7 +1041,7 @@ export default function OnboardingPage() {
                   color: watchTopics.length >= 3 ? "#F5C642" : "rgba(255,255,255,0.3)",
                   backdropFilter: watchTopics.length >= 3 ? "blur(12px)" : undefined,
                   WebkitBackdropFilter: watchTopics.length >= 3 ? "blur(12px)" : undefined,
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 15,
                   fontWeight: 700,
                   cursor: watchTopics.length >= 3 ? "pointer" : "default",
@@ -1052,7 +1052,7 @@ export default function OnboardingPage() {
               <button
                 type="button"
                 onClick={handleSkipToComplete}
-                style={{ padding: "14px 20px", borderRadius: 8, border: "none", background: "transparent", color: "rgba(255,255,255,0.4)", fontFamily: "'Afacad Flux', sans-serif", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}
+                style={{ padding: "14px 20px", borderRadius: 8, border: "none", background: "transparent", color: "rgba(255,255,255,0.4)", fontFamily: "'Inter', sans-serif", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}
               >
                 Skip for now
               </button>
@@ -1066,10 +1066,10 @@ export default function OnboardingPage() {
             <div style={{ width: 56, height: 56, borderRadius: "50%", background: "rgba(245,198,66,0.12)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
               <span style={{ fontSize: 28 }}>&#10003;</span>
             </div>
-            <h2 style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 28, fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
+            <h2 style={{ fontFamily: "'Inter', sans-serif", fontSize: 28, fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
               Your studio is ready
             </h2>
-            <p style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 32, lineHeight: 1.6, maxWidth: 400 }}>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 15, color: "rgba(255,255,255,0.55)", marginBottom: 32, lineHeight: 1.6, maxWidth: 400 }}>
               Voice DNA captured. {watchTopics.length > 0 ? `Sentinel watching ${watchTopics.length} topics. ` : ""}You can refine everything in{"\u00A0"}Settings.
             </p>
             <button
@@ -1083,7 +1083,7 @@ export default function OnboardingPage() {
                 color: "#F5C642",
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 16,
                 fontWeight: 700,
                 cursor: "pointer",
