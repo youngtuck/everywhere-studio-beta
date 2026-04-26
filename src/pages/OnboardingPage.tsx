@@ -535,6 +535,10 @@ export default function OnboardingPage() {
               if (window.confirm("Going back will restart the voice capture. Continue?")) {
                 setStep(1);
               }
+            } else if (step === 4) {
+              if (window.confirm("Going back will restart the brand capture. Continue?")) {
+                setStep(3 as Step);
+              }
             } else {
               setStep((prev) => Math.max(0, prev - 1) as Step);
             }

@@ -8,7 +8,7 @@ import { ReedProfileIcon } from "../studio/ReedProfileIcon";
 const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 
 const OPENING_QUESTION =
-  "Before we do anything else, tell me a little about what you are building. Not the features or the deliverables. The thing underneath that. What does this exist to do in the world?";
+  "Reed uses your brand context to write in your voice and stay aligned with your positioning. Start by describing what you do and who it's for. A sentence or two is enough.";
 
 const BRAND_DNA_REED_SYSTEM = `## WHO REED IS
 

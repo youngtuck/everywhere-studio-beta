@@ -125,6 +125,12 @@ export default function Settings() {
     return () => setDashContent(null);
   }, [setDashContent, setDashOpen]);
 
+  // CO_034 Item 1: Ensure parent main is scrollable
+  useEffect(() => {
+    const main = document.querySelector(".studio-main-inner") as HTMLElement;
+    if (main) { main.style.overflow = ""; main.style.overflowY = "auto"; }
+  }, []);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: FONT }}>
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
