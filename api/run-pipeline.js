@@ -77,9 +77,18 @@ function parseGateResponse(text) {
           .trim()
           .slice(0, 320);
       }
+      let commentInvitationTest;
+      if (parsed.comment_invitation_test && typeof parsed.comment_invitation_test === "object") {
+        const citStatus = String(parsed.comment_invitation_test.status || "").toUpperCase();
+        commentInvitationTest = {
+          status: citStatus === "FLAG" ? "FLAG" : "PASS",
+          feedback: String(parsed.comment_invitation_test.feedback || "").slice(0, 500),
+        };
+      }
       if (status === "FAIL") score = Math.min(score, 50);
       const out = { status, score, feedback, issues };
       if (methodologyTermFidelity) out.methodologyTermFidelity = methodologyTermFidelity;
+      if (commentInvitationTest) out.commentInvitationTest = commentInvitationTest;
       return out;
     }
   } catch {}

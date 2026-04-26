@@ -492,12 +492,16 @@ function outlineAnglesDistinctEnough(a: OutlineRow[], b: OutlineRow[]): boolean 
 
 interface CheckpointResult {
   gate: string;
+  /** Agent name used by the pipeline for gateSubset filtering (e.g. "David", "Elena"). */
+  internalName?: string;
   status: "PASS" | "FAIL" | "FLAG";
   score: number;
   feedback: string;
   issues?: string[];
   /** Jordan only, when Method DNA was in the gate prompt; optional for older API responses. */
   methodologyTermFidelity?: string;
+  /** David only (Checkpoint 3): Comment Invitation Test result. Non-blocking advisory flag. */
+  commentInvitationTest?: { status: "PASS" | "FLAG"; feedback: string };
 }
 
 interface ImpactScore {
@@ -935,11 +939,11 @@ function deriveReviewDisplayGates(
   hvt: { verdict: string; score: number } | null,
 ): Array<{ name: string; status: "Pass" | "Review" | "Fail" }> {
   const find = (gate: string) => checkpoints.find(g => g.gate === gate);
-  const slopGate = find("checkpoint-4");
-  const voiceGate = find("checkpoint-2");
-  const editGate = find("checkpoint-5");
-  const engageGate = find("checkpoint-3");
-  const dedup = find("checkpoint-0");
+  const slopGate = find("SLOP Detection");
+  const voiceGate = find("Voice Authenticity");
+  const editGate = find("Editorial Excellence");
+  const engageGate = find("Engagement Optimization");
+  const dedup = find("Deduplication");
 
   // Humanization: whichever of editorial / engagement scored lower
   const humScore = Math.min(editGate?.score ?? 100, engageGate?.score ?? 100);
@@ -1193,10 +1197,10 @@ function ReviewDash({
                 // Map display gate name back to checkpoint feedback
                 const gateNameLower = (g.name || "").toLowerCase();
                 const sourceCheckpoint = pipelineRun.checkpointResults.find(cp => {
-                  if (gateNameLower.includes("slop")) return cp.gate === "checkpoint-4";
-                  if (gateNameLower.includes("dedup")) return cp.gate === "checkpoint-0";
-                  if (gateNameLower.includes("human")) return cp.gate === "checkpoint-2";
-                  if (gateNameLower.includes("humanization")) return cp.gate === "checkpoint-5" || cp.gate === "checkpoint-3";
+                  if (gateNameLower.includes("slop")) return cp.gate === "SLOP Detection";
+                  if (gateNameLower.includes("dedup")) return cp.gate === "Deduplication";
+                  if (gateNameLower.includes("human")) return cp.gate === "Voice Authenticity";
+                  if (gateNameLower.includes("humanization")) return cp.gate === "Editorial Excellence" || cp.gate === "Engagement Optimization";
                   return false;
                 });
                 return (
@@ -1228,6 +1232,38 @@ function ReviewDash({
               })}
             </DpSection>
           )}
+
+          {/* CO_015A: Comment Invitation Test advisory flag at Review */}
+          {(() => {
+            const engageResult = pipelineRun.checkpointResults.find(
+              cp => cp.gate === "Engagement Optimization"
+            );
+            const citFlag = engageResult?.commentInvitationTest?.status === "FLAG"
+              ? engageResult.commentInvitationTest
+              : null;
+            if (!citFlag) return null;
+            return (
+              <DpSection>
+                <div style={{
+                  padding: "8px 10px", borderRadius: 6,
+                  border: "1px solid rgba(245,198,66,0.3)",
+                  background: "rgba(245,198,66,0.04)",
+                }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                    <span style={{
+                      width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
+                      background: "var(--gold-bright)",
+                    }} />
+                    <span style={{ fontSize: 11, fontWeight: 600, color: "var(--fg)" }}>Comment Invitation</span>
+                    <span style={{ fontSize: 9, color: "var(--fg-3)", marginLeft: "auto" }}>Advisory</span>
+                  </div>
+                  <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                    {citFlag.feedback}
+                  </div>
+                </div>
+              </DpSection>
+            );
+          })()}
 
           {/* CO_029 Failure 1: HVT flagged lines */}
           {pipelineRun.humanVoiceTest && pipelineRun.humanVoiceTest.flaggedLines.length > 0 && (() => {
@@ -6319,9 +6355,10 @@ export default function WorkSession() {
       );
 
       // Only re-run the gates that failed, not all 7
+      // Use internalName (agent name) for pipeline gateSubset filtering
       const failedGateNames = pipelineRun?.checkpointResults
         ?.filter(g => g.status === "FAIL" || g.status === "FLAG")
-        ?.map(g => g.gate)
+        ?.map(g => g.internalName || g.gate)
         ?.filter(Boolean) || [];
 
       if (failedGateNames.length > 0) {
@@ -6411,7 +6448,7 @@ export default function WorkSession() {
     const bgNonPass = backgroundPipelineRun
       ? deriveReviewDisplayGates(backgroundPipelineRun.checkpointResults, backgroundPipelineRun.humanVoiceTest).filter(g => g.status !== "Pass")
       : [];
-    const hookGate = backgroundPipelineRun?.checkpointResults.find(cp => cp.gate === "checkpoint-3");
+    const hookGate = backgroundPipelineRun?.checkpointResults.find(cp => cp.gate === "Engagement Optimization");
     return getDraftInspectorActions(memoWordCount, memoTargetWords, memoFlagCounts, bgNonPass, hookGate?.status ?? null);
   }, [stage, draft, memoWordCount, memoTargetWords, memoFlagCounts, backgroundPipelineRun]);
 
@@ -6607,7 +6644,15 @@ export default function WorkSession() {
                       backgroundPipelineRun.humanVoiceTest,
                     ).filter(g => g.status !== "Pass");
 
-                    if (bgNonPass.length === 0) {
+                    // CO_015A: Check for Comment Invitation Test flag (advisory, non-blocking)
+                    const engageResult = backgroundPipelineRun.checkpointResults.find(
+                      cp => cp.gate === "Engagement Optimization"
+                    );
+                    const citFlag = engageResult?.commentInvitationTest?.status === "FLAG"
+                      ? engageResult.commentInvitationTest
+                      : null;
+
+                    if (bgNonPass.length === 0 && !citFlag) {
                       return (
                         <DpSection>
                           <div style={{ fontSize: 10, color: "#22C55E", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
@@ -6625,10 +6670,10 @@ export default function WorkSession() {
                         {bgNonPass.map((g, i) => {
                           const gLower = (g.name || "").toLowerCase();
                           const src = backgroundPipelineRun.checkpointResults.find(cp => {
-                            if (gLower.includes("slop")) return cp.gate === "checkpoint-4";
-                            if (gLower.includes("dedup")) return cp.gate === "checkpoint-0";
-                            if (gLower.includes("human")) return cp.gate === "checkpoint-2";
-                            if (gLower.includes("humanization")) return cp.gate === "checkpoint-5" || cp.gate === "checkpoint-3";
+                            if (gLower.includes("slop")) return cp.gate === "SLOP Detection";
+                            if (gLower.includes("dedup")) return cp.gate === "Deduplication";
+                            if (gLower.includes("human")) return cp.gate === "Voice Authenticity";
+                            if (gLower.includes("humanization")) return cp.gate === "Editorial Excellence" || cp.gate === "Engagement Optimization";
                             return false;
                           });
                           const summary = src?.feedback
@@ -6653,6 +6698,26 @@ export default function WorkSession() {
                             </div>
                           );
                         })}
+                        {/* CO_015A: Comment Invitation Test advisory flag */}
+                        {citFlag && (
+                          <div style={{
+                            marginBottom: 6, padding: "6px 8px", borderRadius: 5,
+                            border: "1px solid rgba(245,198,66,0.3)",
+                            background: "rgba(245,198,66,0.04)",
+                          }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                              <span style={{
+                                width: 6, height: 6, borderRadius: "50%", flexShrink: 0,
+                                background: "var(--gold-bright)",
+                              }} />
+                              <span style={{ fontSize: 10, fontWeight: 600, color: "var(--fg)" }}>Comment Invitation</span>
+                              <span style={{ fontSize: 9, color: "var(--fg-3)", marginLeft: "auto" }}>Advisory</span>
+                            </div>
+                            <div style={{ fontSize: 9, color: "var(--fg-3)", lineHeight: 1.45, marginTop: 3 }}>
+                              {citFlag.feedback}
+                            </div>
+                          </div>
+                        )}
                         {draftRepairAttempts >= 3 ? (
                           <>
                             <div style={{
