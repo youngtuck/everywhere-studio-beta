@@ -19,7 +19,7 @@ export const MARKETING_CSS = `
   --xp-on-dark: #F0EDE4;
   --xp-dim-dark: rgba(255,255,255,0.38);
   --xp-border: #E4E4E7;
-  --xp-font: 'Instrument Sans', -apple-system, system-ui, sans-serif;
+  --xp-font: 'Inter', -apple-system, system-ui, sans-serif;
   --xp-mono: 'DM Mono', monospace;
   --xp-ease: ${EASE};
   --xp-ease-smooth: ${EASE_SMOOTH};

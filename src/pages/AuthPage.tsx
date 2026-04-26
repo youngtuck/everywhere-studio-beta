@@ -159,7 +159,7 @@ const AuthPage = () => {
         alignItems: "center",
         justifyContent: "center",
         padding: 24,
-        fontFamily: "'Instrument Sans', system-ui, sans-serif",
+        fontFamily: "'Inter', system-ui, sans-serif",
         position: "relative",
         overflow: "hidden",
       }}
@@ -391,7 +391,7 @@ const AuthPage = () => {
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               color: "var(--gold-bright, #F5C642)",
-              fontFamily: "'Instrument Sans', 'Afacad Flux', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
             }}
           >
             Ideas to Impact

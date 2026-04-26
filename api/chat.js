@@ -448,7 +448,7 @@ async function fetchUrlContent(url) {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 10000);
-    const res = await fetch(url, { signal: controller.signal, headers: { "User-Agent": "Mozilla/5.0 (compatible; EverywhereStudio/1.0)", "Accept": "text/html,text/plain" } });
+    const res = await fetch(url, { signal: controller.signal, headers: { "User-Agent": "Mozilla/5.0 (compatible; IdeasOut/1.0)", "Accept": "text/html,text/plain" } });
     clearTimeout(timeout);
     console.log(`[fetchUrlContent] Response status for ${url}: ${res.status}`);
     if (!res.ok) return null;
