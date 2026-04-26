@@ -234,7 +234,7 @@ body {
   color: var(--fg);
   font-size: 16px;
   line-height: 1.6;
-  letter-spacing: -0.08em;
+  letter-spacing: -0.01em;
   overflow-x: hidden;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -275,7 +275,7 @@ body {
   font-family: var(--font);
   font-size: 18px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: var(--text-primary);
   margin: 0 0 16px;
 }
@@ -406,7 +406,7 @@ button { font-family: var(--font); }
   --studio-display-font: 'Inter', sans-serif;
   --studio-display-size: clamp(24px, 3vw, 32px);
   --studio-display-weight: 600;
-  --studio-display-spacing: -0.02em;
+  --studio-display-spacing: -0.05em;
   --studio-heading-size: 18px;
   --studio-heading-weight: 600;
   --studio-subhead-size: 14px;
