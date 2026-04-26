@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 import { useMobile } from "../../hooks/useMobile";
 import { getVoiceTraitDeepDive } from "../../lib/voiceTraitDeepDives";
+import { DnaNav } from "../../components/studio/DnaNav";
 import "./shared.css";
 
 const VOICE_QUESTIONS = [
@@ -254,6 +255,7 @@ export default function VoiceDnaSettings() {
   if (loading) {
     return (
       <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
+        <DnaNav />
         <p style={{ fontSize: 14, color: "var(--fg-3)" }}>Loading Voice DNA...</p>
       </div>
     );
@@ -262,6 +264,7 @@ export default function VoiceDnaSettings() {
   if (!voiceDna) {
     return (
       <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
+        <DnaNav />
         <header style={{ marginBottom: 24 }}>
           <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
             Voice DNA
@@ -299,6 +302,7 @@ export default function VoiceDnaSettings() {
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
+      <DnaNav />
       {/* HEADER */}
       <header style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>

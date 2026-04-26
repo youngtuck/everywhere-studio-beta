@@ -8,6 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { supabase } from "../../lib/supabase";
 import { useMobile } from "../../hooks/useMobile";
+import { DnaNav } from "../../components/studio/DnaNav";
 import "./shared.css";
 
 const FONT = "var(--font)";
@@ -165,16 +166,12 @@ export default function ComposerMemorySettings() {
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: FONT }}>
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
-        <div style={{ padding: "12px 20px 10px", maxWidth: isMobile ? "100%" : 640, margin: "0 auto", width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          <div>
-            <div style={{ fontSize: 18, fontWeight: 600, color: "var(--fg)" }}>Composer memory</div>
-            <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 4, lineHeight: 1.45 }}>
-              Reed reads these lines in Work. Keep them short and factual. Higher sort priority loads first.
-            </div>
+        <div style={{ padding: "12px 20px 10px", maxWidth: isMobile ? "100%" : 640, margin: "0 auto", width: "100%" }}>
+          <DnaNav />
+          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--fg)" }}>Composer memory</div>
+          <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 4, lineHeight: 1.45 }}>
+            Reed reads these lines in Work. Keep them short and factual. Higher sort priority loads first.
           </div>
-          <button type="button" className="liquid-glass-btn" onClick={() => nav("/studio/settings")} style={{ padding: "8px 14px", flexShrink: 0 }}>
-            <span className="liquid-glass-btn-label" style={{ fontWeight: 600 }}>Back</span>
-          </button>
         </div>
       </header>
 

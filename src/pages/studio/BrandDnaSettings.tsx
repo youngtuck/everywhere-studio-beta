@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 import { useMobile } from "../../hooks/useMobile";
 import { BRAND_FIELD_GUIDES } from "../../lib/brandFieldDeepDives";
+import { DnaNav } from "../../components/studio/DnaNav";
 import "./shared.css";
 
 function renderMarkdown(md: string): string {
@@ -92,6 +93,7 @@ export default function BrandDnaSettings() {
   if (!brandDna && !brandDnaMd) {
     return (
       <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
+        <DnaNav />
         <header style={{ marginBottom: 24 }}>
           <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
             Brand DNA
@@ -128,6 +130,7 @@ export default function BrandDnaSettings() {
 
   return (
     <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
+      <DnaNav />
       <header style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
           Brand DNA
