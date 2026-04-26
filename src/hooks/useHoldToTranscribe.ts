@@ -16,6 +16,46 @@ function blobToBase64(blob: Blob): Promise<string> {
   });
 }
 
+// CO_033: Singleton AudioContext for RMS energy computation
+let _audioCtx: AudioContext | null = null;
+function getAudioContext(): AudioContext {
+  if (!_audioCtx) _audioCtx = new AudioContext();
+  return _audioCtx;
+}
+
+const RMS_SILENCE_THRESHOLD = 0.008;
+
+async function computeRms(blob: Blob): Promise<number> {
+  try {
+    const ctx = getAudioContext();
+    const buf = await blob.arrayBuffer();
+    const audio = await ctx.decodeAudioData(buf);
+    const samples = audio.getChannelData(0);
+    let sum = 0;
+    for (let i = 0; i < samples.length; i++) sum += samples[i] * samples[i];
+    return Math.sqrt(sum / samples.length);
+  } catch {
+    return 1; // on decode error, assume speech (don't suppress)
+  }
+}
+
+// CO_033: Known Whisper silence hallucination patterns (full-string match)
+const HALLUCINATION_PATTERNS = [
+  /^(you\s*){2,}\.?$/i,
+  /^thank\s+you\.?\s*$/i,
+  /^thanks\s+for\s+watching\.?\s*$/i,
+  /^(please\s+)?subscribe.*$/i,
+  /^subtitles?\s+by\s+.*$/i,
+  /^\u0421\u0443\u0431\u0442\u0438\u0442\u0440\u044B.*$/i, // Субтитры...
+  /^[\s.…!?]*$/,
+];
+
+function isHallucination(text: string): boolean {
+  const t = text.trim();
+  if (!t) return true;
+  return HALLUCINATION_PATTERNS.some(p => p.test(t));
+}
+
 function pickRecorderMime(): string {
   if (typeof MediaRecorder === "undefined") return "audio/webm";
   if (MediaRecorder.isTypeSupported("audio/webm;codecs=opus")) return "audio/webm;codecs=opus";
@@ -214,6 +254,17 @@ export function useHoldToTranscribe(onAppendText: (text: string) => void) {
 
     const speechLocal = (srFinalRef.current + srInterimRef.current).replace(/\s+/g, " ").trim();
 
+    // CO_033: RMS energy gate — skip Whisper if audio is silence
+    if (blob.size >= 120) {
+      const rms = await computeRms(blob);
+      if (rms < RMS_SILENCE_THRESHOLD) {
+        if (speechLocal && !isHallucination(speechLocal)) onAppendText(speechLocal);
+        finishingRef.current = false;
+        holdSessionRef.current = false;
+        return;
+      }
+    }
+
     if (blob.size < 120) {
       if (speechLocal) onAppendText(speechLocal);
       finishingRef.current = false;
@@ -240,8 +291,10 @@ export function useHoldToTranscribe(onAppendText: (text: string) => void) {
         fromApi = (j.text || "").trim();
       }
 
-      const out = mergeTranscriptSources(fromApi, speechLocal);
-      if (out) onAppendText(out);
+      // CO_033: Filter known Whisper hallucinations
+      const filtered = isHallucination(fromApi) ? "" : fromApi;
+      const out = mergeTranscriptSources(filtered, speechLocal);
+      if (out && !isHallucination(out)) onAppendText(out);
     } catch {
       if (speechLocal) onAppendText(speechLocal);
     } finally {
