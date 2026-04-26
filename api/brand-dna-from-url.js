@@ -1,12 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { callWithRetry } from "./_retry.js";
 import { CLAUDE_MODEL } from "./_config.js";
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+import { setCorsHeaders } from "./_cors.js";
 
 const SYSTEM_PROMPT = `You are a Brand DNA analyst for EVERYWHERE Studio. Given the text content of a website, produce a comprehensive Brand DNA profile.
 
@@ -45,7 +40,7 @@ function stripMarkdownFences(text) {
 }
 
 export default async function handler(req, res) {
-  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.setHeader(k, v));
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 

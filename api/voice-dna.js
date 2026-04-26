@@ -2,6 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { callWithRetry } from "./_retry.js";
 import { CLAUDE_MODEL } from "./_config.js";
 import { requireAuth } from "./_auth.js";
+import { setCorsHeaders } from "./_cors.js";
 
 const SYSTEM_PROMPT = `You are a Voice DNA analyst for EVERYWHERE Studio. Given interview responses and/or authentic writing samples (plain text and/or PDF documents from the same author),
 produce a structured Voice DNA profile. Respond with ONLY a raw JSON object.
@@ -127,9 +128,7 @@ function tryParseJson(text) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  setCorsHeaders(req, res);
 
   if (req.method === "OPTIONS") {
     return res.status(200).end();

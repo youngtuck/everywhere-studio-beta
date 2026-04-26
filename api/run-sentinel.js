@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { CLAUDE_MODEL } from "./_config.js";
+import { setCorsHeaders } from "./_cors.js";
 
 const BLOCKED_DOMAINS = [
   "linkedin.com", "www.linkedin.com", "facebook.com", "www.facebook.com",
@@ -107,9 +108,7 @@ function hashConfig(config, sources) {
 export const config = { maxDuration: 120 };
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 

@@ -4,6 +4,7 @@ import { dnaDebug } from "./_dnaDebugLog.js";
 import { getUserResources } from "./_resources.js";
 import { clipDna, DNA_LIMITS, METHOD_DNA_LEXICON_LINE } from "./_dnaContext.js";
 import { callWithRetry } from "./_retry.js";
+import { setCorsHeaders } from "./_cors.js";
 
 const LINT_MODEL =
   process.env.METHOD_DNA_LINT_MODEL || "claude-3-5-haiku-20241022";
@@ -53,9 +54,7 @@ function normalizeItems(parsed) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 

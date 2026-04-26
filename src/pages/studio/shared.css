@@ -720,6 +720,23 @@ html:has(.studio-app-shell--viewport-lock) #root {
   border-color: var(--glass-border);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
+/* ── SAFE MARKDOWN CONTENT ── */
+.md-content h1 { font-size: 22px; font-weight: 700; margin: 28px 0 12px; color: var(--fg); }
+.md-content h2 { font-size: 18px; font-weight: 700; margin: 24px 0 10px; color: var(--fg); }
+.md-content h3 { font-size: 16px; font-weight: 700; margin: 20px 0 8px; color: var(--fg); }
+.md-content h4 { font-size: 14px; font-weight: 700; margin: 18px 0 6px; color: var(--fg); }
+.md-content p { margin: 0 0 14px; }
+.md-content strong { font-weight: 600; color: var(--fg); }
+.md-content em { font-style: italic; }
+.md-content blockquote {
+  border-left: 3px solid var(--cornflower);
+  padding-left: 16px;
+  margin: 16px 0;
+  color: var(--fg-2);
+}
+.md-content ul { padding-left: 20px; margin: 8px 0; }
+.md-content li { margin: 4px 0; line-height: 1.6; color: var(--fg-2); }
+
 [data-theme="dark"] .draft-body p { color: var(--fg-2); }
 [data-theme="dark"] .rev-tab.on { border-bottom-color: var(--fg); }
 [data-theme="dark"] .ric-pts {

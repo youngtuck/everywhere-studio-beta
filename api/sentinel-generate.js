@@ -2,12 +2,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@supabase/supabase-js";
 import { callWithRetry } from "./_retry.js";
 import { CLAUDE_MODEL } from "./_config.js";
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type",
-};
+import { setCorsHeaders } from "./_cors.js";
 
 const SYSTEM_PROMPT = `You are Sentinel, the intelligence monitoring system for EVERYWHERE Studio. You scan categories, industries, and platforms to deliver actionable intelligence to thought leaders. You never summarize news. You deliver intelligence: what it means, what it threatens, and what it makes possible. Every claim requires two or more independent sources.
 Respond with ONLY a raw JSON object. No markdown, no preamble. Pure JSON.`;
@@ -93,7 +88,7 @@ function getDateLabel() {
 }
 
 export default async function handler(req, res) {
-  Object.entries(CORS_HEADERS).forEach(([k, v]) => res.setHeader(k, v));
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 

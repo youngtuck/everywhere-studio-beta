@@ -6,19 +6,8 @@ import { supabase } from "../../lib/supabase";
 import { useMobile } from "../../hooks/useMobile";
 import { BRAND_FIELD_GUIDES } from "../../lib/brandFieldDeepDives";
 import { DnaNav } from "../../components/studio/DnaNav";
+import { safeMarkdownToHtml } from "../../lib/markdown";
 import "./shared.css";
-
-function renderMarkdown(md: string): string {
-  if (!md) return "";
-  return md
-    .replace(/^### (.+)$/gm, '<h4 style="font-size:14px;font-weight:700;color:var(--fg);margin:24px 0 8px;font-family:var(--font)">$1</h4>')
-    .replace(/^## (.+)$/gm, '<h3 style="font-size:16px;font-weight:700;color:var(--fg);margin:28px 0 10px;font-family:var(--font)">$1</h3>')
-    .replace(/^# (.+)$/gm, '<h2 style="font-size:20px;font-weight:700;color:var(--fg);margin:32px 0 12px;font-family:var(--font)">$1</h2>')
-    .replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:600;color:var(--fg)">$1</strong>')
-    .replace(/^- (.+)$/gm, '<div style="padding-left:16px;margin:4px 0;font-size:14px;color:var(--fg-2);line-height:1.6">&#8226; $1</div>')
-    .replace(/\n\n/g, '<div style="margin:12px 0"></div>')
-    .replace(/\n/g, '<br/>');
-}
 
 function formatKey(key: string): string {
   return key
@@ -153,7 +142,8 @@ export default function BrandDnaSettings() {
         {brandDnaMd ? (
           <div
             style={{ fontFamily: "var(--font)", fontSize: 14, color: "var(--fg-2)", lineHeight: 1.65 }}
-            dangerouslySetInnerHTML={{ __html: renderMarkdown(brandDnaMd) }}
+            className="md-content"
+            dangerouslySetInnerHTML={{ __html: safeMarkdownToHtml(brandDnaMd) }}
           />
         ) : (
           <p style={{ fontSize: 14, color: "var(--fg-3)", margin: 0 }}>

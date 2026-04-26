@@ -2,11 +2,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import fs from "fs";
 import path from "path";
 import { CLAUDE_MODEL } from "./_config.js";
+import { setCorsHeaders } from "./_cors.js";
 
 export const config = { maxDuration: 30 };
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  setCorsHeaders(req, res);
   const results = { prompts: {}, api: null, timestamp: new Date().toISOString() };
 
   // Test 1: Can we load prompt files?

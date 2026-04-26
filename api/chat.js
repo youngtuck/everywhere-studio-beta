@@ -8,6 +8,7 @@ import { loadReedDoctrine } from "./_reedDoctrine.js";
 import { callWithRetry } from "./_retry.js";
 import { CLAUDE_MODEL } from "./_config.js";
 import { requireAuth } from "./_auth.js";
+import { setCorsHeaders } from "./_cors.js";
 
 function sanitizeContent(text) {
   if (!text) return text;
@@ -532,9 +533,7 @@ function detectResearchIntent(text) {
 
 export default async function handler(req, res) {
   // CORS
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
