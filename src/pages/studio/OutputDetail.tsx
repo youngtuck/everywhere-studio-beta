@@ -10,21 +10,10 @@ import type { ImpactScore, GateResult } from "../../lib/agents/types";
 import { CheckpointResultsPanel } from "../../components/pipeline/CheckpointResultsPanel";
 import { ImpactScoreCard } from "../../components/pipeline/ImpactScoreCard";
 import { PipelineBlockedAlert } from "../../components/pipeline/PipelineBlockedAlert";
+import { safeMarkdownToHtml, escapeHtml } from "../../lib/markdown";
 import "./shared.css";
 
 const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
-
-function renderMarkdown(text: string): string {
-  return text
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    .replace(/^### (.+)$/gm, '<h3 style="font-size:18px;font-weight:700;margin:24px 0 8px;color:var(--fg)">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 style="font-size:22px;font-weight:700;margin:28px 0 12px;color:var(--fg)">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 style="font-size:26px;font-weight:700;margin:32px 0 16px;color:var(--fg)">$1</h1>')
-    .replace(/^> (.+)$/gm, '<blockquote style="border-left:3px solid var(--cornflower);padding-left:16px;margin:16px 0;color:var(--fg-2);">$1</blockquote>')
-    .replace(/\n\n/g, '</p><p style="margin:0 0 16px">')
-    .replace(/\n/g, '<br/>');
-}
 
 interface Output {
   id: string;
@@ -53,34 +42,6 @@ interface PipelineRunRow {
   gate_results: GateResult[];
   betterish_score: ImpactScore | null;
   blocked_at: string | null;
-}
-
-// ─── Markdown / HTML helpers ────────────────────────────────────────────────
-function escapeHtml(str: string): string {
-  return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
-
-function simpleMarkdownToHtml(text: string): string {
-  const escaped = escapeHtml(text);
-  const lines = escaped.split(/\r?\n/);
-  const out: string[] = [];
-  let inParagraph = false;
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trim();
-    if (/^###\s/.test(line)) { if (inParagraph) { out.push("</p>"); inParagraph = false; } out.push(`<h3>${line.replace(/^###\s*/, "").trim()}</h3>`); continue; }
-    if (/^##\s/.test(line)) { if (inParagraph) { out.push("</p>"); inParagraph = false; } out.push(`<h2>${line.replace(/^##\s*/, "").trim()}</h2>`); continue; }
-    if (/^#\s/.test(line)) { if (inParagraph) { out.push("</p>"); inParagraph = false; } out.push(`<h1>${line.replace(/^#\s*/, "").trim()}</h1>`); continue; }
-    if (trimmed === "") { if (inParagraph) { out.push("</p>"); inParagraph = false; } continue; }
-    let content = trimmed;
-    content = content.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-    content = content.replace(/\*(.+?)\*/g, "<em>$1</em>");
-    content = content.replace(/_(.+?)_/g, "<em>$1</em>");
-    if (!inParagraph) { out.push("<p>"); inParagraph = true; } else { out.push("<br/>"); }
-    out.push(content);
-  }
-  if (inParagraph) out.push("</p>");
-  return out.join("");
 }
 
 function getHeadingsFromMarkdown(content: string): { id: string; text: string }[] {
@@ -354,7 +315,7 @@ export default function OutputDetail() {
 
   const wrapAsWebPage = useCallback(() => {
     if (!output) return;
-    let contentHtml = simpleMarkdownToHtml(output.content);
+    let contentHtml = safeMarkdownToHtml(output.content);
     const headings = getHeadingsFromMarkdown(output.content);
     const titleEscaped = escapeHtml(output.title);
     headings.forEach(({ id, text }) => {
@@ -375,7 +336,7 @@ export default function OutputDetail() {
 
   const wrapAsGoogleDoc = useCallback(async () => {
     if (!output) return;
-    const html = `<h1>${escapeHtml(output.title)}</h1>${simpleMarkdownToHtml(output.content)}`;
+    const html = `<h1>${escapeHtml(output.title)}</h1>${safeMarkdownToHtml(output.content)}`;
     try {
       await navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([output.content], { type: "text/plain" }) })]);
       toast("Rich text copied. Open Google Docs and paste.");
@@ -387,7 +348,7 @@ export default function OutputDetail() {
 
   const wrapAsWordDoc = useCallback(() => {
     if (!output) return;
-    const contentHtml = simpleMarkdownToHtml(output.content);
+    const contentHtml = safeMarkdownToHtml(output.content);
     const titleEscaped = escapeHtml(output.title);
     const authorName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "EVERYWHERE Studio";
     const dateStr = new Date(output.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
@@ -652,8 +613,9 @@ export default function OutputDetail() {
             padding: isMobile ? "24px 16px" : "36px 40px",
           }}>
             <div
+              className="md-content"
               style={{ fontFamily: font, fontSize: isMobile ? 15 : 16, lineHeight: 1.75, color: "var(--text-primary)" }}
-              dangerouslySetInnerHTML={{ __html: renderMarkdown(output!.content) }}
+              dangerouslySetInnerHTML={{ __html: safeMarkdownToHtml(output!.content) }}
             />
           </div>
         )}

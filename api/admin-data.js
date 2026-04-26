@@ -4,6 +4,7 @@
  * Requires admin auth via Authorization header.
  */
 import { createClient } from "@supabase/supabase-js";
+import { setCorsHeaders } from "./_cors.js";
 
 async function verifyAdmin(req) {
   const supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -42,9 +43,7 @@ function sanitize(input, maxLength = 500) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 

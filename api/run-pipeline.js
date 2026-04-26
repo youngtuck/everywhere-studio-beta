@@ -7,6 +7,7 @@ import { requireAuth } from "./_auth.js";
 import { getUserResources } from "./_resources.js";
 import { dnaDebug } from "./_dnaDebugLog.js";
 import { clipDna, DNA_LIMITS } from "./_dnaContext.js";
+import { setCorsHeaders } from "./_cors.js";
 
 const CHECKPOINT_GATES = [
   { name: "Echo", file: "gate-0-echo.md", label: "Deduplication", displayName: "Deduplication" },
@@ -186,9 +187,7 @@ function extractHVTSuggestion(feedback, flaggedLine) {
 export const config = { maxDuration: 180 };
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 

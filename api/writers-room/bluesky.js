@@ -3,6 +3,7 @@ import { getUserResources } from "../_resources.js";
 import { clipDna, DNA_LIMITS } from "../_dnaContext.js";
 import { callWithRetry } from "../_retry.js";
 import { CLAUDE_MODEL } from "../_config.js";
+import { setCorsHeaders } from "../_cors.js";
 
 const SYSTEM_PROMPT = `You are the Writer's Room for EVERYWHERE Studio. Sara (Chief of Staff) is composing, and Josh (Category Designer) is leading the creative direction.
 
@@ -32,9 +33,7 @@ Return this exact JSON structure:
 export const config = { maxDuration: 30 };
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 

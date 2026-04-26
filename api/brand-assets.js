@@ -1,6 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { callWithRetry } from "./_retry.js";
 import { CLAUDE_MODEL } from "./_config.js";
+import { setCorsHeaders } from "./_cors.js";
 
 const SYSTEM_PROMPT = `You are a Brand DNA analyst for EVERYWHERE Studio. You are given uploaded brand assets (documents, images described as text, etc.). Extract and synthesize a structured Brand DNA profile from these materials. If the assets are incomplete, infer where reasonable and note gaps. Respond with ONLY a raw JSON object. No preamble. No markdown code fences. No explanation. Pure JSON only. The JSON must be parseable by JSON.parse() with no preprocessing.
 
@@ -52,9 +53,7 @@ function decodeFileContent(contentBase64, mimeType) {
 }
 
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  setCorsHeaders(req, res);
 
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });

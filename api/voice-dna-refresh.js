@@ -89,11 +89,8 @@
  * - Idempotent runs: same candidate should not spam notifications if unchanged (hash compare).
  */
 
-const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization",
-};
+import { setCorsHeaders } from "./_cors.js";
+
 
 function cronAuthorized(req) {
   const secret = process.env.EW_VOICE_DNA_REFRESH_SECRET;
@@ -104,7 +101,7 @@ function cronAuthorized(req) {
 }
 
 export default async function handler(req, res) {
-  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  setCorsHeaders(req, res);
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "GET" && req.method !== "POST") {
     return res.status(405).json({ error: "Method not allowed" });
