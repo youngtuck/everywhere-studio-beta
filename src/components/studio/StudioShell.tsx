@@ -423,11 +423,10 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
           aria-expanded="false"
           aria-controls="studio-reed-flyout"
           aria-label="Open inspector panel"
-          style={{ color: "var(--fg-2)" }}
+          style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--fg-2)", width: "auto", padding: "0 14px" }}
         >
-          <svg width="18" height="14" viewBox="0 0 18 14" fill="none" aria-hidden>
-            <path d="M1 1.5h16M1 7h16M1 12.5h16" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <ReedProfileIcon size={20} title="Reed" />
+          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.02em" }}>Reed</span>
         </button>
       )}
 

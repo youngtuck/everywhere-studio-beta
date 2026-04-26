@@ -259,9 +259,13 @@ function workStagePillLabel(s: WorkStage): string {
 
 function WorkBreadcrumb() {
   const stageRaw = useWorkStageFromShell();
+  const { intakeProgress } = useShell();
   const stage: WorkStage = WORK_STAGES.includes(stageRaw as WorkStage)
     ? (stageRaw as WorkStage)
     : "Review";
+
+  // CO_017 Fix 3: Hide stepper on fresh Intake until first message
+  if (stage === "Intake" && intakeProgress.questionCount === 0) return null;
 
   const stages = WORK_STAGES;
   const activeIdx = stages.indexOf(stage);
@@ -903,27 +907,10 @@ export default function StudioTopBar() {
       gap: 12,
       flexShrink: 0,
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0, minWidth: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0, flexShrink: 1 }}>
-          <ProjectSwitcher />
-          <WorkSessionPathDivider />
-          <WorkSessionTitleChip />
-        </div>
-        <button
-          type="button"
-          className="liquid-glass-btn-gold"
-          onClick={() => {
-            if (loc.pathname === "/studio/work") {
-              window.dispatchEvent(new CustomEvent("ew-new-session-request"));
-              return;
-            }
-            sessionStorage.setItem("ew-new-session", "1");
-            nav("/studio/work");
-          }}
-          style={{ fontSize: 11, padding: "6px 14px", flexShrink: 0 }}
-        >
-          <span className="liquid-glass-btn-gold-label">+ New Session</span>
-        </button>
+      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, minWidth: 0 }}>
+        <ProjectSwitcher />
+        <WorkSessionPathDivider />
+        <WorkSessionTitleChip />
       </div>
 
       {showReturnPill && (
@@ -964,6 +951,21 @@ export default function StudioTopBar() {
 
       {/* Right: system actions */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        <button
+          type="button"
+          className="liquid-glass-btn-gold"
+          onClick={() => {
+            if (loc.pathname === "/studio/work") {
+              window.dispatchEvent(new CustomEvent("ew-new-session-request"));
+              return;
+            }
+            sessionStorage.setItem("ew-new-session", "1");
+            nav("/studio/work");
+          }}
+          style={{ fontSize: 11, padding: "6px 14px", flexShrink: 0 }}
+        >
+          <span className="liquid-glass-btn-gold-label">+ New Session</span>
+        </button>
         <Divider />
         <SearchIconButton onClick={() => setSearchOpen(true)} />
 
