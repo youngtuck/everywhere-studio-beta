@@ -905,6 +905,24 @@ function countDraftFlags(draft: string, dismissedFlags: Set<string>, fixedFlags:
   return { must, style };
 }
 
+// ── CO_020 Part 3: Dynamic intake placeholder ────────────────
+const QUESTION_STARTERS = /^(who|what|where|when|why|how|is|are|do|does|should|could|would|can|will|did|has|have|tell|walk|give|help|show)\b/i;
+
+function shortenQuestion(sentence: string): string {
+  const limit = QUESTION_STARTERS.test(sentence) ? 40 : 35;
+  if (sentence.length <= limit) return sentence.replace(/\?$/, "...");
+  const trimmed = sentence.slice(0, limit);
+  const lastSpace = trimmed.lastIndexOf(" ");
+  const cut = lastSpace > 10 ? trimmed.slice(0, lastSpace) : trimmed;
+  return cut.replace(/[.,;:!?\s]+$/, "") + "...";
+}
+
+const READINESS_PHRASES = [
+  "ready to write", "ready to produce", "i have what i need", "i have enough",
+  "let me produce", "shall i produce", "here is what i will produce",
+  "here's what i'll produce", "ready to make an outline",
+];
+
 // ── Review helpers ────────────────────────────────────────────
 function deriveReviewGateStatus(score: number): "Pass" | "Review" | "Fail" {
   if (score >= 70) return "Pass";
@@ -1346,7 +1364,7 @@ function StageIntake({
   messages, onSend, sending, isReady, onAdvance, userInitials, firstName,
   serializeSessionFiles, onCommitAttachedFiles, onNewSession,
   composerSeed, onConsumeComposerSeed,
-  dockedComposer,
+  dockedComposer, intakePlaceholder,
 }: {
   messages: ChatMessage[]; onSend: (text: string) => void | Promise<void>;
   sending: boolean; isReady: boolean; onAdvance: () => void; userInitials?: string; firstName?: string;
@@ -1357,6 +1375,7 @@ function StageIntake({
   onConsumeComposerSeed?: () => void;
   /** When set (active intake with docked shell), the parent renders ChatInputBar; this instance omits it. */
   dockedComposer?: IntakeDockedComposerProps | null;
+  intakePlaceholder?: string;
 }) {
   const [internalInput, setInternalInput] = useState("");
   const [internalPendingFiles, setInternalPendingFiles] = useState<File[]>([]);
@@ -1525,7 +1544,7 @@ function StageIntake({
           {/* Centered input bar */}
           <div style={{ width: "100%", minWidth: 0, maxWidth: "100%" }}>
             <ChatInputBar
-              placeholder="What's on your mind?"
+              placeholder={intakePlaceholder || "What's on your mind?"}
               value={input}
               onChange={setInput}
               onSend={handleSend}
@@ -1710,7 +1729,7 @@ function StageIntake({
               </button>
             )}
             <ChatInputBar
-              placeholder="What's on your mind?"
+              placeholder={intakePlaceholder || "What's on your mind?"}
               value={input}
               onChange={setInput}
               onSend={handleSend}
@@ -6838,6 +6857,21 @@ export default function WorkSession() {
   const intakeTotalQ = 4;
   const intakeProgressValue = Math.min(intakeReedQCount / intakeTotalQ, 1);
   const intakeShowJustWrite = intakeReedQCount < 2 && !(intakeReady || intakeReedQCount >= intakeTotalQ);
+
+  // CO_020 Part 3: Dynamic intake placeholder
+  const intakePlaceholder = useMemo(() => {
+    if (intakeReady) return "Any changes before I build the outline...";
+    const reedMsgs = messages.filter(m => m.role === "reed");
+    const lastReed = reedMsgs[reedMsgs.length - 1]?.content?.trim();
+    if (!lastReed) return "What's on your mind?";
+    const lower = lastReed.toLowerCase();
+    if (READINESS_PHRASES.some(p => lower.includes(p))) return "Any changes before I build the outline...";
+    const sentences = lastReed.split(/(?<=[.!?])\s+/);
+    const lastQuestion = [...sentences].reverse().find(s => s.trim().endsWith("?"));
+    if (lastQuestion) return shortenQuestion(lastQuestion.trim());
+    return "What's on your mind?";
+  }, [messages, intakeReady]);
+
   const dockIntakeOutlineShell = (stage === "Intake" && hasUserMessage) || stage === "Outline";
   const showOutlineBridgeLoading = stage === "Outline" && buildingOutline && ioTransitionStep === 2;
   const showOutlineMain = stage === "Outline" && !(buildingOutline && ioTransitionStep === 2);
@@ -7052,6 +7086,7 @@ export default function WorkSession() {
           onNewSession={handleNewSession}
           composerSeed={intakeComposerSeed}
           onConsumeComposerSeed={clearIntakeComposerSeed}
+          intakePlaceholder={intakePlaceholder}
         />
       )}
       {dockIntakeOutlineShell && (
@@ -7092,6 +7127,7 @@ export default function WorkSession() {
                   composerSeed={intakeComposerSeed}
                   onConsumeComposerSeed={clearIntakeComposerSeed}
                   dockedComposer={intakeDocked}
+                  intakePlaceholder={intakePlaceholder}
                 />
               </div>
             )}
@@ -7164,7 +7200,7 @@ export default function WorkSession() {
                   </button>
                 )}
                 <ChatInputBar
-                  placeholder="What's on your mind?"
+                  placeholder={intakePlaceholder}
                   value={intakeBarInput}
                   onChange={setIntakeBarInput}
                   onSend={handleIntakeBarSend}
