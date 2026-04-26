@@ -25,6 +25,8 @@ export interface ShellCtx {
   setIntakeAdvance: (fn: (() => void) | null) => void;
   draftChips: Array<{ label: string; prefill: string }>;
   setDraftChips: (chips: Array<{ label: string; prefill: string }>) => void;
+  askReedPlaceholder: string;
+  setAskReedPlaceholder: (v: string) => void;
 }
 
 export const ShellContext = createContext<ShellCtx>({
@@ -52,6 +54,8 @@ export const ShellContext = createContext<ShellCtx>({
   setIntakeAdvance: () => {},
   draftChips: [],
   setDraftChips: () => {},
+  askReedPlaceholder: "",
+  setAskReedPlaceholder: () => {},
 });
 
 export function useShell() {
