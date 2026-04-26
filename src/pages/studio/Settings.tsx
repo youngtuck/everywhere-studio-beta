@@ -37,7 +37,7 @@ function RadioGroup({
   name, options, value, onChange,
 }: {
   name: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; disabled?: boolean }[];
   value: string;
   onChange: (v: string) => void;
 }) {
@@ -45,21 +45,23 @@ function RadioGroup({
     <div style={{ display: "flex", gap: 6 }}>
       {options.map(opt => {
         const active = value === opt.value;
+        const dim = opt.disabled;
         return (
           <label
             key={opt.value}
-            onClick={() => onChange(opt.value)}
+            onClick={() => { if (!dim) onChange(opt.value); }}
             style={{
               display: "flex", alignItems: "center", gap: 5,
               fontSize: 11, padding: "4px 10px", borderRadius: 5,
               border: active ? "1px solid var(--fg)" : "1px solid var(--glass-border)",
               background: active ? "var(--bg)" : "var(--glass-input)",
-              color: active ? "var(--fg)" : "var(--fg-3)",
+              color: dim ? "var(--fg-3)" : active ? "var(--fg)" : "var(--fg-3)",
               fontWeight: active ? 600 : 400,
-              cursor: "pointer", transition: "all 0.1s",
+              cursor: dim ? "not-allowed" : "pointer", transition: "all 0.1s",
+              opacity: dim ? 0.5 : 1,
             }}
           >
-            <input type="radio" name={name} value={opt.value} checked={active} onChange={() => onChange(opt.value)} style={{ display: "none" }} />
+            <input type="radio" name={name} value={opt.value} checked={active} disabled={!!dim} onChange={() => onChange(opt.value)} style={{ display: "none" }} />
             {opt.label}
           </label>
         );
@@ -173,12 +175,15 @@ export default function Settings() {
 
       {/* Voice */}
       <Card title="Voice">
+        <div style={{ fontSize: 11, color: "var(--fg-3)", lineHeight: 1.5, padding: "0 0 12px" }}>
+          Control how you speak to Reed. Push to talk activates the mic only while you hold the button. Always on keeps the mic open so you can speak naturally without pressing anything.
+        </div>
         <PrefRowLast label="Input method">
           <RadioGroup
             name="voice-mode"
-            options={[{ value: "ptt", label: "Push to talk" }, { value: "auto", label: "Always on" }]}
+            options={[{ value: "ptt", label: "Push to talk" }, { value: "auto", label: "Always on (coming soon)", disabled: true }]}
             value={voiceMode}
-            onChange={v => setVoiceMode(v as "ptt" | "auto")}
+            onChange={v => { if (v !== "auto") setVoiceMode(v as "ptt" | "auto"); }}
           />
         </PrefRowLast>
       </Card>

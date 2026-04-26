@@ -2022,18 +2022,22 @@ function ChatInputBar({
       display: "flex", flexDirection: "column", gap: 6,
       width: "100%", minWidth: 0, maxWidth: "100%", boxSizing: "border-box" as const,
     }}>
-      {(recording || transcribing) && (
-        <div
-          role="status"
-          style={{
-            fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" as const,
-            color: transcribing ? "var(--fg-3)" : "#C24141",
-            padding: "4px 2px 0",
-          }}
-        >
-          {transcribing ? "Transcribing" : "Recording"}
-        </div>
-      )}
+      {/* CO_033: Fixed-height container prevents UI jump on state change */}
+      <div
+        role="status"
+        aria-live="polite"
+        style={{
+          height: 18, flexShrink: 0,
+          fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" as const,
+          color: transcribing ? "var(--fg-3)" : "#C24141",
+          padding: "4px 2px 0",
+          visibility: (recording || transcribing) ? "visible" : "hidden",
+          opacity: (recording || transcribing) ? 1 : 0,
+          transition: "opacity 150ms",
+        }}
+      >
+        {transcribing ? "Transcribing" : recording ? "Recording" : "\u00A0"}
+      </div>
       <input
         ref={fileInputRef}
         type="file"
