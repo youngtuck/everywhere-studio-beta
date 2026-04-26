@@ -70,7 +70,7 @@ function HomeRouteBreadcrumb({ path, nav }: { path: string; nav: ReturnType<type
     <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
       <span
         onClick={() => nav("/studio/dashboard")}
-        style={{ fontSize: 11, color: "var(--fg-3)", cursor: "pointer", transition: "color 0.1s" }}
+        style={{ fontSize: 14, color: "var(--fg-3)", cursor: "pointer", transition: "color 0.1s" }}
         onMouseEnter={e => { (e.target as HTMLElement).style.color = "var(--fg-2)"; }}
         onMouseLeave={e => { (e.target as HTMLElement).style.color = "var(--fg-3)"; }}
       >
@@ -81,7 +81,7 @@ function HomeRouteBreadcrumb({ path, nav }: { path: string; nav: ReturnType<type
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--fg-3)", opacity: 0.85 }}>
             <path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
-          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--fg)", padding: "3px 8px", borderRadius: 6, background: "rgba(200,169,110,0.1)", border: "1px solid rgba(200,169,110,0.18)" }}>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", padding: "3px 8px", borderRadius: 6, background: "rgba(200,169,110,0.1)", border: "1px solid rgba(200,169,110,0.18)" }}>
             {label}
           </span>
         </>
@@ -95,7 +95,7 @@ function SessionProjectSessionBreadcrumb({ projectLabel, sessionTitle }: { proje
     <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
       <span
         style={{
-          fontSize: 11,
+          fontSize: 14,
           fontWeight: 600,
           color: "var(--fg)",
           overflow: "hidden",
@@ -111,7 +111,7 @@ function SessionProjectSessionBreadcrumb({ projectLabel, sessionTitle }: { proje
       </svg>
       <span
         style={{
-          fontSize: 11,
+          fontSize: 14,
           fontWeight: 600,
           color: "var(--fg)",
           padding: "3px 8px",
@@ -281,7 +281,7 @@ function WorkBreadcrumb() {
               }}
               className={isActive ? "liquid-glass-pill" : ""}
               style={{
-                fontSize: 11,
+                fontSize: 14,
                 padding: "4px 10px",
                 cursor: canClick ? "pointer" : "default",
                 transition: "color 0.15s ease, opacity 0.15s ease",
@@ -492,7 +492,7 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
                         type="submit"
                         disabled={renameBusy || !editName.trim()}
                         style={{
-                          flex: 1, padding: "6px 8px", borderRadius: 8, fontSize: 11, fontWeight: 600,
+                          flex: 1, padding: "6px 8px", borderRadius: 8, fontSize: 14, fontWeight: 600,
                           border: "none", cursor: renameBusy || !editName.trim() ? "default" : "pointer",
                           background: "rgba(245,198,66,0.28)", color: "rgba(255,255,255,0.95)",
                           opacity: renameBusy || !editName.trim() ? 0.5 : 1, fontFamily: "inherit",
@@ -504,7 +504,7 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
                         type="button"
                         onClick={() => { setEditingId(null); setEditName(""); setRenameErr(null); }}
                         style={{
-                          padding: "6px 8px", borderRadius: 8, fontSize: 11,
+                          padding: "6px 8px", borderRadius: 8, fontSize: 14,
                           border: "1px solid rgba(255,255,255,0.12)", background: "transparent",
                           color: "rgba(255,255,255,0.75)", cursor: "pointer", fontFamily: "inherit",
                         }}
@@ -616,14 +616,14 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
                     }}
                   />
                   {createErr && (
-                    <div style={{ fontSize: 11, color: "#f87171", marginBottom: 8 }}>{createErr}</div>
+                    <div style={{ fontSize: 14, color: "#f87171", marginBottom: 8 }}>{createErr}</div>
                   )}
                   <div style={{ display: "flex", gap: 8 }}>
                     <button
                       type="submit"
                       disabled={createBusy || !newName.trim()}
                       style={{
-                        flex: 1, padding: "7px 10px", borderRadius: 8, fontSize: 11, fontWeight: 600,
+                        flex: 1, padding: "7px 10px", borderRadius: 8, fontSize: 14, fontWeight: 600,
                         border: "none", cursor: createBusy || !newName.trim() ? "default" : "pointer",
                         background: "rgba(245,198,66,0.25)", color: "rgba(255,255,255,0.95)",
                         opacity: createBusy || !newName.trim() ? 0.5 : 1,
@@ -635,7 +635,7 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
                       type="button"
                       onClick={() => { setCreating(false); setNewName(""); setCreateErr(null); }}
                       style={{
-                        padding: "7px 10px", borderRadius: 8, fontSize: 11,
+                        padding: "7px 10px", borderRadius: 8, fontSize: 14,
                         border: "1px solid rgba(255,255,255,0.12)", background: "transparent",
                         color: "rgba(255,255,255,0.75)", cursor: "pointer", fontFamily: "inherit",
                       }}
@@ -908,7 +908,7 @@ export default function StudioTopBar() {
           onClick={onReturnToSession}
           style={{
             flexShrink: 0,
-            fontSize: 11,
+            fontSize: 14,
             lineHeight: 1.2,
             fontWeight: 600,
             padding: "5px 12px",
@@ -951,7 +951,7 @@ export default function StudioTopBar() {
             sessionStorage.setItem("ew-new-session", "1");
             nav("/studio/work");
           }}
-          style={{ fontSize: 11, padding: "6px 14px", flexShrink: 0 }}
+          style={{ fontSize: 14, padding: "6px 14px", flexShrink: 0 }}
         >
           <span className="liquid-glass-btn-gold-label">+ New Session</span>
         </button>

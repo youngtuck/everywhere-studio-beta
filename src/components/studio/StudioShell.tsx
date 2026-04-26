@@ -92,7 +92,7 @@ function AdvisorFeedbackFallback({ pathname }: { pathname: string }) {
         }}>
           Consensus
         </div>
-        <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.55 }}>{ctx.rec}</div>
+        <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>{ctx.rec}</div>
       </div>
       {ctx.cards.map((card, i) => (
         <div
@@ -106,7 +106,7 @@ function AdvisorFeedbackFallback({ pathname }: { pathname: string }) {
           }}
         >
           <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{card.role}</div>
-          <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>{card.text}</div>
+          <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>{card.text}</div>
         </div>
       ))}
     </div>
@@ -428,7 +428,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
           style={{ display: "flex", alignItems: "center", gap: 6, color: "var(--fg-2)", width: "auto", padding: "0 14px" }}
         >
           <ReedProfileIcon size={20} title="Reed" />
-          <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: "0.02em" }}>Reed</span>
+          <span style={{ fontSize: 14, fontWeight: 600, letterSpacing: "0.02em" }}>Reed</span>
         </button>
       )}
 
@@ -443,7 +443,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
           background: "rgba(255,255,255,0.42)", flexShrink: 0,
           padding: "10px 12px",
         }}>
-          <span style={{ fontSize: 12, fontWeight: 600, color: "var(--fg)", letterSpacing: "0.01em" }}>Inspector</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", letterSpacing: "0.01em" }}>Inspector</span>
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -680,7 +680,7 @@ function ReedPanel() {
                 }}>
                   CARRIED FROM {m.from?.toUpperCase()}
                 </div>
-                <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6, marginBottom: 6 }}>{m.text}</div>
+                <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6, marginBottom: 6 }}>{m.text}</div>
                 <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
                   <button type="button" onClick={() => prefillAndFocus(`Let's work on this now: ${m.text}`)} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 99, background: "rgba(255,255,255,0.92)", color: "#0D1B2A", border: "none", cursor: "pointer", fontFamily: "inherit" }}>Work on this now</button>
                   <button type="button" onClick={() => prefillAndFocus(`Apply this to the current ${stageKey} context: ${m.text}`)} style={{ fontSize: 9, padding: "3px 8px", borderRadius: 99, background: "rgba(255,255,255,0.92)", color: "#0D1B2A", border: "none", cursor: "pointer", fontFamily: "inherit" }}>Apply to {stageKey}</button>
@@ -701,7 +701,8 @@ function ReedPanel() {
                 <div style={{
                   background: "rgba(74,144,217,0.06)", border: "1px solid rgba(74,144,217,0.2)",
                   borderRadius: "0 8px 8px 8px", padding: "8px 10px",
-                  fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: "85%",
+                  fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6, maxWidth: "85%",
+                  overflowWrap: "break-word" as const,
                 }}>{m.text}</div>
               </div>
             );
@@ -712,7 +713,8 @@ function ReedPanel() {
               <div style={{
                 background: "rgba(245,198,66,0.1)", border: "1px solid rgba(245,198,66,0.2)",
                 borderRadius: "8px 0 8px 8px", padding: "8px 10px",
-                fontSize: 11, color: "var(--fg)", lineHeight: 1.6, maxWidth: "85%",
+                fontSize: 14, color: "var(--fg)", lineHeight: 1.6, maxWidth: "85%",
+                overflowWrap: "break-word" as const,
               }}>{m.text}</div>
             </div>
           );
@@ -728,7 +730,7 @@ function ReedPanel() {
             <div style={{
               background: "rgba(74,144,217,0.06)", border: "1px solid rgba(74,144,217,0.2)",
               borderRadius: "0 8px 8px 8px", padding: "8px 10px",
-              fontSize: 11, color: "var(--fg-3)", lineHeight: 1.6, fontStyle: "italic",
+              fontSize: 14, color: "var(--fg-3)", lineHeight: 1.6, fontStyle: "italic",
             }}>Reed is thinking...</div>
           </div>
         )}
@@ -764,7 +766,7 @@ function ReedPanel() {
             background: "transparent",
             border: "none",
             outline: "none",
-            fontSize: 12,
+            fontSize: 14,
             color: "var(--fg)",
             fontFamily: "var(--font)",
           }}
@@ -819,7 +821,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
 
   const formatDetail = (text: string) =>
     text.split("\n\n").map((para, i) => (
-      <p key={i} style={{ fontSize: 13, color: "rgba(255,255,255,0.84)", lineHeight: 1.75, marginBottom: 12 }}>
+      <p key={i} style={{ fontSize: 14, color: "rgba(255,255,255,0.84)", lineHeight: 1.75, marginBottom: 12 }}>
         {para.split("\n").map((line, j) => (
           <span key={j}>
             {line}
@@ -851,7 +853,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <button
                 onClick={() => setDetailItem(null)}
-                style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", color: "rgba(255,255,255,0.66)", fontSize: 12, cursor: "pointer", fontFamily: "var(--font)", padding: 0 }}
+                style={{ display: "flex", alignItems: "center", gap: 5, background: "none", border: "none", color: "rgba(255,255,255,0.66)", fontSize: 14, cursor: "pointer", fontFamily: "var(--font)", padding: 0 }}
               >
                 <svg style={{ width: 14, height: 14, stroke: "currentColor", strokeWidth: 2, fill: "none" }} viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6" /></svg>
                 All tools
@@ -881,7 +883,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
               style={{
                 padding: "10px 20px", borderRadius: 6,
                 background: detailItem.color, border: "none",
-                color: "#fff", fontSize: 12, fontWeight: 700,
+                color: "#fff", fontSize: 14, fontWeight: 700,
                 cursor: "pointer", fontFamily: "var(--font)",
               }}
             >
@@ -892,7 +894,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
           /* ── List view ── */
           <>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "rgba(255,255,255,0.92)", letterSpacing: "0.01em" }}>Discover</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.92)", letterSpacing: "0.01em" }}>Discover</div>
               <button onClick={onClose} aria-label="Close panel" style={{ background: "none", border: "none", color: "rgba(255,255,255,0.66)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: 0 }}>✕</button>
             </div>
 
@@ -903,7 +905,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
               autoFocus
               style={{
                 width: "100%", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 8,
-                padding: "10px 14px", fontSize: 13, fontFamily: "var(--font)",
+                padding: "10px 14px", fontSize: 14, fontFamily: "var(--font)",
                 outline: "none", marginBottom: 16, color: "rgba(255,255,255,0.92)", background: "rgba(255,255,255,0.03)",
                 transition: "border-color 0.12s",
               }}
@@ -928,8 +930,8 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
                   <div style={{ width: 32, height: 32, borderRadius: 7, background: `${item.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, marginBottom: 10, color: item.color }}>
                     {item.icon}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.92)", marginBottom: 3 }}>{item.name}</div>
-                  <div style={{ fontSize: 11, color: "rgba(255,255,255,0.84)", lineHeight: 1.4, marginBottom: 5 }}>{item.desc}</div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.92)", marginBottom: 3 }}>{item.name}</div>
+                  <div style={{ fontSize: 14, color: "rgba(255,255,255,0.84)", lineHeight: 1.4, marginBottom: 5 }}>{item.desc}</div>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.66)", fontStyle: "normal", lineHeight: 1.4 }}>{item.rationale}</div>
                 </div>
               ))}

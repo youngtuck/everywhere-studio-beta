@@ -682,7 +682,7 @@ function AdvanceButton({ label, onClick, disabled }: { label: string; onClick: (
         className="liquid-glass-btn-gold"
         onClick={onClick}
         disabled={disabled}
-        style={{ fontSize: 11, padding: "8px 20px", fontFamily: FONT }}
+        style={{ fontSize: 14, padding: "8px 20px", fontFamily: FONT }}
       >
         <span className="liquid-glass-btn-gold-label">{label}</span>
       </button>
@@ -692,7 +692,7 @@ function AdvanceButton({ label, onClick, disabled }: { label: string; onClick: (
 
 function LoadingDots({ label }: { label: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", fontSize: 12, color: "var(--fg-3)" }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", fontSize: 14, color: "var(--fg-3)" }}>
       <span style={{ animation: "pulse 1.5s infinite", display: "inline-block" }}>●</span>
       <span style={{ animation: "pulse 1.5s 0.3s infinite", display: "inline-block" }}>●</span>
       <span style={{ animation: "pulse 1.5s 0.6s infinite", display: "inline-block" }}>●</span>
@@ -730,7 +730,7 @@ function InputBar({
           readOnly={disabled}
           style={{
             flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)",
-            borderRadius: 10, padding: "0 12px", fontSize: 13, color: "var(--fg)",
+            borderRadius: 10, padding: "0 12px", fontSize: 14, color: "var(--fg)",
             fontFamily: FONT, outline: "none", height: 36, transition: "border-color 0.12s",
             opacity: disabled ? 0.5 : 1,
             backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)",
@@ -837,7 +837,7 @@ function OutlineDash({ selectedFormats, outlineRows }: { selectedFormats: Format
     {reedOutlineTake && (
       <DpSection>
         <DpLabel>Reed's Take</DpLabel>
-        <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedOutlineTake}</div>
+        <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedOutlineTake}</div>
       </DpSection>
     )}
     <DpSection>
@@ -854,7 +854,7 @@ function OutlineDash({ selectedFormats, outlineRows }: { selectedFormats: Format
             padding: "5px 8px", borderRadius: 5,
             border: "1px solid var(--gold-bright)", background: "rgba(245,198,66,0.05)",
           }}>
-            <span style={{ fontSize: 11, color: "var(--fg)", fontWeight: 500 }}>{f}</span>
+            <span style={{ fontSize: 14, color: "var(--fg)", fontWeight: 500 }}>{f}</span>
             <span style={{ fontSize: 10, color: "var(--blue)" }}>{wordMap[f] ?? "~"}</span>
           </div>
         ))}
@@ -1140,7 +1140,7 @@ function ReviewDash({
 
       {/* Fixing/rerunning state */}
       {(fixingGate || rerunning) && !running && (
-        <div style={{ fontSize: 11, color: "var(--gold-bright)", marginBottom: 12, fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ fontSize: 14, color: "var(--gold-bright)", marginBottom: 12, fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ animation: "pulse-dot 1.5s infinite" }}>&#9679;</span>
           Reed is improving the draft...
         </div>
@@ -1158,7 +1158,7 @@ function ReviewDash({
               backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 6 }}>Reed</div>
-              <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedMessage}</div>
+              <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedMessage}</div>
             </div>
           )}
 
@@ -1172,7 +1172,7 @@ function ReviewDash({
               backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
               <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
-              <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
+              <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
               <button
                 type="button"
                 onClick={onDismissReedAction}
@@ -1183,7 +1183,7 @@ function ReviewDash({
                   border: "none", background: "transparent",
                   color: "var(--fg-3)", cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 11, fontFamily: FONT, padding: 0,
+                  fontSize: 14, fontFamily: FONT, padding: 0,
                 }}
               >&times;</button>
             </div>
@@ -1214,7 +1214,7 @@ function ReviewDash({
                         width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
                         background: g.status === "Fail" ? "#b91c1c" : "var(--gold-bright)",
                       }} />
-                      <span style={{ fontSize: 11, fontWeight: 600, color: "var(--fg)" }}>{g.name}</span>
+                      <span style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)" }}>{g.name}</span>
                       <span style={{ fontSize: 9, color: "var(--fg-3)", marginLeft: "auto" }}>{g.status}</span>
                     </div>
                     {sourceCheckpoint?.feedback && (
@@ -1254,7 +1254,7 @@ function ReviewDash({
                       width: 8, height: 8, borderRadius: "50%", flexShrink: 0,
                       background: "var(--gold-bright)",
                     }} />
-                    <span style={{ fontSize: 11, fontWeight: 600, color: "var(--fg)" }}>Comment Invitation</span>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)" }}>Comment Invitation</span>
                     <span style={{ fontSize: 9, color: "var(--fg-3)", marginLeft: "auto" }}>Advisory</span>
                   </div>
                   <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>
@@ -1282,7 +1282,7 @@ function ReviewDash({
               className="liquid-glass-btn-gold"
               onClick={onRepairPipeline}
               disabled={!!fixingGate || rerunning}
-              style={{ width: "100%", marginBottom: 8, fontSize: 11, fontFamily: FONT }}
+              style={{ width: "100%", marginBottom: 8, fontSize: 14, fontFamily: FONT }}
             >
               <span className="liquid-glass-btn-gold-label">Let Reed fix it</span>
             </button>
@@ -1296,7 +1296,7 @@ function ReviewDash({
               style={{
                 width: "100%", padding: 10, borderRadius: 6, marginBottom: 8,
                 background: "var(--glass-card)", border: "1px solid var(--glass-border)",
-                fontSize: 11, fontWeight: 600, color: "var(--fg-2)",
+                fontSize: 14, fontWeight: 600, color: "var(--fg-2)",
                 cursor: "pointer", fontFamily: FONT,
                 backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
               }}
@@ -1308,7 +1308,7 @@ function ReviewDash({
           {hasMethodDna && (methodLintLoading || methodLintInspectorError != null) && (
             <div style={{ marginBottom: 12 }}>
               {methodLintLoading ? (
-                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: "var(--fg-2)", lineHeight: 1.45 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 14, color: "var(--fg-2)", lineHeight: 1.45 }}>
                   <span
                     aria-hidden
                     style={{
@@ -1320,7 +1320,7 @@ function ReviewDash({
                   Checking...
                 </div>
               ) : methodLintInspectorError === "timeout" ? (
-                <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>
                   <div style={{ marginBottom: 8 }}>The method terminology check timed out. This can happen with longer drafts. Hit Retry, it usually resolves in one attempt.</div>
                   <button
                     type="button"
@@ -1332,7 +1332,7 @@ function ReviewDash({
                   </button>
                 </div>
               ) : methodLintInspectorError === "unreachable" ? (
-                <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>
                   <div style={{ marginBottom: 8 }}>
                     The studio API is not reachable from this browser. Check your connection or VPN, then try again.
                   </div>
@@ -1346,7 +1346,7 @@ function ReviewDash({
                   </button>
                 </div>
               ) : (
-                <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>
                   <div style={{ marginBottom: 8 }}>The method terminology check did not complete. Hit Retry, it usually resolves in one attempt.</div>
                   <button
                     type="button"
@@ -1369,7 +1369,7 @@ function ReviewDash({
               width: "100%", padding: 10, borderRadius: 6,
               background: allExported ? "rgba(74,144,217,0.12)" : (publishAggregateOk ? "var(--gold)" : "var(--surface)"),
               border: publishAggregateOk ? "none" : "1px solid var(--glass-border)",
-              fontSize: 12, fontWeight: 700,
+              fontSize: 14, fontWeight: 700,
               color: allExported ? "var(--blue)" : (publishAggregateOk ? "var(--fg)" : "var(--fg)"),
               cursor: allExported ? "default" : "pointer",
               fontFamily: FONT, transition: "all 0.2s",
@@ -1571,7 +1571,7 @@ function StageIntake({
               marginBottom: 14, fontFamily: FONT,
             }}>
               <ReedProfileIcon size={18} title="Reed" />
-              <span style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+              <span style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>
                 I pulled your top signal from Watch. Ready to build. Hit send.
               </span>
             </div>
@@ -1694,7 +1694,7 @@ function StageIntake({
             }}>
               {reedQuestionCount < totalQuestions ? (
                 <p style={{
-                  fontSize: 12,
+                  fontSize: 14,
                   lineHeight: 1.55,
                   color: "var(--fg-2)",
                   margin: "0 0 12px",
@@ -1712,7 +1712,7 @@ function StageIntake({
                   maxWidth: 300,
                   padding: "12px 20px",
                   borderRadius: 10,
-                  fontSize: 13,
+                  fontSize: 14,
                   fontWeight: 700,
                   fontFamily: FONT,
                   letterSpacing: "0.02em",
@@ -1872,7 +1872,7 @@ function ChatBubble({ role, text, userInitials, isChallenge }: { role: "reed" | 
             {isChallenge && (
               <div style={{
                 display: "inline-block",
-                fontSize: 11, fontWeight: 500,
+                fontSize: 14, fontWeight: 500,
                 color: "#fff", background: "var(--blue, #4A90D9)",
                 borderRadius: 99, padding: "2px 10px",
                 marginBottom: 6, fontFamily: FONT,
@@ -1959,7 +1959,7 @@ function ChatPendingAttachments({
         >
           <ChatPendingFileThumb file={file} />
           <span style={{
-            fontSize: 11, color: "var(--fg-2)", overflow: "hidden",
+            fontSize: 14, color: "var(--fg-2)", overflow: "hidden",
             textOverflow: "ellipsis", whiteSpace: "nowrap" as const, flex: 1, minWidth: 0,
           }} title={file.name}>{file.name}</span>
           <button
@@ -2221,7 +2221,7 @@ function OutlineStageComposer() {
             style={{
               flex: "1 1 0%", minWidth: 0, width: "100%", maxWidth: "100%", boxSizing: "border-box" as const,
               background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10,
-              padding: "0 12px", fontSize: 12, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36,
+              padding: "0 12px", fontSize: 14, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36,
               backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)",
             }}
             onFocus={e => { e.target.style.borderColor = "rgba(245,198,66,0.4)"; }}
@@ -2302,7 +2302,7 @@ function StageOutline({
               }}>
                 <ReedProfileIcon size={18} title="Reed" />
                 <p style={{
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 400,
                   color: "var(--fg-3)",
                   margin: 0,
@@ -2315,7 +2315,7 @@ function StageOutline({
               {/* CO_021 Fix 1A: Auto-selection narration */}
               {angles && (
                 <p style={{
-                  fontSize: 11,
+                  fontSize: 14,
                   color: "var(--fg-3)",
                   margin: "0 0 12px",
                   lineHeight: 1.45,
@@ -2375,7 +2375,7 @@ function StageOutline({
               type="button"
               className="liquid-glass-btn-gold"
               onClick={onAdvance}
-              style={{ fontSize: 12, padding: "8px 22px", fontFamily: FONT }}
+              style={{ fontSize: 14, padding: "8px 22px", fontFamily: FONT }}
             >
               <span className="liquid-glass-btn-gold-label">Write Draft →</span>
             </button>
@@ -2634,7 +2634,7 @@ function StageEdit({
                 onClick={() => onVersionSelect(i)}
                 style={{
                   padding: "4px 12px", borderRadius: 6,
-                  fontSize: 11, fontWeight: activeVersionIdx === i ? 600 : 400,
+                  fontSize: 14, fontWeight: activeVersionIdx === i ? 600 : 400,
                   color: activeVersionIdx === i ? "var(--fg)" : "var(--fg-3)",
                   background: activeVersionIdx === i ? "var(--surface)" : "transparent",
                   border: activeVersionIdx === i ? "1px solid var(--glass-border)" : "1px solid transparent",
@@ -2651,7 +2651,7 @@ function StageEdit({
                 disabled={generating}
                 style={{
                   padding: "4px 12px", borderRadius: 6,
-                  fontSize: 11, fontWeight: 500,
+                  fontSize: 14, fontWeight: 500,
                   color: "var(--fg-3)",
                   background: "transparent",
                   border: "1px dashed var(--glass-border)",
@@ -2690,7 +2690,7 @@ function StageEdit({
                 padding: "8px 12px",
                 background: "rgba(245,198,66,0.08)",
                 borderBottom: "1px solid rgba(245,198,66,0.2)",
-                fontSize: 11,
+                fontSize: 14,
                 color: "var(--gold-bright)",
                 fontWeight: 500,
               }}
@@ -2783,7 +2783,7 @@ function StageEdit({
               background: "rgba(245,198,66,0.06)",
               marginBottom: 8,
             }}>
-              <div style={{ fontSize: 11, color: "var(--fg)", fontWeight: 600, marginBottom: 4 }}>
+              <div style={{ fontSize: 14, color: "var(--fg)", fontWeight: 600, marginBottom: 4 }}>
                 Draft has flagged items
               </div>
               <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>
@@ -2795,7 +2795,7 @@ function StageEdit({
                 type="button"
                 className="liquid-glass-btn-gold"
                 onClick={() => setShowFlagsWarning(false)}
-                style={{ padding: "8px 16px", fontSize: 11, fontFamily: FONT }}
+                style={{ padding: "8px 16px", fontSize: 14, fontFamily: FONT }}
               >
                 <span className="liquid-glass-btn-gold-label">Address flags</span>
               </button>
@@ -2803,7 +2803,7 @@ function StageEdit({
                 type="button"
                 className="liquid-glass-btn"
                 onClick={() => { setShowFlagsWarning(false); (onAdvanceForced || onAdvance)(); }}
-                style={{ padding: "8px 16px", fontSize: 11, fontFamily: FONT }}
+                style={{ padding: "8px 16px", fontSize: 14, fontFamily: FONT }}
               >
                 <span className="liquid-glass-btn-label" style={{ fontWeight: 600 }}>Review as-is</span>
               </button>
@@ -2828,7 +2828,7 @@ function StageEdit({
               padding: "8px 28px 8px 10px",
             }}>
               <div style={{
-                fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6, fontFamily: FONT,
+                fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6, fontFamily: FONT,
                 fontStyle: converseLoading ? "italic" : "normal",
               }}>
                 {converseLoading ? "Reed is thinking..." : reedResponse}
@@ -2845,7 +2845,7 @@ function StageEdit({
                   border: "none", background: "transparent",
                   color: "var(--fg-3)", cursor: "pointer",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 12, fontFamily: FONT, padding: 0,
+                  fontSize: 14, fontFamily: FONT, padding: 0,
                 }}
               >
                 &times;
@@ -2872,7 +2872,7 @@ function StageEdit({
             onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSubmit(); } }}
             placeholder="Ask Reed anything, or give an edit instruction..."
             readOnly={generating}
-            style={{ flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10, padding: "0 12px", fontSize: 12, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36, opacity: generating ? 0.5 : 1, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}
+            style={{ flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10, padding: "0 12px", fontSize: 14, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36, opacity: generating ? 0.5 : 1, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}
             onFocus={e => { e.target.style.borderColor = "rgba(245,198,66,0.4)"; }}
             onBlur={e => { e.target.style.borderColor = "var(--glass-border)"; }}
           />
@@ -2925,8 +2925,8 @@ function GenerationProgress() {
 
   return (
     <div style={{ padding: "40px clamp(16px, 3vw, 28px)", width: "100%", boxSizing: "border-box" as const }}>
-      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{currentPhase.label}</div>
-      <div style={{ fontSize: 11, color: "var(--fg-3)", marginBottom: 20 }}>{currentPhase.sub}</div>
+      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{currentPhase.label}</div>
+      <div style={{ fontSize: 14, color: "var(--fg-3)", marginBottom: 20 }}>{currentPhase.sub}</div>
       <div style={{ width: "100%", height: 3, borderRadius: 2, background: "var(--glass-border)", overflow: "hidden", marginBottom: 20 }}>
         <div style={{ height: "100%", borderRadius: 2, background: "var(--gold-bright)", width: `${Math.round(eased * 100)}%`, transition: "width 0.4s ease-out" }} />
       </div>
@@ -2946,7 +2946,7 @@ function GenerationProgress() {
                 {isDone && <svg width="8" height="8" viewBox="0 0 10 10" fill="none"><path d="M2 5L4 7L8 3" stroke="var(--bg)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                 {isActive && <div style={{ width: 4, height: 4, borderRadius: "50%", background: "var(--gold-bright)", animation: "pulse-dot 1s ease-in-out infinite" }} />}
               </div>
-              <span style={{ fontSize: 11, fontWeight: isActive ? 600 : 400, color: isActive ? "var(--fg)" : "var(--fg-3)" }}>{phase.label}</span>
+              <span style={{ fontSize: 14, fontWeight: isActive ? 600 : 400, color: isActive ? "var(--fg)" : "var(--fg-3)" }}>{phase.label}</span>
             </div>
           );
         })}
@@ -3001,14 +3001,14 @@ function ReviewProgress({
       <div style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", marginTop: 24, lineHeight: 1.3, fontFamily: FONT }}>
         Reed is reviewing your draft
       </div>
-      <div style={{ fontSize: 13, color: "var(--fg-3)", marginTop: 10, lineHeight: 1.5, fontFamily: FONT }}>
+      <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 10, lineHeight: 1.5, fontFamily: FONT }}>
         Checking voice, clarity, and originality
       </div>
       <div style={{
         marginTop: 26,
         paddingTop: 22,
         borderTop: "1px solid var(--glass-border)",
-        fontSize: 11,
+        fontSize: 14,
         color: "var(--fg-3)",
         lineHeight: 1.55,
         fontFamily: FONT,
@@ -3073,7 +3073,7 @@ function ReviewFormatPreview({
         {podcast.open && (
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
             <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>OPEN</span>
-            <div style={{ flex: 1 }}><p style={{ fontSize: 13, color: "var(--fg-2)", lineHeight: 1.7 }}>{renderInlineMarkdown(podcast.open)}</p></div>
+            <div style={{ flex: 1 }}><p style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.7 }}>{renderInlineMarkdown(podcast.open)}</p></div>
           </div>
         )}
         {podcast.hook && (
@@ -3091,7 +3091,7 @@ function ReviewFormatPreview({
         {podcast.close && (
           <div style={{ display: "flex", gap: 12, marginTop: 10 }}>
             <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>CLOSE</span>
-            <div style={{ flex: 1 }}><p style={{ fontSize: 13, color: "var(--fg-2)", lineHeight: 1.7 }}>{renderInlineMarkdown(podcast.close)}</p></div>
+            <div style={{ flex: 1 }}><p style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.7 }}>{renderInlineMarkdown(podcast.close)}</p></div>
           </div>
         )}
       </div>
@@ -3113,7 +3113,7 @@ function ReviewFormatPreview({
   if (format === "Newsletter" || format === "Newsletter Issue") {
     return (
       <div className="draft-body">
-        <div style={{ fontSize: 11, color: "var(--fg-3)", marginBottom: 16 }}>Newsletter Preview</div>
+        <div style={{ fontSize: 14, color: "var(--fg-3)", marginBottom: 16 }}>Newsletter Preview</div>
         <div className="draft-title-text" style={{ fontSize: 18, marginBottom: 12 }}>{title}</div>
         <div style={{ width: 28, height: 3, background: "var(--gold-bright)", marginBottom: 16, borderRadius: 2 }} />
         {body.map((p, i) => renderPara(p, i))}
@@ -3252,7 +3252,7 @@ function PreWrapOutputGate({
     padding: "12px 14px",
     borderRadius: 10,
     fontFamily: FONT,
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 600,
     color: "var(--fg)",
     cursor: "pointer",
@@ -3287,20 +3287,20 @@ function PreWrapOutputGate({
         }}>
           Where is this going?
         </h1>
-        <p style={{ fontSize: 12, color: "var(--fg-2)", margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT }}>
+        <p style={{ fontSize: 14, color: "var(--fg-2)", margin: "0 0 10px", lineHeight: 1.5, fontFamily: FONT }}>
           {reviewStatusLine}
         </p>
         {hvtLine ? (
-          <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT }}>
+          <p style={{ fontSize: 14, color: "var(--fg-3)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT }}>
             {hvtLine}
           </p>
         ) : null}
         {showWrapExplainer && (
-          <p style={{ fontSize: 12, color: "var(--gold)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT, fontWeight: 500 }}>
+          <p style={{ fontSize: 14, color: "var(--gold)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT, fontWeight: 500 }}>
             Wrap formats and delivers your piece for the channel you choose.
           </p>
         )}
-        <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "0 0 22px", lineHeight: 1.5, fontFamily: FONT }}>
+        <p style={{ fontSize: 14, color: "var(--fg-3)", margin: "0 0 22px", lineHeight: 1.5, fontFamily: FONT }}>
           Select exactly one Catalog format to start Wrap, or turn on Add another format and pick two.
         </p>
 
@@ -3324,7 +3324,7 @@ function PreWrapOutputGate({
             {isMobile ? "Reed recommends (tap to select)" : "Reed recommends"}
           </div>
           <div style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)" }}>{recLabel}</div>
-          <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 6, lineHeight: 1.45 }}>
+          <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 6, lineHeight: 1.45 }}>
             Suggestion only. Your pick in the grids below uses the gold selected style.
           </div>
         </button>
@@ -3435,7 +3435,7 @@ function PreWrapOutputGate({
             style={{
               padding: "8px 14px",
               borderRadius: 8,
-              fontSize: 11,
+              fontSize: 14,
               fontWeight: 600,
               fontFamily: FONT,
               border: allowSecondFormat ? "1px solid var(--glass-border)" : "1px dashed var(--gold-bright, #F5C642)",
@@ -3453,7 +3453,7 @@ function PreWrapOutputGate({
               style={{
                 padding: "8px 14px",
                 borderRadius: 8,
-                fontSize: 11,
+                fontSize: 14,
                 fontWeight: 600,
                 fontFamily: FONT,
                 border: "1px solid var(--glass-border)",
@@ -3482,7 +3482,7 @@ function PreWrapOutputGate({
             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>
               Presentation length
             </div>
-            <label style={{ fontSize: 12, color: "var(--fg-2)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" as const }}>
+            <label style={{ fontSize: 14, color: "var(--fg-2)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" as const }}>
               <span>Duration (minutes)</span>
               <input
                 type="number"
@@ -3499,11 +3499,11 @@ function PreWrapOutputGate({
                   padding: "6px 8px",
                   borderRadius: 8,
                   border: "1px solid var(--glass-border)",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontFamily: FONT,
                 }}
               />
-              <span style={{ fontSize: 11, color: "var(--fg-3)" }}>
+              <span style={{ fontSize: 14, color: "var(--fg-3)" }}>
                 Target ≈ {presentationMinutes * 300} words in Wrap
               </span>
             </label>
@@ -3525,7 +3525,7 @@ function PreWrapOutputGate({
             <div style={{ fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>
               Talk length
             </div>
-            <label style={{ fontSize: 12, color: "var(--fg-2)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" as const }}>
+            <label style={{ fontSize: 14, color: "var(--fg-2)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" as const }}>
               <span>Duration (minutes)</span>
               <input
                 type="number"
@@ -3542,11 +3542,11 @@ function PreWrapOutputGate({
                   padding: "6px 8px",
                   borderRadius: 8,
                   border: "1px solid var(--glass-border)",
-                  fontSize: 13,
+                  fontSize: 14,
                   fontFamily: FONT,
                 }}
               />
-              <span style={{ fontSize: 11, color: "var(--fg-3)" }}>
+              <span style={{ fontSize: 14, color: "var(--fg-3)" }}>
                 Target ≈ {talkDuration * 300} words in Wrap
               </span>
             </label>
@@ -3581,7 +3581,7 @@ function PreWrapOutputGate({
               id="prewrap-start-hint"
               style={{
                 margin: 0,
-                fontSize: 11,
+                fontSize: 14,
                 color: "var(--fg-3)",
                 fontFamily: FONT,
                 textAlign: "center" as const,
@@ -3633,7 +3633,7 @@ function StageReview({
         <div style={{
           padding: "8px 20px", background: "rgba(245,198,66,0.08)",
           borderBottom: "1px solid rgba(245,198,66,0.2)",
-          fontSize: 11, color: "var(--gold-bright)", fontWeight: 500, flexShrink: 0,
+          fontSize: 14, color: "var(--gold-bright)", fontWeight: 500, flexShrink: 0,
         }}>
           Applying suggestion...
         </div>
@@ -3677,7 +3677,7 @@ function StageReview({
                   minWidth: 0,
                   padding: "6px 10px",
                   borderRadius: 8,
-                  fontSize: 12,
+                  fontSize: 14,
                   fontFamily: FONT,
                   color: "var(--fg)",
                   cursor: "pointer",
@@ -3728,7 +3728,7 @@ function StageReview({
               if (isAdapting) {
                 return (
                   <div style={{ padding: "20px 0" }}>
-                    <div style={{ fontSize: 11, color: "var(--fg-3)", marginBottom: 8 }}>Adapting for {activeTab}...</div>
+                    <div style={{ fontSize: 14, color: "var(--fg-3)", marginBottom: 8 }}>Adapting for {activeTab}...</div>
                     <div style={{ width: "100%", height: 3, borderRadius: 2, background: "var(--glass-border)", overflow: "hidden" }}>
                       <div style={{ height: "100%", borderRadius: 2, background: "var(--gold-bright)", width: "60%", animation: "pulse-width 2s ease-in-out infinite" }} />
                     </div>
@@ -3741,11 +3741,11 @@ function StageReview({
                   {metadata.subject && (
                     <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--glass-card)", borderRadius: 8, border: "1px solid var(--glass-border)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}>
                       <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: 4 }}>Subject line</div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)" }}>{metadata.subject}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)" }}>{metadata.subject}</div>
                       {metadata.preview && (
                         <>
                           <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginTop: 8, marginBottom: 4 }}>Preview text</div>
-                          <div style={{ fontSize: 12, color: "var(--fg-2)" }}>{metadata.preview}</div>
+                          <div style={{ fontSize: 14, color: "var(--fg-2)" }}>{metadata.preview}</div>
                         </>
                       )}
                     </div>
@@ -3753,11 +3753,11 @@ function StageReview({
                   {metadata.episodeTitle && (
                     <div style={{ marginBottom: 16, padding: "10px 14px", background: "var(--glass-card)", borderRadius: 8, border: "1px solid var(--glass-border)", backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}>
                       <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", textTransform: "uppercase" as const, letterSpacing: "0.05em", marginBottom: 4 }}>Episode title</div>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)" }}>{metadata.episodeTitle}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)" }}>{metadata.episodeTitle}</div>
                     </div>
                   )}
                   {metadata.subtitle && (
-                    <div style={{ fontSize: 12, color: "var(--fg-3)", marginBottom: 16 }}>{metadata.subtitle}</div>
+                    <div style={{ fontSize: 14, color: "var(--fg-3)", marginBottom: 16 }}>{metadata.subtitle}</div>
                   )}
                   <ReviewFormatPreview
                     format={activeTab}
@@ -3780,7 +3780,7 @@ function StageReview({
         </div>
 
         {!running && pipelineRun && (
-          <div className="work-stage-content-column" style={{ padding: "12px clamp(16px, 3vw, 28px) 0", fontSize: 11, color: "var(--fg-3)", width: "100%", flexShrink: 0 }}>
+          <div className="work-stage-content-column" style={{ padding: "12px clamp(16px, 3vw, 28px) 0", fontSize: 14, color: "var(--fg-3)", width: "100%", flexShrink: 0 }}>
             {canApprove ? "Ready to export." : "Reed will tell you what needs attention."}
           </div>
         )}
@@ -3791,7 +3791,7 @@ function StageReview({
           <input
             value={input} onChange={e => setInput(e.target.value)}
             placeholder="Send back to Draft, tell Reed what to change..."
-            style={{ flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10, padding: "0 12px", fontSize: 12, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}
+            style={{ flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10, padding: "0 12px", fontSize: 14, color: "var(--fg)", fontFamily: FONT, outline: "none", height: 36, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}
             onFocus={e => { e.target.style.borderColor = "rgba(245,198,66,0.4)"; }}
             onBlur={e => { e.target.style.borderColor = "var(--glass-border)"; }}
           />
@@ -6494,7 +6494,7 @@ export default function WorkSession() {
           return (
             <DpSection>
               <DpLabel>Reed's Take</DpLabel>
-              <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{intakeTakeText}</div>
+              <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{intakeTakeText}</div>
             </DpSection>
           );
         }
@@ -6517,7 +6517,7 @@ export default function WorkSession() {
               {generating && (
                 <DpSection>
                   <DpLabel>Reed's Take</DpLabel>
-                  <div style={{ fontSize: 11, color: "var(--gold-bright)", lineHeight: 1.6, fontWeight: 500 }}>{generatingLabel}</div>
+                  <div style={{ fontSize: 14, color: "var(--gold-bright)", lineHeight: 1.6, fontWeight: 500 }}>{generatingLabel}</div>
                 </DpSection>
               )}
 
@@ -6525,7 +6525,7 @@ export default function WorkSession() {
               {!generating && hasDraftText && reedTakeText && (
                 <DpSection>
                   <DpLabel>Reed's Take</DpLabel>
-                  <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedTakeText}</div>
+                  <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedTakeText}</div>
                 </DpSection>
               )}
 
@@ -6534,7 +6534,7 @@ export default function WorkSession() {
                   {/* Word length lives in Feedback (right), not beside the main-stage CTA */}
                   <DpSection>
                     <DpLabel>Draft length</DpLabel>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>
+                    <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>
                       {wordCount} words
                     </div>
                     <button
@@ -6554,7 +6554,7 @@ export default function WorkSession() {
                         fontFamily: FONT,
                       }}
                     >
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>
                         Target: {targetWords} words{hasCatalogOutputType ? "" : " (default)"}
                       </div>
                       <div style={{ fontSize: 10, color: "var(--fg-3)", lineHeight: 1.45 }}>
@@ -6580,7 +6580,7 @@ export default function WorkSession() {
                             }
                           }}
                           aria-label="Target word count"
-                          style={{ width: 100, fontSize: 12, padding: "6px 8px" }}
+                          style={{ width: 100, fontSize: 14, padding: "6px 8px" }}
                         />
                         <button
                           type="button"
@@ -6600,7 +6600,7 @@ export default function WorkSession() {
                         </button>
                       </div>
                     ) : null}
-                    <div style={{ display: "flex", justifyContent: "flex-end", fontSize: 11, marginBottom: 3 }}>
+                    <div style={{ display: "flex", justifyContent: "flex-end", fontSize: 14, marginBottom: 3 }}>
                       <span style={{ color: "var(--gold)" }}>
                         {wordCount > targetWords ? `+${wordCount - targetWords}` : wordCount < targetWords ? `-${targetWords - wordCount}` : "on target"}
                       </span>
@@ -6786,7 +6786,7 @@ export default function WorkSession() {
                             border: "none", background: "transparent",
                             color: "var(--fg-3)", cursor: "pointer",
                             display: "flex", alignItems: "center", justifyContent: "center",
-                            fontSize: 11, fontFamily: FONT, padding: 0,
+                            fontSize: 14, fontFamily: FONT, padding: 0,
                           }}
                         >&times;</button>
                       </div>
@@ -6817,7 +6817,7 @@ export default function WorkSession() {
                         marginBottom: 8,
                       }}>
                         <div style={{
-                          fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6,
+                          fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6,
                           marginBottom: 8,
                         }}>
                           {pendingProposal.reason}
@@ -7031,7 +7031,7 @@ export default function WorkSession() {
             <h2 id="ew-cloud-restore-title" style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700, color: "var(--fg)" }}>
               Continue saved session?
             </h2>
-            <p style={{ margin: "0 0 16px", fontSize: 12, color: "var(--fg-2)", lineHeight: 1.55 }}>
+            <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>
               We found in-progress Work for this project from{" "}
               {new Date(restorePromptRow.updated_at).toLocaleString()}. Restore it, or start fresh and discard the cloud copy.
             </p>
@@ -7041,7 +7041,7 @@ export default function WorkSession() {
                 onClick={() => void handleCloudRestoreDecline()}
                 style={{
                   padding: "8px 14px",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 600,
                   borderRadius: 8,
                   border: "1px solid var(--glass-border)",
@@ -7057,7 +7057,7 @@ export default function WorkSession() {
                 type="button"
                 onClick={handleCloudRestoreAccept}
                 className="liquid-glass-btn-gold"
-                style={{ padding: "8px 18px", fontSize: 12, fontFamily: FONT }}
+                style={{ padding: "8px 18px", fontSize: 14, fontFamily: FONT }}
               >
                 <span className="liquid-glass-btn-gold-label">Restore session</span>
               </button>
@@ -7094,7 +7094,7 @@ export default function WorkSession() {
             <h2 id="ew-new-session-park-title" style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700, color: "var(--fg)" }}>
               New session
             </h2>
-            <p style={{ margin: "0 0 16px", fontSize: 12, color: "var(--fg-2)", lineHeight: 1.55 }}>
+            <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>
               Would you like to send &ldquo;{resolvedSessionTitle}&rdquo; to the Pipeline and park it for later? Choose Yes to save a copy you can reopen from the Pipeline, or No to start fresh without parking.
             </p>
             <div style={{ display: "flex", gap: 10, justifyContent: "flex-end", flexWrap: "wrap" as const }}>
@@ -7104,7 +7104,7 @@ export default function WorkSession() {
                 onClick={handleNewSessionConfirmNo}
                 style={{
                   padding: "8px 14px",
-                  fontSize: 12,
+                  fontSize: 14,
                   fontWeight: 600,
                   borderRadius: 8,
                   border: "1px solid var(--glass-border)",
@@ -7122,7 +7122,7 @@ export default function WorkSession() {
                 disabled={newSessionParkBusy}
                 onClick={() => void handleNewSessionConfirmYes()}
                 className="liquid-glass-btn-gold"
-                style={{ padding: "8px 18px", fontSize: 12, fontFamily: FONT, opacity: newSessionParkBusy ? 0.7 : 1 }}
+                style={{ padding: "8px 18px", fontSize: 14, fontFamily: FONT, opacity: newSessionParkBusy ? 0.7 : 1 }}
               >
                 <span className="liquid-glass-btn-gold-label">{newSessionParkBusy ? "Saving..." : "Yes"}</span>
               </button>
@@ -7339,10 +7339,10 @@ export default function WorkSession() {
             >
               Talk length
             </h2>
-            <p style={{ margin: "0 0 16px", fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+            <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>
               How many minutes should this talk run? Wrap will target about {300} words per minute.
             </p>
-            <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--fg-2)", marginBottom: 8 }}>
+            <label style={{ display: "block", fontSize: 14, fontWeight: 600, color: "var(--fg-2)", marginBottom: 8 }}>
               Duration (minutes)
             </label>
             <input
