@@ -228,19 +228,8 @@ function useStudioTopBarCenterBreadcrumbs(): {
     };
   }
 
-  if (hasContext) {
-    return {
-      center: (
-        <SessionProjectSessionBreadcrumb
-          projectLabel={projectLabel}
-          sessionTitle={sessionTitleForDisplay}
-        />
-      ),
-      showReturnPill: true,
-      onReturnToSession,
-    };
-  }
-
+  // CO_030: Session breadcrumb scoped to Work routes only.
+  // Non-Work pages show page-level breadcrumb, not the session title.
   return {
     center: <HomeRouteBreadcrumb path={path} nav={nav} />,
     showReturnPill: false,
