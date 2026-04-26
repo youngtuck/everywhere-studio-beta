@@ -42,7 +42,7 @@ const Logo = ({ size = "md", onDark, variant, onClick }: LogoProps) => {
       onClick={onClick}
     >
       <span style={{ display: "inline-flex", alignItems: "baseline" }}>
-        <span style={{ color, fontWeight: 600, fontSize: fs }}>
+        <span style={{ color, fontWeight: 400, fontSize: fs }}>
           Ideas
         </span>
         <span style={{ color, fontWeight: 600, fontSize: fs, position: "relative" }}>
