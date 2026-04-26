@@ -283,34 +283,21 @@ function WatchFieldGroup({ title, description, children }: { title: string; desc
 }
 
 // ── Right Panel: Watch Dashboard ──────────────────────────────
-function WatchRightPanel({ briefing, contentTriggers, opportunities, prefillReed }: {
-  briefing: BriefingData | null;
+function WatchRightPanel({ contentTriggers, onTurnIntoBrief }: {
   contentTriggers: Signal[];
-  opportunities: Signal[];
-  prefillReed: (text: string) => void;
+  onTurnIntoBrief: () => void;
 }) {
-  const signalCount = contentTriggers.length;
-  const topSignal = contentTriggers[0]?.title || "";
-  const topOpp = opportunities[0]?.title || "";
-  const hasBriefing = signalCount > 0 || opportunities.length > 0;
+  const topSignal = contentTriggers[0];
+  const hasSignals = contentTriggers.length > 0;
 
-  const signalSummary = hasBriefing
-    ? `Reed has read your sources. ${signalCount} signal${signalCount !== 1 ? "s" : ""} surfaced above threshold.${topSignal ? ` Top signal: ${topSignal}.` : ""}`
-    : "No briefing generated yet. Run a briefing to see signal analysis.";
-
-  const weekSummary = hasBriefing
-    ? `${signalCount} signal${signalCount !== 1 ? "s" : ""} flagged as high relevance.${topOpp ? ` Top opportunity: ${topOpp}.` : ""}`
-    : "Run a briefing to see this week's analysis.";
-
-  const reedAssessment = hasBriefing
-    ? `The strongest signal this week is ${topSignal || "in your queue"}. ${topOpp ? `Consider writing about ${topOpp}.` : "Review signals to find your next piece."}`
-    : "Run your first briefing. Reed will analyze your sources and surface what matters.";
-
-  const chips = [
-    { label: "Turn signal into brief", prefill: "Turn the strongest signal this week into a content brief for me." },
-    { label: "What should I write about?", prefill: "Based on this week's signals, what's the most timely thing for me to write about?" },
-    { label: "Who went quiet?", prefill: "Which competitors went quiet this week and what does that mean for my positioning?" },
-  ];
+  // CO_016 Fix 1: Reed's Take — single confident recommendation
+  let reedTake: string;
+  if (!hasSignals) {
+    reedTake = "Run a briefing to surface this week's signals.";
+  } else {
+    reedTake = `You should write about ${topSignal.title} this week. ${topSignal.summary}`;
+    if (topSignal.implication) reedTake += ` ${topSignal.implication}`;
+  }
 
   const DpSection = ({ children }: { children: React.ReactNode }) => (
     <div style={{ marginBottom: 14 }}>{children}</div>
@@ -322,32 +309,24 @@ function WatchRightPanel({ briefing, contentTriggers, opportunities, prefillReed
   return (
     <>
       <DpSection>
-        <DpLabel>Signal Review</DpLabel>
-        <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{signalSummary}</div>
+        <DpLabel>Reed's Take</DpLabel>
+        <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedTake}</div>
       </DpSection>
 
-      <DpSection>
-        <DpLabel>This Week</DpLabel>
-        <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{weekSummary}</div>
-      </DpSection>
-
-      <div style={{
-        border: "1px solid rgba(74,144,217,0.25)", borderRadius: 12,
-        padding: "10px 12px", background: "rgba(74,144,217,0.04)", marginBottom: 12,
-      }}>
-        <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 6 }}>Reed</div>
-        <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedAssessment}</div>
-      </div>
-
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
-        {chips.map((chip, i) => (
-          <button key={i} type="button" onClick={() => prefillReed(chip.prefill)} style={{
-            fontSize: 10, padding: "4px 10px", borderRadius: 99,
-            background: "#EDF1F5", border: "1px solid #CBD5E1",
-            color: "#334155", cursor: "pointer", fontFamily: "inherit",
-          }}>{chip.label}</button>
-        ))}
-      </div>
+      {/* CO_016 Fix 2: Single First Move button */}
+      {hasSignals && (
+        <DpSection>
+          <DpLabel>First Move</DpLabel>
+          <button
+            type="button"
+            className="liquid-glass-btn-gold"
+            onClick={onTurnIntoBrief}
+            style={{ width: "100%", fontSize: 11, padding: "8px 16px", fontFamily: FONT }}
+          >
+            <span className="liquid-glass-btn-gold-label">Turn signal into brief</span>
+          </button>
+        </DpSection>
+      )}
     </>
   );
 }
@@ -357,7 +336,7 @@ export default function Watch() {
   const nav = useNavigate();
   const { user } = useAuth();
   const { toast } = useToast();
-  const { setFeedbackContent, setReedPrefill } = useShell();
+  const { setFeedbackContent, setReedPrefill, setAskReedPlaceholder } = useShell();
   const isMobile = useMobile();
 
   const [activeTab, setActiveTab] = useState<"briefing" | "research" | "settings">("briefing");
@@ -657,109 +636,93 @@ export default function Watch() {
   const displayDate = briefingDate || now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
 
   // Inject right panel dashboard (Reed flyout opens only from the edge launcher)
+  const topSignalForBrief = contentTriggers[0];
+  const handleTurnIntoBrief = useCallback(() => {
+    if (topSignalForBrief) {
+      goToWorkFromWatchItem(nav, topSignalForBrief.title, topSignalForBrief.summary || "");
+    }
+  }, [nav, topSignalForBrief]);
+
   useLayoutEffect(() => {
     setFeedbackContent(
       <WatchRightPanel
-        briefing={briefing}
         contentTriggers={contentTriggers}
-        opportunities={opportunities}
-        prefillReed={prefillReed}
+        onTurnIntoBrief={handleTurnIntoBrief}
       />
     );
     return () => setFeedbackContent(null);
-  }, [briefing, contentTriggers, opportunities, prefillReed, setFeedbackContent]);
+  }, [contentTriggers, handleTurnIntoBrief, setFeedbackContent]);
 
-  const activeHint = WATCH_TABS.find(t => t.id === activeTab)?.hint ?? "";
+  // CO_016 Fix 3: Ask Reed placeholder override for Watch page
+  useLayoutEffect(() => {
+    setAskReedPlaceholder("Ask me why I picked this signal over the others...");
+    return () => setAskReedPlaceholder("");
+  }, [setAskReedPlaceholder]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, overflow: "hidden", fontFamily: FONT }}>
       <header className="liquid-glass" style={{
-        display: "flex", flexDirection: "column", flexShrink: 0, borderRadius: 0,
+        display: "flex", alignItems: "center", flexShrink: 0, borderRadius: 0,
         borderBottom: "1px solid var(--glass-border)",
+        padding: "10px 20px", gap: 12, flexWrap: "wrap",
       }}>
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          gap: 16, flexWrap: "wrap", padding: "12px 20px 10px",
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", minWidth: 0 }}>
-            <div
-              role="tablist"
-              aria-label="Watch sections"
-              style={{
-                display: "inline-flex", gap: 4, padding: 5,
-                borderRadius: 14, background: "rgba(0,0,0,0.028)", border: "1px solid var(--glass-border)",
-              }}
-            >
-              {WATCH_TABS.map(({ id, label }) => {
-                const selected = activeTab === id;
-                return (
-                  <button
-                    key={id}
-                    type="button"
-                    role="tab"
-                    aria-selected={selected}
-                    onClick={() => setActiveTab(id)}
-                    style={{
-                      fontSize: 11, fontWeight: selected ? 600 : 500, fontFamily: FONT,
-                      color: selected ? "var(--fg)" : "var(--fg-3)",
-                      padding: "7px 14px", borderRadius: 10, border: "none", cursor: "pointer",
-                      background: selected ? "var(--glass-surface)" : "transparent",
-                      boxShadow: selected ? "0 1px 0 rgba(0,0,0,0.04)" : "none",
-                      transition: "background 0.12s, color 0.12s",
-                    }}
-                  >{label}</button>
-                );
-              })}
-            </div>
-            <p style={{
-              margin: 0, fontSize: 11, color: "var(--fg-3)", lineHeight: 1.45, maxWidth: 320,
-              display: isMobile ? "none" : "block",
-            }}>{activeHint}</p>
-          </div>
+        <div
+          role="tablist"
+          aria-label="Watch sections"
+          style={{
+            display: "inline-flex", gap: 4, padding: 5,
+            borderRadius: 14, background: "rgba(0,0,0,0.028)", border: "1px solid var(--glass-border)",
+            flexShrink: 0,
+          }}
+        >
+          {WATCH_TABS.map(({ id, label }) => {
+            const selected = activeTab === id;
+            return (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={selected}
+                onClick={() => setActiveTab(id)}
+                style={{
+                  fontSize: 11, fontWeight: selected ? 600 : 500, fontFamily: FONT,
+                  color: selected ? "var(--fg)" : "var(--fg-3)",
+                  padding: "7px 14px", borderRadius: 10, border: "none", cursor: "pointer",
+                  background: selected ? "var(--glass-surface)" : "transparent",
+                  boxShadow: selected ? "0 1px 0 rgba(0,0,0,0.04)" : "none",
+                  transition: "background 0.12s, color 0.12s",
+                }}
+              >{label}</button>
+            );
+          })}
         </div>
 
-        <div style={{
-          display: "flex", alignItems: "center", justifyContent: "space-between",
-          gap: 12, flexWrap: "wrap", padding: "10px 20px 12px",
-          borderTop: "1px solid var(--glass-border)", background: "rgba(0,0,0,0.02)",
-        }}>
-          {activeTab === "briefing" && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, flex: 1, flexWrap: "wrap", width: "100%" }}>
-              <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 2 }}>
-                  Latest run
-                </div>
-                <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.4 }}>
-                  {displayDate}
-                  <span style={{ color: "var(--fg-3)", margin: "0 6px" }}>·</span>
-                  <span style={{ fontFamily: "var(--studio-mono-font, ui-monospace, monospace)" }}>{briefingTime}</span>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={handleGenerateBriefing}
-                disabled={generatingBriefing || loadingBriefing}
-                style={{
-                  fontSize: 11, fontWeight: 600, padding: "8px 18px", borderRadius: 10,
-                  background: "var(--fg)", color: "var(--gold, #F5C642)", border: "none",
-                  cursor: generatingBriefing || loadingBriefing ? "not-allowed" : "pointer", fontFamily: FONT,
-                  letterSpacing: "0.02em", opacity: generatingBriefing || loadingBriefing ? 0.5 : 1,
-                  flexShrink: 0,
-                }}
-              >{generatingBriefing ? "Running..." : "Run Brief"}</button>
-            </div>
-          )}
+        <div style={{ flex: 1 }} />
 
-          {activeTab === "research" && (
-            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", flex: 1 }}>
-              <div style={{ fontSize: 11, color: "var(--fg-3)", lineHeight: 1.45, flex: 1, minWidth: 200 }}>
-                Results come from the open web. Add anything you want Reed to remember in Settings.
-              </div>
-            </div>
-          )}
+        {activeTab === "briefing" && (
+          <>
+            <span style={{ fontSize: 10, color: "var(--fg-3)", lineHeight: 1.4 }}>
+              {displayDate}
+              <span style={{ margin: "0 4px" }}>·</span>
+              <span style={{ fontFamily: "var(--studio-mono-font, ui-monospace, monospace)" }}>{briefingTime}</span>
+            </span>
+            <button
+              type="button"
+              onClick={handleGenerateBriefing}
+              disabled={generatingBriefing || loadingBriefing}
+              style={{
+                fontSize: 11, fontWeight: 600, padding: "8px 18px", borderRadius: 10,
+                background: "var(--fg)", color: "var(--gold, #F5C642)", border: "none",
+                cursor: generatingBriefing || loadingBriefing ? "not-allowed" : "pointer", fontFamily: FONT,
+                letterSpacing: "0.02em", opacity: generatingBriefing || loadingBriefing ? 0.5 : 1,
+                flexShrink: 0,
+              }}
+            >{generatingBriefing ? "Running..." : "Run Brief"}</button>
+          </>
+        )}
 
-          {activeTab === "settings" && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", width: "100%" }}>
+        {activeTab === "settings" && (
+          <>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                 <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>
                   Briefing cadence
@@ -796,9 +759,8 @@ export default function Watch() {
                   opacity: saving ? 0.5 : 1, flexShrink: 0,
                 }}
               >{saving ? "Saving..." : "Save settings"}</button>
-            </div>
+          </>
           )}
-        </div>
       </header>
 
       {/* ── Tab Content ── */}

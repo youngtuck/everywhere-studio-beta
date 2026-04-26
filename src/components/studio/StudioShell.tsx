@@ -272,6 +272,7 @@ export default function StudioShell() {
   const [intakeProgress, setIntakeProgress] = useState<{ questionCount: number; ready: boolean }>({ questionCount: 0, ready: false });
   const [intakeAdvance, setIntakeAdvance] = useState<(() => void) | null>(null);
   const [draftChips, setDraftChips] = useState<Array<{ label: string; prefill: string }>>([]);
+  const [askReedPlaceholder, setAskReedPlaceholder] = useState("");
 
   const studioGlassDense =
     location.pathname.startsWith("/studio/outputs") ||
@@ -297,6 +298,7 @@ export default function StudioShell() {
       intakeProgress, setIntakeProgress,
       intakeAdvance, setIntakeAdvance,
       draftChips, setDraftChips,
+      askReedPlaceholder, setAskReedPlaceholder,
     }}>
       <ProjectProvider>
       <div
@@ -516,7 +518,7 @@ function FloatingReedPanel({ isMobile, open, setOpen }: { isMobile: boolean; ope
 const API_BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/$/, "");
 
 function ReedPanel() {
-  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending, intakeProgress, intakeAdvance, draftChips } = useShell();
+  const { reedThread, setReedThread, reedPrefill, setReedPrefill, setReedChipRequest, proposalPending, intakeProgress, intakeAdvance, draftChips, askReedPlaceholder } = useShell();
   const location = useLocation();
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
@@ -752,7 +754,7 @@ function ReedPanel() {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-          placeholder="Ask Reed..."
+          placeholder={askReedPlaceholder || "Ask Reed..."}
           aria-label="Ask Reed"
           disabled={sending}
           style={{
