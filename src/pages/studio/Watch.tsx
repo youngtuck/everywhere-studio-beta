@@ -67,12 +67,12 @@ function SignalCard({ signal, ctaLabel, ctaColor, onCta }: {
   signal: Signal; ctaLabel: string; ctaColor: string; onCta?: () => void;
 }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--glass-border)" }}>
-      <div style={{ flex: 1, fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5 }}>
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "8px 0", borderBottom: "1px solid var(--glass-border)", flexWrap: "wrap" }}>
+      <div style={{ flex: 1, fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5, minWidth: 0 }}>
         <strong style={{ color: "var(--fg)" }}>{signal.title}</strong>
         {signal.summary ? `, ${signal.summary}` : ""}
         {signal.implication && (
-          <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 3, lineHeight: 1.4 }}>{signal.implication}</div>
+          <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 3, lineHeight: 1.4 }}>{signal.implication}</div>
         )}
         {signal.sources && signal.sources.length > 0 && (
           <div style={{ fontSize: 9, color: "var(--fg-3)", marginTop: 3 }}>
@@ -84,8 +84,8 @@ function SignalCard({ signal, ctaLabel, ctaColor, onCta }: {
         <button type="button" onClick={onCta} style={{
           fontSize: 10, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" as const,
           padding: "3px 8px", borderRadius: 4, border: `1px solid ${ctaColor}33`,
-          background: `${ctaColor}09`, color: ctaColor, flexShrink: 0,
-          fontFamily: FONT, transition: "opacity 0.1s",
+          background: `${ctaColor}14`, color: "var(--fg)", flexShrink: 0,
+          fontFamily: FONT, transition: "opacity 0.1s", textDecoration: "underline",
         }}
           onMouseEnter={e => { e.currentTarget.style.opacity = "0.75"; }}
           onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
@@ -103,7 +103,7 @@ function OpportunityRow({ signal, active, onUseThis }: { signal: Signal; active:
       borderBottom: "1px solid var(--glass-border)", opacity: active ? 1 : 0.55,
     }}>
       <div style={{ width: 6, height: 6, borderRadius: "50%", background: active ? "var(--blue)" : "var(--line-2)", flexShrink: 0, marginTop: 5 }} />
-      <div style={{ flex: 1, fontSize: 12, color: "var(--fg-2)", lineHeight: 1.5, minWidth: 0 }}>
+      <div style={{ flex: 1, fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5, minWidth: 0 }}>
         <strong style={{ color: "var(--fg)" }}>{signal.title}</strong>
         {signal.summary ? `, ${signal.summary}` : ""}
       </div>
@@ -111,8 +111,8 @@ function OpportunityRow({ signal, active, onUseThis }: { signal: Signal; active:
         <button type="button" onClick={onUseThis} style={{
           fontSize: 10, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" as const,
           padding: "3px 8px", borderRadius: 4, border: `1px solid ${ctaColor}33`,
-          background: `${ctaColor}09`, color: ctaColor, flexShrink: 0,
-          fontFamily: FONT, transition: "opacity 0.1s",
+          background: `${ctaColor}14`, color: "var(--fg)", flexShrink: 0,
+          fontFamily: FONT, transition: "opacity 0.1s", textDecoration: "underline",
         }}
           onMouseEnter={e => { e.currentTarget.style.opacity = "0.75"; }}
           onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
@@ -153,7 +153,7 @@ function Card({
             fontFamily: "var(--studio-mono-font, ui-monospace, monospace)",
           }}>{title}</div>
           {subtitle ? (
-            <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 5, lineHeight: 1.45 }}>{subtitle}</div>
+            <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 5, lineHeight: 1.45 }}>{subtitle}</div>
           ) : null}
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
@@ -188,7 +188,7 @@ function AddRow({ placeholder, onAdd }: { placeholder: string; onAdd: (v: string
         placeholder={placeholder}
         style={{
           flex: 1, background: "var(--glass-input)", border: "1px solid var(--glass-border)", borderRadius: 10,
-          padding: "8px 11px", fontSize: 12, color: "var(--fg)", fontFamily: FONT, outline: "none",
+          padding: "8px 11px", fontSize: 14, color: "var(--fg)", fontFamily: FONT, outline: "none",
           backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)",
         }}
       />
@@ -209,7 +209,7 @@ function AddRow({ placeholder, onAdd }: { placeholder: string; onAdd: (v: string
 function TagChips({ items, onRemove, chipStyle }: { items: string[]; onRemove: (v: string) => void; chipStyle?: React.CSSProperties }) {
   if (items.length === 0) {
     return (
-      <div style={{ fontSize: 11, color: "var(--fg-3)", fontStyle: "italic", marginBottom: 10, padding: "4px 0" }}>
+      <div style={{ fontSize: 14, color: "var(--fg-3)", fontStyle: "italic", marginBottom: 10, padding: "4px 0" }}>
         None yet. Add below.
       </div>
     );
@@ -220,7 +220,7 @@ function TagChips({ items, onRemove, chipStyle }: { items: string[]; onRemove: (
         <span
           key={item}
           style={{
-            display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, color: "var(--fg-2)",
+            display: "inline-flex", alignItems: "center", gap: 6, fontSize: 14, color: "var(--fg-2)",
             background: "var(--glass-surface)", border: "1px solid var(--glass-border)", padding: "5px 10px",
             borderRadius: 8, ...chipStyle,
           }}
@@ -245,7 +245,7 @@ function TagChips({ items, onRemove, chipStyle }: { items: string[]; onRemove: (
 function SourceRows({ items, onRemove, borderColor }: { items: string[]; onRemove: (v: string) => void; borderColor: string }) {
   if (items.length === 0) {
     return (
-      <div style={{ fontSize: 11, color: "var(--fg-3)", fontStyle: "italic", marginBottom: 10, padding: "4px 0" }}>
+      <div style={{ fontSize: 14, color: "var(--fg-3)", fontStyle: "italic", marginBottom: 10, padding: "4px 0" }}>
         None yet. Add below.
       </div>
     );
@@ -254,7 +254,7 @@ function SourceRows({ items, onRemove, borderColor }: { items: string[]; onRemov
     <div style={{ display: "flex", flexDirection: "column", gap: 0, marginBottom: 10, borderRadius: 8, overflow: "hidden", border: "1px solid var(--glass-border)" }}>
       {items.map(item => (
         <div key={item} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderLeft: `3px solid ${borderColor}`, borderBottom: "1px solid var(--glass-border)", background: "rgba(0,0,0,0.015)" }}>
-          <span style={{ flex: 1, fontSize: 12, color: "var(--fg-2)" }}>{item}</span>
+          <span style={{ flex: 1, fontSize: 14, color: "var(--fg-2)" }}>{item}</span>
           <button
             type="button"
             onClick={() => onRemove(item)}
@@ -275,7 +275,7 @@ function WatchFieldGroup({ title, description, children }: { title: string; desc
         marginBottom: description ? 4 : 8, fontFamily: "var(--studio-mono-font, ui-monospace, monospace)",
       }}>{title}</div>
       {description ? (
-        <div style={{ fontSize: 11, color: "var(--fg-3)", marginBottom: 10, lineHeight: 1.45 }}>{description}</div>
+        <div style={{ fontSize: 14, color: "var(--fg-3)", marginBottom: 10, lineHeight: 1.45 }}>{description}</div>
       ) : null}
       {children}
     </div>
@@ -310,7 +310,7 @@ function WatchRightPanel({ contentTriggers, onTurnIntoBrief }: {
     <>
       <DpSection>
         <DpLabel>Reed's Take</DpLabel>
-        <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedTake}</div>
+        <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedTake}</div>
       </DpSection>
 
       {/* CO_016 Fix 2: Single First Move button */}
@@ -321,7 +321,7 @@ function WatchRightPanel({ contentTriggers, onTurnIntoBrief }: {
             type="button"
             className="liquid-glass-btn-gold"
             onClick={onTurnIntoBrief}
-            style={{ width: "100%", fontSize: 11, padding: "8px 16px", fontFamily: FONT }}
+            style={{ width: "100%", fontSize: 14, padding: "8px 16px", fontFamily: FONT }}
           >
             <span className="liquid-glass-btn-gold-label">Turn signal into brief</span>
           </button>
@@ -690,7 +690,7 @@ export default function Watch() {
                 aria-selected={selected}
                 onClick={() => setActiveTab(id)}
                 style={{
-                  fontSize: 11, fontWeight: selected ? 600 : 500, fontFamily: FONT,
+                  fontSize: 14, fontWeight: selected ? 600 : 500, fontFamily: FONT,
                   color: selected ? "var(--fg)" : "var(--fg-3)",
                   padding: "7px 14px", borderRadius: 10, border: "none", cursor: "pointer",
                   background: selected ? "var(--glass-surface)" : "transparent",
@@ -716,7 +716,7 @@ export default function Watch() {
               onClick={handleGenerateBriefing}
               disabled={generatingBriefing || loadingBriefing}
               style={{
-                fontSize: 11, fontWeight: 600, padding: "8px 18px", borderRadius: 10,
+                fontSize: 14, fontWeight: 600, padding: "8px 18px", borderRadius: 10,
                 background: "var(--fg)", color: "var(--gold, #F5C642)", border: "none",
                 cursor: generatingBriefing || loadingBriefing ? "not-allowed" : "pointer", fontFamily: FONT,
                 letterSpacing: "0.02em", opacity: generatingBriefing || loadingBriefing ? 0.5 : 1,
@@ -746,7 +746,7 @@ export default function Watch() {
                         saveWatchConfig({ ...buildWatchConfig(), frequency: val });
                       }}
                       style={{
-                        fontSize: 11, fontWeight: frequency === val ? 600 : 500,
+                        fontSize: 14, fontWeight: frequency === val ? 600 : 500,
                         padding: "6px 12px", borderRadius: 9, border: "1px solid var(--glass-border)",
                         background: frequency === val ? "var(--glass-surface)" : "transparent",
                         color: frequency === val ? "var(--fg)" : "var(--fg-3)",
@@ -766,9 +766,9 @@ export default function Watch() {
         {activeTab === "briefing" && (
           <div style={{ padding: "20px 20px 28px", maxWidth: 760, margin: "0 auto", width: "100%" }}>
             {loadingBriefing ? (
-              <div style={{ fontSize: 12, color: "var(--fg-3)", padding: "40px 0", textAlign: "center" as const }}>Loading briefing...</div>
+              <div style={{ fontSize: 14, color: "var(--fg-3)", padding: "40px 0", textAlign: "center" as const }}>Loading briefing...</div>
             ) : generatingBriefing ? (
-              <div style={{ fontSize: 12, color: "var(--fg-3)", padding: "40px 0", textAlign: "center" as const }}>
+              <div style={{ fontSize: 14, color: "var(--fg-3)", padding: "40px 0", textAlign: "center" as const }}>
                 Generating your briefing. This takes about 60 seconds...
               </div>
             ) : contentTriggers.length === 0 && opportunities.length === 0 && marketSignals.length === 0 ? (
@@ -777,11 +777,11 @@ export default function Watch() {
                   Sentinel
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", marginBottom: 10 }}>No briefing yet</div>
-                <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.65, marginBottom: 22 }}>
+                <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.65, marginBottom: 22 }}>
                   Configure keywords and sources in Settings, then run a brief. Reed ranks what matters for your next move.
                 </div>
                 <button type="button" onClick={handleGenerateBriefing} disabled={generatingBriefing} style={{
-                  fontSize: 12, fontWeight: 600, padding: "10px 22px", borderRadius: 10,
+                  fontSize: 14, fontWeight: 600, padding: "10px 22px", borderRadius: 10,
                   background: "var(--fg)", border: "none", color: "var(--surface)",
                   cursor: "pointer", fontFamily: FONT,
                 }}>Generate briefing</button>
@@ -792,7 +792,7 @@ export default function Watch() {
                   <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                     At a glance
                   </div>
-                  <div style={{ fontSize: 13, color: "var(--fg-2)", lineHeight: 1.55 }}>
+                  <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>
                     Top five per section. Use a signal in Work, or open Ask Reed from the right panel for deeper follow-up.
                   </div>
                 </div>
@@ -860,7 +860,7 @@ export default function Watch() {
                 Discovery
               </div>
               <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg)", marginBottom: 8 }}>Find a person, publication, or topic</div>
-              <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 16 }}>
+              <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 16 }}>
                 Search pulls live pages. When something fits your watchlist, add it as a keyword, publication, or competitor without leaving this tab.
               </div>
               <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
@@ -872,7 +872,7 @@ export default function Watch() {
                   aria-label="Research query"
                   style={{
                     flex: "1 1 220px", minWidth: 0, background: "var(--glass-input)", border: "1px solid var(--glass-border)",
-                    borderRadius: 10, padding: "10px 14px", fontSize: 13, color: "var(--fg)", fontFamily: FONT, outline: "none",
+                    borderRadius: 10, padding: "10px 14px", fontSize: 14, color: "var(--fg)", fontFamily: FONT, outline: "none",
                     backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)",
                   }}
                 />
@@ -882,7 +882,7 @@ export default function Watch() {
                   disabled={searching}
                   style={{
                     padding: "10px 22px", borderRadius: 10, background: "var(--fg)", color: "var(--surface)", border: "none",
-                    fontSize: 13, fontWeight: 600, cursor: searching ? "not-allowed" : "pointer", fontFamily: FONT, opacity: searching ? 0.5 : 1,
+                    fontSize: 14, fontWeight: 600, cursor: searching ? "not-allowed" : "pointer", fontFamily: FONT, opacity: searching ? 0.5 : 1,
                   }}
                 >{searching ? "Searching..." : "Search"}</button>
               </div>
@@ -893,7 +893,7 @@ export default function Watch() {
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--blue, #4A90D9)", marginBottom: 6 }}>
                   Summary
                 </div>
-                <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.6 }}>{researchMessage}</div>
+                <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{researchMessage}</div>
               </div>
             )}
 
@@ -915,7 +915,7 @@ export default function Watch() {
 
               <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 4 }}>
                 {searching && (
-                  <div style={{ fontSize: 12, color: "var(--fg-3)", textAlign: "center" as const, paddingTop: 36 }}>Searching...</div>
+                  <div style={{ fontSize: 14, color: "var(--fg-3)", textAlign: "center" as const, paddingTop: 36 }}>Searching...</div>
                 )}
 
                 {!searching && searchResults.length > 0 && searchResults.map((result, i) => (
@@ -925,17 +925,17 @@ export default function Watch() {
                     style={{ padding: "14px 16px", marginBottom: 10 }}
                   >
                     {result.url ? (
-                      <a href={result.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", textDecoration: "none", display: "inline-block", marginBottom: 4 }}>
+                      <a href={result.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", textDecoration: "none", display: "inline-block", marginBottom: 4 }}>
                         {result.title || result.url}
                       </a>
                     ) : (
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{result.title || "Untitled"}</div>
+                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{result.title || "Untitled"}</div>
                     )}
                     {result.url && (
                       <div style={{ fontSize: 10, color: "var(--fg-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: "100%" }}>{result.url}</div>
                     )}
                     {result.description && (
-                      <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.55, marginTop: 8, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{result.description}</div>
+                      <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55, marginTop: 8, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{result.description}</div>
                     )}
                     <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
                       <button
@@ -945,7 +945,7 @@ export default function Watch() {
                           if (name) { addKeyword(name); toast("Added as keyword."); }
                         }}
                         style={{
-                          fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
+                          fontSize: 14, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
                           background: "rgba(74,144,217,0.08)", border: "1px solid rgba(74,144,217,0.22)",
                           color: "var(--blue, #4A90D9)", cursor: "pointer", fontFamily: FONT,
                         }}
@@ -957,7 +957,7 @@ export default function Watch() {
                           if (name) { addSourceItem(publications, setPublications, "Publication")(name); toast("Added as source."); }
                         }}
                         style={{
-                          fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
+                          fontSize: 14, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
                           background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.22)",
                           color: "#7C3AED", cursor: "pointer", fontFamily: FONT,
                         }}
@@ -969,7 +969,7 @@ export default function Watch() {
                           if (name) { addConfigItem(competitors, setCompetitors, "competitors")(name); toast("Added as competitor."); }
                         }}
                         style={{
-                          fontSize: 11, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
+                          fontSize: 14, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
                           background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.22)",
                           color: "#DC2626", cursor: "pointer", fontFamily: FONT,
                         }}
@@ -980,7 +980,7 @@ export default function Watch() {
 
                 {!searching && searchResults.length === 0 && !researchMessage && (
                   <div className="liquid-glass-card" style={{ padding: "28px 20px", textAlign: "center" as const }}>
-                    <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.6 }}>
+                    <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.6 }}>
                       Run a search to preview outlets and names. Promote anything promising straight into Settings.
                     </div>
                   </div>
@@ -1004,7 +1004,7 @@ export default function Watch() {
                 <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg)", marginBottom: 8 }}>
                   Set up your Watch
                 </div>
-                <div style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.6, marginBottom: 16 }}>
+                <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6, marginBottom: 16 }}>
                   Tell Reed what to track. Add a few keywords about your industry, name your competitors, and pick some sources you read. You can always change these later.
                 </div>
 
@@ -1013,7 +1013,7 @@ export default function Watch() {
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {DEFAULT_KEYWORDS.filter(k => !keywords.includes(k)).map(k => (
                       <button key={k} type="button" onClick={() => addKeyword(k)} style={{
-                        fontSize: 11, padding: "6px 12px", borderRadius: 8,
+                        fontSize: 14, padding: "6px 12px", borderRadius: 8,
                         background: "var(--glass-surface)", border: "1px solid var(--glass-border)",
                         color: "var(--fg-2)", cursor: "pointer", fontFamily: FONT,
                         transition: "border-color 0.1s",
@@ -1042,7 +1042,7 @@ export default function Watch() {
                           }}
                           disabled={isAdded}
                           style={{
-                            fontSize: 11, padding: "6px 12px", borderRadius: 8,
+                            fontSize: 14, padding: "6px 12px", borderRadius: 8,
                             background: isAdded ? "rgba(34,197,94,0.08)" : "var(--glass-surface)",
                             border: isAdded ? "1px solid rgba(34,197,94,0.3)" : "1px solid var(--glass-border)",
                             color: isAdded ? "#16A34A" : "var(--fg-2)", cursor: isAdded ? "default" : "pointer",
@@ -1063,8 +1063,8 @@ export default function Watch() {
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                   Topic & community
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>What to listen for</div>
-                <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 18 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>What to listen for</div>
+                <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 18 }}>
                   Keywords run across every channel. Reddit adds community-level chatter on top.
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 22 }}>
@@ -1087,8 +1087,8 @@ export default function Watch() {
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                   Media you follow
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>Sources for the briefing</div>
-                <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 18 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>Sources for the briefing</div>
+                <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 18 }}>
                   Layer newsletters, podcasts, publications, and Substacks. Reed weights all of them when Sentinel runs.
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 22 }}>
@@ -1123,8 +1123,8 @@ export default function Watch() {
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                   Competitive lens
                 </div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>People and brands to contrast</div>
-                <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 18 }}>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>People and brands to contrast</div>
+                <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 18 }}>
                   Competitors sharpen positioning signals. Thought leaders keep you honest on narrative shifts.
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 22 }}>

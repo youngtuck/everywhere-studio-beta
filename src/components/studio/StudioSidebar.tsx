@@ -360,7 +360,7 @@ function NavItem({
       {/* Label */}
       {!collapsed && (
         <span style={{
-          fontSize: 12,
+          fontSize: 14,
           color: active ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.78)",
           fontWeight: active ? 600 : 500,
           whiteSpace: "nowrap",
@@ -382,7 +382,7 @@ function NavItem({
             top: "50%",
             transform: "translateY(-50%)",
             padding: "8px 11px",
-            fontSize: 11,
+            fontSize: 14,
             color: "rgba(255,255,255,0.92)",
             whiteSpace: "normal",
             width: 188,
