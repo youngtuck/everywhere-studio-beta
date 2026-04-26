@@ -46,18 +46,11 @@ export const OUTPUT_TYPES = {
     description: "Single-session outputs that build your reputation, audience, and authority over time.",
     types: [
       { id: "essay", name: "Essay", format: ".md / .html", shortDesc: "Long-form writing that establishes your thinking on a subject." },
+      { id: "talk", name: "Talk", format: ".md", shortDesc: "A spoken presentation scripted for delivery. Reed builds the arc around your duration." },
       { id: "podcast", name: "Podcast", format: ".md", shortDesc: "Scripted audio show in any format: solo, two hosts, interview, or panel." },
       { id: "video_script", name: "Video Script", format: ".md", shortDesc: "Scripts built for the platform. The algorithm decides in the first three seconds." },
       { id: "email", name: "Email", format: "Plain text", shortDesc: "Any email, any purpose. 2 to 3 strategic variants, each aimed at a different outcome." },
-    ],
-  },
-  social: {
-    label: "Social Media",
-    description: "Content built for the interest graph. Each platform has its own rules.",
-    types: [
-      { id: "linkedin", name: "LinkedIn Post", format: "Plain text", shortDesc: "Short-form professional post built for the interest graph." },
-      { id: "x_post", name: "X Post", format: "Plain text", shortDesc: "A short, sharp take built for speed and signal. 280 characters." },
-      { id: "social_post", name: "Social Post", format: "Plain text", shortDesc: "Content adapted for Instagram, Facebook, or other platforms." },
+      { id: "sunday_story", name: "Sunday Story", format: ".md / .html", shortDesc: "A weekly narrative essay that builds relationship with your audience over time." },
     ],
   },
   business: {
@@ -74,6 +67,7 @@ export const OUTPUT_TYPES = {
       { id: "meeting", name: "Meeting Agenda / Recap", format: ".md / .html", shortDesc: "Pre-meeting structure or post-meeting record of what matters." },
       { id: "bio", name: "Bio / Speaker Profile", format: "Plain text", shortDesc: "All four lengths in one session plus a speaker introduction." },
       { id: "white_paper", name: "White Paper", format: ".html / .pdf", shortDesc: "Your longest bet on your own thinking. A position backed by evidence." },
+      { id: "session_brief", name: "Session Brief", format: "Branded HTML", shortDesc: "Takes a call, meeting, or transcript and distills it to what actually matters." },
     ],
   },
   extended: {
@@ -83,6 +77,7 @@ export const OUTPUT_TYPES = {
       { id: "book", name: "Book", format: ".md per chapter", shortDesc: "Your most ambitious output. A project, not a single session." },
       { id: "website", name: "Website", format: ".md / .html", shortDesc: "A full website built page by page, each page its own session." },
       { id: "newsletter", name: "Newsletter", format: ".html", shortDesc: "A recurring publication. Each issue is its own session." },
+      { id: "social_media", name: "Social Media", format: "Plain text", shortDesc: "Content built for the interest graph. Runs on a cadence by platform." },
     ],
   },
   freestyle: {
