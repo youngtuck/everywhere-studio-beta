@@ -22,7 +22,7 @@ const Logo = ({ size = "md", onDark, variant, onClick }: LogoProps) => {
         : theme === "dark";
 
   const fs = typeof size === "number" ? size : SIZE_MAP[size];
-  const tmFs = Math.max(7, Math.round(fs * 0.36));
+  const tmFs = Math.max(7, Math.round(fs * 0.30));
   const taglineFs = Math.max(10, Math.round(fs * 0.38));
   const color = isDark ? "#FFFFFF" : "#0D1B2A";
 
@@ -52,10 +52,11 @@ const Logo = ({ size = "md", onDark, variant, onClick }: LogoProps) => {
             fontSize: tmFs,
             fontWeight: 400,
             position: "absolute",
-            top: 0,
-            right: Math.round(fs * -0.38),
+            top: "0.1em",
+            right: Math.round(fs * -0.48),
             lineHeight: 1,
-            opacity: 0.7,
+            letterSpacing: "0.02em",
+            opacity: 0.65,
           }}>TM</span>
         </span>
       </span>
