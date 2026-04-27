@@ -10,6 +10,7 @@ import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useShell } from "../../components/studio/StudioShell";
+import { triggerEditionDownload } from "./editionHtmlTemplate";
 import "./shared.css";
 
 // ---- Types ----
@@ -78,7 +79,7 @@ const CHECKPOINT_LABELS = [
 ];
 
 const NAV_ITEMS = [
-  { id: "article", label: "Article" }, { id: "callout", label: "Callout" },
+  { id: "editors-note", label: "Note" }, { id: "article", label: "Article" }, { id: "callout", label: "Callout" },
   { id: "notes", label: "Notes" }, { id: "podcast", label: "Podcast" },
   { id: "hero", label: "Hero" }, { id: "broll", label: "B-Roll" },
   { id: "music", label: "Music" }, { id: "shownotes", label: "Show Notes" },
@@ -382,6 +383,45 @@ export default function SundayEditionDetail() {
     scheduleSave();
   }, [scheduleSave]);
 
+  // Image upload (base64, 2MB cap)
+  const handleImageUpload = useCallback((fieldPath: string) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { toast("Image must be under 2MB.", "error"); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result as string;
+        const path = fieldPath.split(".");
+        contentRef.current = setNested(contentRef.current, path, base64);
+        setEdition(prev => prev ? { ...prev, content: contentRef.current } : prev);
+        scheduleSave();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }, [toast, scheduleSave]);
+
+  const handleBrollImageUpload = useCallback((index: number) => {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.onchange = () => {
+      const file = input.files?.[0];
+      if (!file) return;
+      if (file.size > 2 * 1024 * 1024) { toast("Image must be under 2MB.", "error"); return; }
+      const reader = new FileReader();
+      reader.onload = () => {
+        updateBrollField(index, "base64", reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }, [toast, updateBrollField]);
+
   // ---- Render ----
 
   if (loading || !edition) {
@@ -443,6 +483,16 @@ export default function SundayEditionDetail() {
             {edition.impact_score > 0 ? `${edition.impact_score} / 1000` : "-"}
           </span>
           <SaveIndicator state={saveState} />
+          <button
+            type="button"
+            onClick={() => { triggerEditionDownload(edition); toast("Edition downloaded."); }}
+            style={{
+              background: "var(--ed-ink)", color: "var(--ed-honey)", border: "none",
+              padding: "6px 14px", borderRadius: 3, cursor: "pointer", fontSize: 10,
+              fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const,
+              fontFamily: "inherit",
+            }}
+          >Download</button>
         </div>
 
         {/* Sticky nav */}
@@ -467,6 +517,11 @@ export default function SundayEditionDetail() {
             >{n.label}</button>
           ))}
         </div>
+
+        {/* Editor's Note */}
+        <Card id="editors-note" number="00" title="Editor's Note">
+          <EditableText value={g(ct, "editorsNote")} placeholder="Add editor's note..." fieldPath="editorsNote" multiline large onUpdate={updateField} />
+        </Card>
 
         {/* 01: Substack Article */}
         <Card id="article" number="01" title="Substack Article">
@@ -518,13 +573,18 @@ export default function SundayEditionDetail() {
 
         {/* 04: Hero Image */}
         <Card id="hero" number="04" title="Hero Image">
+          {(g(ct, "heroImage", "base64") || g(ct, "heroImage", "generatedUrl")) && (
+            <img src={g(ct, "heroImage", "base64") || g(ct, "heroImage", "generatedUrl")} alt="Hero" style={{ width: "100%", borderRadius: 4, marginBottom: 12, maxHeight: 300, objectFit: "cover" }} />
+          )}
+          <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+            <button type="button" onClick={() => handleImageUpload("heroImage.base64")} style={{ ...inputBase, width: "auto", cursor: "pointer", fontSize: 14, fontWeight: 600 }}>Upload image</button>
+          </div>
           <div style={{ marginBottom: 12 }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 4 }}>Prompt</div>
             <EditableText value={g(ct, "heroImage", "prompt")} placeholder="Add image prompt..." fieldPath="heroImage.prompt" multiline onUpdate={updateField} />
           </div>
-          {g(ct, "heroImage", "generatedUrl") && <img src={g(ct, "heroImage", "generatedUrl")} alt="Hero" style={{ width: "100%", borderRadius: 4, marginBottom: 8, maxHeight: 300, objectFit: "cover" }} />}
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 4 }}>Image URL</div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 4 }}>Image URL (fallback)</div>
             <EditableText value={g(ct, "heroImage", "generatedUrl")} placeholder="Paste image URL..." fieldPath="heroImage.generatedUrl" onUpdate={updateField} />
           </div>
         </Card>
@@ -535,7 +595,10 @@ export default function SundayEditionDetail() {
             {broll.map((img, i) => (
               <div key={i} style={{ background: "var(--ed-card)", border: "1px solid rgba(43,52,65,0.08)", borderRadius: 4, padding: "12px 14px" }}>
                 <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 6 }}>{img.label}</div>
-                {img.generatedUrl && <img src={img.generatedUrl} alt={img.label} style={{ width: "100%", borderRadius: 3, marginBottom: 6, maxHeight: 120, objectFit: "cover" }} />}
+                {(img.generatedUrl || (ct.brollImages && Array.isArray(ct.brollImages) && (ct.brollImages[i] as Record<string, unknown>)?.base64)) && (
+                  <img src={String((ct.brollImages && Array.isArray(ct.brollImages) && (ct.brollImages[i] as Record<string, unknown>)?.base64) || img.generatedUrl)} alt={img.label} style={{ width: "100%", borderRadius: 3, marginBottom: 6, maxHeight: 120, objectFit: "cover" }} />
+                )}
+                <button type="button" onClick={() => handleBrollImageUpload(i)} style={{ background: "none", border: "1px solid var(--ed-honey)", borderRadius: 3, padding: "3px 8px", fontSize: 10, color: "var(--ed-slate)", cursor: "pointer", marginBottom: 6, fontFamily: "inherit" }}>Upload</button>
                 <EditableText value={img.prompt} placeholder="Add prompt..." fieldPath={`brollImages.${i}.prompt`} multiline onUpdate={(_, val) => updateBrollField(i, "prompt", val)} />
                 <div style={{ marginTop: 6 }}>
                   <EditableText value={img.generatedUrl} placeholder="Paste URL..." fieldPath={`brollImages.${i}.generatedUrl`} onUpdate={(_, val) => updateBrollField(i, "generatedUrl", val)} />
