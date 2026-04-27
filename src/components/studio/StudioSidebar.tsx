@@ -71,6 +71,17 @@ const NAV: NavGroupDef[] = [
         ),
       },
       {
+        path: "/studio/editions",
+        label: "Editions",
+        desc: "Sunday Story production packages.",
+        icon: (
+          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+          </svg>
+        ),
+      },
+      {
         path: "/studio/lot",
         label: "Pipeline",
         desc: "Ideas parked for later. Resurfaces when timing is right.",
