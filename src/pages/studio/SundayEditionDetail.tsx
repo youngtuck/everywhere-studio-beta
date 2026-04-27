@@ -11,6 +11,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useShell } from "../../components/studio/StudioShell";
 import { triggerEditionDownload } from "./editionHtmlTemplate";
+import { validateText, summarizeViolations, type Violation } from "../../lib/aarValidation";
 import "./shared.css";
 
 // ---- Types ----
@@ -230,6 +231,67 @@ function HashtagEditor({ tags, onUpdate }: { tags: string[]; onUpdate: (tags: st
   );
 }
 
+function ViolationBadge({ violations: vs, fieldPath, onDismiss }: {
+  violations: Violation[]; fieldPath: string; onDismiss: (fp: string, sample: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  if (vs.length === 0) return null;
+  const blocks = vs.filter(v => v.severity === "block").length;
+  const warns = vs.length - blocks;
+  const color = blocks > 0 ? "#C0392B" : "#B8960A";
+  return (
+    <div style={{ marginTop: 8 }}>
+      <button type="button" onClick={() => setExpanded(!expanded)} style={{
+        background: "none", border: "none", cursor: "pointer", fontSize: 14,
+        color, fontWeight: 600, padding: 0, fontFamily: "inherit",
+      }}>
+        {blocks > 0 ? `${blocks} block${blocks > 1 ? "s" : ""}` : ""}{blocks > 0 && warns > 0 ? ", " : ""}{warns > 0 ? `${warns} warning${warns > 1 ? "s" : ""}` : ""}
+        {expanded ? " -" : " +"}
+      </button>
+      {expanded && (
+        <div style={{ marginTop: 6 }}>
+          {vs.map((v, i) => (
+            <div key={i} style={{
+              display: "flex", alignItems: "flex-start", gap: 8, padding: "6px 0",
+              borderBottom: "1px solid rgba(43,52,65,0.06)", fontSize: 14,
+            }}>
+              <span style={{ color: v.severity === "block" ? "#C0392B" : "#B8960A", fontWeight: 700, flexShrink: 0, fontSize: 10, marginTop: 2 }}>
+                {v.severity === "block" ? "BLOCK" : "WARN"}
+              </span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontWeight: 600, color: "var(--ed-ink)", marginBottom: 2 }}>{v.ruleName}</div>
+                <div style={{ color: "var(--ed-slate)", opacity: 0.7, fontSize: 14 }}>"{v.sample}"</div>
+                <div style={{ color: "var(--ed-slate)", opacity: 0.5, fontSize: 14, marginTop: 2 }}>{v.message}</div>
+                {v.ruleId === "fabrication-flag" && (
+                  <button type="button" onClick={() => onDismiss(fieldPath, v.sample)} style={{
+                    background: "none", border: "1px solid var(--ed-honey)", borderRadius: 3,
+                    padding: "2px 8px", fontSize: 10, color: "var(--ed-slate)", cursor: "pointer",
+                    marginTop: 4, fontFamily: "inherit",
+                  }}>Verified</button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ValidationSummary({ violations: allViolations }: { violations: Map<string, Violation[]> }) {
+  const { blocks, warns } = summarizeViolations(allViolations);
+  if (blocks === 0 && warns === 0) {
+    return <span style={{ fontSize: 14, color: "#2D8C4E", opacity: 0.7 }}>All clear</span>;
+  }
+  return (
+    <span style={{ fontSize: 14, fontWeight: 600 }}>
+      {blocks > 0 && <span style={{ color: "#C0392B" }}>{blocks} block{blocks > 1 ? "s" : ""}</span>}
+      {blocks > 0 && warns > 0 && <span style={{ color: "var(--ed-slate)", opacity: 0.4 }}>, </span>}
+      {warns > 0 && <span style={{ color: "#B8960A" }}>{warns} warning{warns > 1 ? "s" : ""}</span>}
+    </span>
+  );
+}
+
 function SaveIndicator({ state }: { state: SaveState }) {
   if (state === "idle") return null;
   const dot = state === "saving" ? "#EDCC73" : state === "saved" ? "#2D8C4E" : "#C0392B";
@@ -256,6 +318,7 @@ export default function SundayEditionDetail() {
   const [loading, setLoading] = useState(true);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [activeNav, setActiveNav] = useState("article");
+  const [violations, setViolations] = useState<Map<string, Violation[]>>(new Map());
 
   const debounceRef = useRef<number>(0);
   const contentRef = useRef<Record<string, unknown>>({});
@@ -316,10 +379,39 @@ export default function SundayEditionDetail() {
     savedTimerRef.current = window.setTimeout(() => setSaveState("idle"), 2000);
   }, [edition]);
 
+  // Validated prose fields
+  const VALIDATED_FIELDS = [
+    "editorsNote", "article.title", "article.subtitle", "article.body",
+    "callout.primary", "callout.alternate",
+    "notes.launch", "notes.standalone1", "notes.standalone2", "notes.standalone3", "notes.standalone4", "notes.followup",
+    "podcast.script", "showNotes.description", "descript.script",
+    "linkedin.postBody", "linkedin.firstComment",
+  ];
+
+  const runAllValidation = useCallback(() => {
+    const ct = contentRef.current;
+    const next = new Map<string, Violation[]>();
+    const dismissed = (ct.dismissedFabrications && typeof ct.dismissedFabrications === "object" ? ct.dismissedFabrications : {}) as Record<string, string[]>;
+    for (const fp of VALIDATED_FIELDS) {
+      const path = fp.split(".");
+      let val: unknown = ct;
+      for (const k of path) { val = val && typeof val === "object" ? (val as Record<string, unknown>)[k] : undefined; }
+      if (typeof val === "string" && val.length > 0) {
+        const fieldDismissed = dismissed[fp] || [];
+        const v = validateText(val, fieldDismissed);
+        if (v.length > 0) next.set(fp, v);
+      }
+    }
+    setViolations(next);
+  }, []);
+
   const scheduleSave = useCallback(() => {
     window.clearTimeout(debounceRef.current);
-    debounceRef.current = window.setTimeout(() => { void persistEdition(); }, DEBOUNCE_MS);
-  }, [persistEdition]);
+    debounceRef.current = window.setTimeout(() => {
+      runAllValidation();
+      void persistEdition();
+    }, DEBOUNCE_MS);
+  }, [persistEdition, runAllValidation]);
 
   // Content field update
   const updateField = useCallback((fieldPath: string, value: string) => {
@@ -366,10 +458,44 @@ export default function SundayEditionDetail() {
 
   // Status update
   const updateStatus = useCallback((status: string) => {
+    // Block-publish intercept
+    if (status === "published") {
+      runAllValidation();
+      const summary = summarizeViolations(violations);
+      if (summary.blocks > 0) {
+        const override = window.confirm(
+          `${summary.blocks} blocking violation${summary.blocks > 1 ? "s" : ""} detected (em dashes). Override and publish anyway?`
+        );
+        if (!override) return;
+        // Log override
+        const log = Array.isArray(contentRef.current.override_log) ? [...(contentRef.current.override_log as unknown[])] : [];
+        for (const [, vs] of violations) {
+          for (const v of vs) {
+            if (v.severity === "block") {
+              log.push({ rule_id: v.ruleId, count: 1, timestamp: new Date().toISOString(), sample: v.sample });
+            }
+          }
+        }
+        contentRef.current = { ...contentRef.current, override_log: log };
+      }
+    }
     statusRef.current = status;
     setEdition(prev => prev ? { ...prev, status } : prev);
     scheduleSave();
-  }, [scheduleSave]);
+  }, [scheduleSave, runAllValidation, violations]);
+
+  // Dismiss a fabrication flag for a specific field
+  const dismissFabrication = useCallback((fieldPath: string, sampleText: string) => {
+    const dismissed = (contentRef.current.dismissedFabrications && typeof contentRef.current.dismissedFabrications === "object"
+      ? { ...(contentRef.current.dismissedFabrications as Record<string, string[]>) } : {}) as Record<string, string[]>;
+    const arr = dismissed[fieldPath] ? [...dismissed[fieldPath]] : [];
+    if (!arr.includes(sampleText)) arr.push(sampleText);
+    dismissed[fieldPath] = arr;
+    contentRef.current = { ...contentRef.current, dismissedFabrications: dismissed };
+    setEdition(prev => prev ? { ...prev, content: contentRef.current } : prev);
+    runAllValidation();
+    scheduleSave();
+  }, [runAllValidation, scheduleSave]);
 
   // B-roll field update
   const updateBrollField = useCallback((index: number, field: string, value: string) => {
@@ -493,6 +619,7 @@ export default function SundayEditionDetail() {
               fontFamily: "inherit",
             }}
           >Download</button>
+          <ValidationSummary violations={violations} />
         </div>
 
         {/* Sticky nav */}
@@ -521,6 +648,7 @@ export default function SundayEditionDetail() {
         {/* Editor's Note */}
         <Card id="editors-note" number="00" title="Editor's Note">
           <EditableText value={g(ct, "editorsNote")} placeholder="Add editor's note..." fieldPath="editorsNote" multiline large onUpdate={updateField} />
+          {violations.has("editorsNote") && <ViolationBadge violations={violations.get("editorsNote")!} fieldPath="editorsNote" onDismiss={dismissFabrication} />}
         </Card>
 
         {/* 01: Substack Article */}
@@ -536,6 +664,7 @@ export default function SundayEditionDetail() {
           <div>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Body</div>
             <EditableText value={g(ct, "article", "body")} placeholder="Add your article..." fieldPath="article.body" multiline large onUpdate={updateField} />
+            {violations.has("article.body") && <ViolationBadge violations={violations.get("article.body")!} fieldPath="article.body" onDismiss={dismissFabrication} />}
           </div>
         </Card>
 
@@ -544,6 +673,7 @@ export default function SundayEditionDetail() {
           <div style={{ marginBottom: 12 }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Primary</div>
             <EditableText value={g(ct, "callout", "primary")} placeholder="Add primary quote..." fieldPath="callout.primary" multiline onUpdate={updateField} />
+            {violations.has("callout.primary") && <ViolationBadge violations={violations.get("callout.primary")!} fieldPath="callout.primary" onDismiss={dismissFabrication} />}
           </div>
           <div>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Alternate</div>
@@ -569,6 +699,7 @@ export default function SundayEditionDetail() {
         {/* 03: Podcast Script */}
         <Card id="podcast" number="03" title="Podcast Script">
           <EditableText value={g(ct, "podcast", "script")} placeholder="Add your podcast script..." fieldPath="podcast.script" multiline large onUpdate={updateField} />
+          {violations.has("podcast.script") && <ViolationBadge violations={violations.get("podcast.script")!} fieldPath="podcast.script" onDismiss={dismissFabrication} />}
         </Card>
 
         {/* 04: Hero Image */}
@@ -646,6 +777,7 @@ export default function SundayEditionDetail() {
         {/* 08: Descript Video Script */}
         <Card id="descript" number="08" title="Descript Video Script">
           <EditableText value={g(ct, "descript", "script")} placeholder="Add Descript script..." fieldPath="descript.script" multiline large onUpdate={updateField} />
+          {violations.has("descript.script") && <ViolationBadge violations={violations.get("descript.script")!} fieldPath="descript.script" onDismiss={dismissFabrication} />}
         </Card>
 
         {/* 09+10: LinkedIn */}
@@ -653,6 +785,7 @@ export default function SundayEditionDetail() {
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Post Body</div>
             <EditableText value={g(ct, "linkedin", "postBody")} placeholder="Add LinkedIn post..." fieldPath="linkedin.postBody" multiline large onUpdate={updateField} />
+            {violations.has("linkedin.postBody") && <ViolationBadge violations={violations.get("linkedin.postBody")!} fieldPath="linkedin.postBody" onDismiss={dismissFabrication} />}
           </div>
           <div style={{ borderTop: "1px solid rgba(43,52,65,0.08)", paddingTop: 16 }}>
             <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>First Comment</div>
