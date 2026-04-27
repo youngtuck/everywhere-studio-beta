@@ -56,7 +56,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
           backdropFilter: "var(--glass-blur-light)",
           WebkitBackdropFilter: "var(--glass-blur-light)",
           zIndex: 9999,
-          fontFamily: "'Afacad Flux', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           padding: 40,
         }}
       >
@@ -67,7 +67,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
             position: "absolute", top: 16, right: 20,
             background: "none", border: "none", cursor: "pointer",
             fontSize: 12, color: "var(--text-tertiary)",
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
           }}
         >
           Skip tour
@@ -119,7 +119,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
               <>
                 <button
                   onClick={dismiss}
-                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--text-tertiary)", fontFamily: "'Afacad Flux', sans-serif" }}
+                  style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "var(--text-tertiary)", fontFamily: "'Inter', sans-serif" }}
                 >
                   Don't show this again
                 </button>
@@ -129,7 +129,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
                     padding: "12px 24px", borderRadius: 8, border: "none",
                     background: "var(--gold)", color: "#fff",
                     fontSize: 14, fontWeight: 700, cursor: "pointer",
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                   }}
                 >
                   Got it, let's go
@@ -142,7 +142,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
                   padding: "12px 24px", borderRadius: 8, border: "none",
                   background: "var(--gold)", color: "#fff",
                   fontSize: 14, fontWeight: 700, cursor: "pointer",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 Next

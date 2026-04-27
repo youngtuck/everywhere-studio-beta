@@ -154,7 +154,7 @@ export default function NotificationBell() {
             backdropFilter: "var(--glass-blur-light)",
             WebkitBackdropFilter: "var(--glass-blur-light)",
             zIndex: 100,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
           }}
         >
           <div
@@ -177,7 +177,7 @@ export default function NotificationBell() {
                   fontSize: 12,
                   color: "var(--cornflower)",
                   cursor: "pointer",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 Mark all read
@@ -205,7 +205,7 @@ export default function NotificationBell() {
                   borderBottom: "1px solid var(--glass-border)",
                   cursor: n.link ? "pointer" : "default",
                   textAlign: "left",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   transition: "background 0.15s ease",
                 }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(0,0,0,0.02)"; }}

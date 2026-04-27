@@ -14,7 +14,7 @@ export function PipelineBlockedAlert({ blockedAt, feedback }: PipelineBlockedAle
         borderRadius: 10,
         border: "1px solid rgba(185,28,28,0.3)",
         background: "rgba(185,28,28,0.06)",
-        fontFamily: "'Afacad Flux', sans-serif",
+        fontFamily: "'Inter', sans-serif",
       }}
     >
       <div

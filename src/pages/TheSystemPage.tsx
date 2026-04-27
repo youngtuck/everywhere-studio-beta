@@ -22,7 +22,7 @@ const DNA_MODULES = [
   {
     name: "MethodDNA",
     subhead: "Built for coaching ecosystems.",
-    body: "If you operate inside a professional methodology, your clients deserve a studio that already knows their world. MethodDNA provisions EVERYWHERE Studio with your framework, your vocabulary, and your philosophy. Clients start inside the system, not configuring from scratch. The methodology delivers the framework. EVERYWHERE Studio delivers the content infrastructure that makes it land.",
+    body: "If you operate inside a professional methodology, your clients deserve a studio that already knows their world. MethodDNA provisions IdeasOut with your framework, your vocabulary, and your philosophy. Clients start inside the system, not configuring from scratch. The methodology delivers the framework. IdeasOut delivers the content infrastructure that makes it land.",
     bg: "var(--xp-white)",
   },
 ];

@@ -45,7 +45,7 @@ export default function CookiePolicyPage() {
             Cookies are small text files stored on your device when you visit a website. Similar technologies include
             local storage, session storage, pixels, and software development kits. This Cookie Policy explains how Mixed
             Grill, LLC (<strong>we</strong>, <strong>us</strong>, or <strong>our</strong>) uses these technologies in
-            connection with EVERYWHERE Studio and related sites (collectively, the <strong>Service</strong>).
+            connection with IdeasOut and related sites (collectively, the <strong>Service</strong>).
           </p>
 
           <h2>2. Why We Use Cookies</h2>

@@ -33,11 +33,11 @@ function Demo() {
       {/* Header bar */}
       <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:16, paddingBottom:12, borderBottom:"1px solid rgba(255,255,255,0.05)" }}>
         <div style={{ width:6, height:6, borderRadius:"50%", background:"#F5C642", boxShadow:"0 0 6px rgba(245,198,66,0.5)" }} />
-        <span style={{ fontSize:13, color:"rgba(255,255,255,0.2)", fontFamily:"'Afacad Flux', sans-serif", letterSpacing:"0.5px" }}>Reed is listening</span>
+        <span style={{ fontSize:13, color:"rgba(255,255,255,0.2)", fontFamily:"'Inter', sans-serif", letterSpacing:"0.5px" }}>Reed is listening</span>
       </div>
       {/* Input */}
       <div style={{ marginBottom:16, minHeight:56 }}>
-        <p style={{ fontSize:14, lineHeight:1.72, color:"rgba(255,255,255,0.78)", fontFamily:"'Afacad Flux', sans-serif", fontWeight:300 }}>
+        <p style={{ fontSize:14, lineHeight:1.72, color:"rgba(255,255,255,0.78)", fontFamily:"'Inter', sans-serif", fontWeight:300 }}>
           {typed}<span style={{ display:"inline-block", width:1.5, height:13, background:"rgba(245,198,66,0.7)", marginLeft:2, verticalAlign:"middle", animation:"blink 1s step-end infinite" }} />
         </p>
       </div>
@@ -45,7 +45,7 @@ function Demo() {
       <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:4 }}>
         {FORMATS.map((f,i) => { const on = active && i < cnt; return (
           <div key={f} style={{ padding:"8px 10px", background:on?"rgba(245,198,66,0.07)":"rgba(255,255,255,0.02)", border:`1px solid ${on?"rgba(245,198,66,0.18)":"rgba(255,255,255,0.04)"}`, borderRadius:6, opacity:on?1:0.4, transition:"all 0.18s" }}>
-            <p style={{ fontSize:13, fontWeight:on?500:400, color:on?"#F5C642":"rgba(255,255,255,0.38)", fontFamily:"'Afacad Flux', sans-serif", lineHeight:1.3, transition:"color 0.18s" }}>{f}</p>
+            <p style={{ fontSize:13, fontWeight:on?500:400, color:on?"#F5C642":"rgba(255,255,255,0.38)", fontFamily:"'Inter', sans-serif", lineHeight:1.3, transition:"color 0.18s" }}>{f}</p>
           </div>
         );})}
       </div>
@@ -76,33 +76,33 @@ export default function Hero() {
           {/* Eyebrow */}
           <div style={{ display:"inline-flex", alignItems:"center", gap:8, marginBottom:32, padding:"5px 12px", background:dark?"rgba(255,255,255,0.04)":"rgba(0,0,0,0.04)", border:`1px solid ${dark?"rgba(255,255,255,0.08)":"rgba(0,0,0,0.08)"}`, borderRadius:20 }}>
             <span style={{ width:5, height:5, borderRadius:"50%", background:"#4A90D9", display:"block" }} />
-            <span style={{ fontSize:14, fontWeight:400, letterSpacing:"0.3px", color:dark?"rgba(255,255,255,0.45)":"rgba(0,0,0,0.42)", fontFamily:"'Afacad Flux', sans-serif" }}>Composed Intelligence Platform</span>
+            <span style={{ fontSize:14, fontWeight:400, letterSpacing:"0.3px", color:dark?"rgba(255,255,255,0.45)":"rgba(0,0,0,0.42)", fontFamily:"'Inter', sans-serif" }}>Composed Intelligence Platform</span>
           </div>
 
           {/* Headline: very large, serif */}
-          <h1 style={{ fontFamily:"'Afacad Flux', sans-serif", fontSize:"clamp(48px,5.8vw,82px)", fontWeight:400, lineHeight:1.0, letterSpacing:"-1px", color:headC, marginBottom:28 }}>
+          <h1 style={{ fontFamily:"'Inter', sans-serif", fontSize:"clamp(48px,5.8vw,82px)", fontWeight:400, lineHeight:1.0, letterSpacing:"-1px", color:headC, marginBottom:28 }}>
             Your thinking,<br />
             <em style={{ fontStyle:"normal", color:"#F5C642" }}>composed.</em>
           </h1>
 
-          <p style={{ fontSize:"clamp(15px,1.4vw,17px)", lineHeight:1.82, color:bodyC, maxWidth:420, marginBottom:40, fontFamily:"'Afacad Flux', sans-serif", fontWeight:300 }}>
-            There is a mountain between the spark and the audience. EVERYWHERE Studio carries it: one idea, many surfaces, everywhere it belongs.
+          <p style={{ fontSize:"clamp(15px,1.4vw,17px)", lineHeight:1.82, color:bodyC, maxWidth:420, marginBottom:40, fontFamily:"'Inter', sans-serif", fontWeight:300 }}>
+            There is a mountain between the spark and the audience. IdeasOut carries it: one idea, many surfaces, everywhere it belongs.
           </p>
 
           <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginBottom:24 }}>
             <button onClick={()=>navigate("/auth")}
-              style={{ background:headC, color:bg, border:"none", cursor:"pointer", fontSize:13, fontWeight:500, letterSpacing:"-0.01em", padding:"13px 28px", borderRadius:8, fontFamily:"'Afacad Flux', sans-serif", transition:"opacity 0.15s" }}
+              style={{ background:headC, color:bg, border:"none", cursor:"pointer", fontSize:13, fontWeight:500, letterSpacing:"-0.01em", padding:"13px 28px", borderRadius:8, fontFamily:"'Inter', sans-serif", transition:"opacity 0.15s" }}
               onMouseEnter={e=>(e.currentTarget.style.opacity="0.82")} onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
               Request access
             </button>
             <button onClick={()=>navigate("/studio/dashboard")}
-              style={{ background:"transparent", border:`1px solid ${secBd}`, color:secC, cursor:"pointer", fontSize:13, fontWeight:400, letterSpacing:"-0.01em", padding:"12px 24px", borderRadius:8, fontFamily:"'Afacad Flux', sans-serif", transition:"all 0.15s" }}
+              style={{ background:"transparent", border:`1px solid ${secBd}`, color:secC, cursor:"pointer", fontSize:13, fontWeight:400, letterSpacing:"-0.01em", padding:"12px 24px", borderRadius:8, fontFamily:"'Inter', sans-serif", transition:"all 0.15s" }}
               onMouseEnter={e=>{ e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.28)":"rgba(0,0,0,0.28)"; e.currentTarget.style.color=headC; }}
               onMouseLeave={e=>{ e.currentTarget.style.borderColor=secBd; e.currentTarget.style.color=secC; }}>
               Explore demo →
             </button>
           </div>
-          <p style={{ fontSize:14, color:microC, fontFamily:"'Afacad Flux', sans-serif", fontWeight:300 }}>Invitation only · Founding members onboarding now</p>
+          <p style={{ fontSize:14, color:microC, fontFamily:"'Inter', sans-serif", fontWeight:300 }}>Invitation only · Founding members onboarding now</p>
         </div>
 
         <div style={{ display:"flex", justifyContent:"flex-end", alignItems:"center" }}>

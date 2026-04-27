@@ -82,7 +82,7 @@ export default function WhoItsForPage() {
           </Reveal>
           <Reveal delay={400}>
             <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-text)", fontWeight: 500 }}>
-              EVERYWHERE Studio is the system that ends the wait.
+              IdeasOut is the system that ends the wait.
             </p>
           </Reveal>
         </div>
@@ -125,7 +125,7 @@ export default function WhoItsForPage() {
           <Reveal delay={100}>
             <div className="xp-glass-card" style={{ padding: "32px 36px", borderLeft: "3px solid rgba(200,120,100,0.3)" }}>
               <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-sec)", marginBottom: 24 }}>
-                EVERYWHERE Studio will not make average thinking sound better than it is. The system runs quality checkpoints with blocking authority. If the thinking isn't there, the system will tell you. If you're looking for a faster way to produce generic content, this is the wrong place.
+                IdeasOut will not make average thinking sound better than it is. The system runs quality checkpoints with blocking authority. If the thinking isn't there, the system will tell you. If you're looking for a faster way to produce generic content, this is the wrong place.
               </p>
               <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-text)", fontWeight: 500, margin: 0 }}>
                 Signal only. No noise.

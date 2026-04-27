@@ -73,14 +73,14 @@ export default function AdminPanel() {
   ];
 
   return (
-    <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px", fontFamily: "'Afacad Flux', sans-serif" }}>
+    <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px", fontFamily: "'Inter', sans-serif" }}>
       <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: "0 0 24px", letterSpacing: "-0.02em" }}>Admin</h1>
       <div style={{ display: "flex", gap: 4, marginBottom: 32, borderBottom: "1px solid var(--glass-border)", paddingBottom: 0 }}>
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{
             padding: "10px 20px", border: "none", borderBottom: tab === t.key ? "2px solid var(--gold-dark)" : "2px solid transparent",
             background: "none", cursor: "pointer", fontSize: 14, fontWeight: tab === t.key ? 600 : 400,
-            color: tab === t.key ? "var(--fg)" : "var(--fg-3)", fontFamily: "'Afacad Flux', sans-serif",
+            color: tab === t.key ? "var(--fg)" : "var(--fg-3)", fontFamily: "'Inter', sans-serif",
             display: "flex", alignItems: "center", gap: 6, transition: "all 0.15s ease",
           }}>
             <t.icon size={16} /> {t.label}
@@ -125,7 +125,7 @@ function InviteTab() {
     setCreating(false);
   };
 
-  const inviteMessage = result ? `Hey ${result.name}, I'd like you to try EVERYWHERE Studio. It's an AI content system that actually sounds like you, not like AI. Here's your invite code: ${result.code}. Sign up at everywherestudio-one.vercel.app` : "";
+  const inviteMessage = result ? `Hey ${result.name}, I'd like you to try IdeasOut. It's an AI content system that actually sounds like you, not like AI. Here's your invite code: ${result.code}. Sign up at everywherestudio-one.vercel.app` : "";
 
   const handleCopy = (text: string, label: string) => { copyToClipboard(text); setCopied(label); setTimeout(() => setCopied(""), 1500); };
 
@@ -147,7 +147,7 @@ function InviteTab() {
         {result && (
           <div className="liquid-glass-card" style={{ padding: 24 }}>
             <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)", margin: "0 0 16px" }}>Invite Created</h3>
-            <div style={{ fontSize: 28, fontWeight: 700, color: "var(--gold-dark)", letterSpacing: "2px", marginBottom: 12, fontFamily: "'Afacad Flux', sans-serif" }}>
+            <div style={{ fontSize: 28, fontWeight: 700, color: "var(--gold-dark)", letterSpacing: "2px", marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
               {result.code}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -158,7 +158,7 @@ function InviteTab() {
                 {copied === "msg" ? <Check size={14} /> : <Copy size={14} />} {copied === "msg" ? "Copied!" : "Copy Invite Message"}
               </button>
               {email && (
-                <a href={`mailto:${email}?subject=Your EVERYWHERE Studio Invite&body=${encodeURIComponent(inviteMessage)}`} style={{ ...btnOutline, textDecoration: "none", textAlign: "center" }}>
+                <a href={`mailto:${email}?subject=Your IdeasOut Invite&body=${encodeURIComponent(inviteMessage)}`} style={{ ...btnOutline, textDecoration: "none", textAlign: "center" }}>
                   Send via Email
                 </a>
               )}
@@ -174,7 +174,7 @@ function InviteTab() {
             {recentInvites.map(c => (
               <div key={c.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--glass-border)", fontSize: 13 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <span style={{ fontWeight: 600, color: "var(--fg)", fontFamily: "'Afacad Flux', sans-serif", letterSpacing: "1px" }}>{c.code}</span>
+                  <span style={{ fontWeight: 600, color: "var(--fg)", fontFamily: "'Inter', sans-serif", letterSpacing: "1px" }}>{c.code}</span>
                   <span style={{ color: "var(--fg-2)" }}>{c.assigned_name || "Anyone"}</span>
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
@@ -284,7 +284,7 @@ function PeopleTab() {
               <button type="button" onClick={() => loadDetail(u.id)} style={{
                 width: "100%", display: "flex", alignItems: "center", gap: 12, padding: "12px 16px",
                 background: expanded ? "rgba(74,144,217,0.03)" : "transparent", border: "none", borderBottom: "1px solid var(--glass-border)",
-                cursor: "pointer", fontFamily: "'Afacad Flux', sans-serif", textAlign: "left",
+                cursor: "pointer", fontFamily: "'Inter', sans-serif", textAlign: "left",
               }}>
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: u.voice_dna_completed ? "#50c8a0" : "var(--fg-3)", flexShrink: 0 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -312,7 +312,7 @@ function PeopleTab() {
                   )}
                   <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
                     <button onClick={() => handleResetOnboarding(u.id)} style={btnSmall}>Reset Onboarding</button>
-                    <a href={`mailto:${u.email}?subject=Welcome to EVERYWHERE Studio`} style={{ ...btnSmall, textDecoration: "none" }}>Send Welcome</a>
+                    <a href={`mailto:${u.email}?subject=Welcome to IdeasOut`} style={{ ...btnSmall, textDecoration: "none" }}>Send Welcome</a>
                   </div>
                 </div>
               )}
@@ -391,7 +391,7 @@ function CodesTab() {
       <div className="liquid-glass-card" style={{ overflow: "hidden" }}>
         {codes.map(c => (
           <div key={c.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", borderBottom: "1px solid var(--glass-border)", fontSize: 13 }}>
-            <span style={{ fontWeight: 600, color: "var(--fg)", letterSpacing: "1px", width: 100, fontFamily: "'Afacad Flux', sans-serif" }}>{c.code}</span>
+            <span style={{ fontWeight: 600, color: "var(--fg)", letterSpacing: "1px", width: 100, fontFamily: "'Inter', sans-serif" }}>{c.code}</span>
             <span style={{ color: "var(--fg-2)", width: 120, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.assigned_name || "-"}</span>
             <span style={{
               fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 4,
@@ -461,23 +461,23 @@ function DashboardTab() {
 // ── SHARED STYLES ─────────────────────────────────
 const inputStyle: React.CSSProperties = {
   padding: "10px 12px", borderRadius: 8, border: "1px solid var(--glass-border)",
-  background: "var(--glass-input)", fontSize: 14, fontFamily: "'Afacad Flux', sans-serif",
+  background: "var(--glass-input)", fontSize: 14, fontFamily: "'Inter', sans-serif",
   color: "var(--fg)", outline: "none",
   backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)",
 };
 const btnGold: React.CSSProperties = {
   padding: "10px 20px", borderRadius: 8, border: "none",
   background: "#F5C642", color: "#0D1B2A", fontSize: 14, fontWeight: 700,
-  cursor: "pointer", fontFamily: "'Afacad Flux', sans-serif",
+  cursor: "pointer", fontFamily: "'Inter', sans-serif",
 };
 const btnOutline: React.CSSProperties = {
   padding: "8px 14px", borderRadius: 8, border: "1px solid var(--glass-border)",
   background: "transparent", color: "var(--fg-2)", fontSize: 13, fontWeight: 500,
-  cursor: "pointer", fontFamily: "'Afacad Flux', sans-serif",
+  cursor: "pointer", fontFamily: "'Inter', sans-serif",
   display: "flex", alignItems: "center", gap: 6, justifyContent: "center",
 };
 const btnSmall: React.CSSProperties = {
   padding: "4px 10px", borderRadius: 4, border: "1px solid var(--glass-border)",
   background: "transparent", color: "var(--fg-3)", fontSize: 12,
-  cursor: "pointer", fontFamily: "'Afacad Flux', sans-serif",
+  cursor: "pointer", fontFamily: "'Inter', sans-serif",
 };

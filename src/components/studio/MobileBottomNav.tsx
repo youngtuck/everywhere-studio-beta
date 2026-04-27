@@ -38,7 +38,7 @@ export default function MobileBottomNav() {
         WebkitBackdropFilter: "var(--glass-blur)",
         zIndex: 50,
         paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        fontFamily: "'Afacad Flux', sans-serif",
+        fontFamily: "'Inter', sans-serif",
       }}
     >
       {TABS.map(({ path, label, icon: Icon }) => {

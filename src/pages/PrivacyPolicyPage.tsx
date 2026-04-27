@@ -43,8 +43,8 @@ export default function PrivacyPolicyPage() {
           <h2>1. Introduction</h2>
           <p>
             This Privacy Policy explains how Mixed Grill, LLC (<strong>we</strong>, <strong>us</strong>, or{" "}
-            <strong>our</strong>) collects, uses, discloses, and protects information in connection with EVERYWHERE
-            Studio and related websites and services (collectively, the <strong>Service</strong>). If you do not agree with
+            <strong>our</strong>) collects, uses, discloses, and protects information in connection with IdeasOut
+            and related websites and services (collectively, the <strong>Service</strong>). If you do not agree with
             this policy, do not use the Service.
           </p>
 

@@ -2,7 +2,7 @@ import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Logo from "../Logo";
 import { MarketingDemoCursor } from "./MarketingDemoCursor";
 
-const font = { fontFamily: "var(--xp-font, 'Instrument Sans', system-ui, sans-serif)" };
+const font = { fontFamily: "var(--xp-font, 'Inter', system-ui, sans-serif)" };
 const mono = { fontFamily: "var(--xp-mono, 'DM Mono', monospace)" };
 
 const panel: React.CSSProperties = {

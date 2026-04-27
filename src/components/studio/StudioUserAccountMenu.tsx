@@ -133,7 +133,7 @@ export function StudioUserAccountMenu({
                 </div>
                 <div>
                   <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.92)" }}>{displayName || "User"}</div>
-                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.72)" }}>EVERYWHERE Studio</div>
+                  <div style={{ fontSize: 10, color: "rgba(255,255,255,0.72)" }}>IdeasOut</div>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.72)" }}>v{APP_VERSION}</div>
                 </div>
               </div>

@@ -169,7 +169,7 @@ export default function MeetTheTeam({ onClose, activeAgents = [] }: MeetTheTeamP
           boxShadow: "var(--glass-shadow)",
           backdropFilter: "var(--glass-blur-light)",
           WebkitBackdropFilter: "var(--glass-blur-light)",
-          zIndex: 9999, fontFamily: "'Afacad Flux', sans-serif",
+          zIndex: 9999, fontFamily: "'Inter', sans-serif",
           padding: "28px 32px",
         }}
       >

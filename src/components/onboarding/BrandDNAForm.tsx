@@ -68,7 +68,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
             border: "none",
             borderRadius: 999,
             padding: "6px 10px",
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 12,
             background: "rgba(255,255,255,0.06)",
             color: "rgba(255,255,255,0.85)",
@@ -85,7 +85,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
     <div style={{ maxWidth: 640, margin: "0 auto" }}>
       <h2
         style={{
-          fontFamily: "'Afacad Flux', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 28,
           fontWeight: 600,
           color: "#ffffff",
@@ -96,7 +96,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
       </h2>
       <p
         style={{
-          fontFamily: "'Afacad Flux', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 16,
           color: "rgba(255,255,255,0.6)",
           margin: "0 0 24px",
@@ -110,7 +110,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <label
             style={{
               display: "block",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.12em",
@@ -131,7 +131,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
               border: "1px solid rgba(255,255,255,0.16)",
               borderRadius: 10,
               padding: "12px 14px",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 14,
               color: "#ffffff",
               outline: "none",
@@ -142,7 +142,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <label
             style={{
               display: "block",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.12em",
@@ -163,7 +163,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
               border: "1px solid rgba(255,255,255,0.16)",
               borderRadius: 10,
               padding: "12px 14px",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 14,
               color: "#ffffff",
               outline: "none",
@@ -174,7 +174,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <label
             style={{
               display: "block",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.12em",
@@ -195,7 +195,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
               border: "1px solid rgba(255,255,255,0.16)",
               borderRadius: 10,
               padding: "12px 14px",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 14,
               color: "#ffffff",
               outline: "none",
@@ -206,7 +206,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <label
             style={{
               display: "block",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.12em",
@@ -228,7 +228,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
               border: "1px solid rgba(255,255,255,0.16)",
               borderRadius: 10,
               padding: "12px 14px",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 14,
               color: "#ffffff",
               outline: "none",
@@ -240,7 +240,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <label
             style={{
               display: "block",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.12em",
@@ -268,7 +268,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
                 border: "1px solid rgba(255,255,255,0.16)",
                 borderRadius: 10,
                 padding: "10px 12px",
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 14,
                 color: "#ffffff",
                 outline: "none",
@@ -283,7 +283,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
                 padding: "10px 14px",
                 background: "rgba(255,255,255,0.08)",
                 color: "rgba(255,255,255,0.85)",
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 13,
                 cursor: "pointer",
               }}
@@ -297,7 +297,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <label
             style={{
               display: "block",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.12em",
@@ -325,7 +325,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
                 border: "1px solid rgba(255,255,255,0.16)",
                 borderRadius: 10,
                 padding: "10px 12px",
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 14,
                 color: "#ffffff",
                 outline: "none",
@@ -340,7 +340,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
                 padding: "10px 14px",
                 background: "rgba(255,255,255,0.08)",
                 color: "rgba(255,255,255,0.85)",
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 13,
                 cursor: "pointer",
               }}
@@ -354,7 +354,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <label
             style={{
               display: "block",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 12,
               fontWeight: 600,
               letterSpacing: "0.12em",
@@ -376,7 +376,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
               border: "1px solid rgba(255,255,255,0.16)",
               borderRadius: 10,
               padding: "12px 14px",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 14,
               color: "#ffffff",
               outline: "none",
@@ -400,7 +400,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
           <Upload size={16} color="rgba(255,255,255,0.6)" />
           <div
             style={{
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 13,
               color: "rgba(255,255,255,0.7)",
             }}
@@ -429,7 +429,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
             padding: "14px 18px",
             background: "#C8961A",
             color: "#07090f",
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 14,
             fontWeight: 600,
             cursor: "pointer",
@@ -448,7 +448,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
             border: "1px solid rgba(255,255,255,0.35)",
             background: "transparent",
             color: "#ffffff",
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 14,
             fontWeight: 500,
             cursor: "pointer",

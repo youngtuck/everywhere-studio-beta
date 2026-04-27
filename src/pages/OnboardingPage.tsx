@@ -3,6 +3,7 @@ import { MessageSquare, FileUp } from "lucide-react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../context/AuthContext";
+import Logo from "../components/Logo";
 import { ProgressIndicator } from "../components/onboarding/ProgressIndicator";
 import { VoiceInterviewChat } from "../components/onboarding/VoiceInterviewChat";
 import { VoiceUpload } from "../components/onboarding/VoiceUpload";
@@ -476,10 +477,7 @@ export default function OnboardingPage() {
             }}
           >
             <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <span style={{ letterSpacing: "-1px", fontFamily: "'Inter', sans-serif", display: "inline-flex", alignItems: "baseline" }}>
-                <span style={{ color: "#4A90D9", fontWeight: 700, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>EVERYWHERE</span>
-                <span style={{ color: "#0D1B2A", fontWeight: 300, fontSize: 14, lineHeight: 1, textTransform: "uppercase" }}>STUDIO<span style={{ color: "#0D1B2A", fontSize: 7, verticalAlign: "top", marginLeft: 2 }}>™</span></span>
-              </span>
+              <Logo size={14} variant="light" />
             </div>
             <div
               style={{
@@ -609,7 +607,7 @@ export default function OnboardingPage() {
         {showStep0 && (
           <section style={{ minHeight: "60vh", display: "flex", flexDirection: "column", justifyContent: "center", maxWidth: 480 }}>
             <h1 style={{ fontFamily: "'Inter', sans-serif", fontSize: 32, fontWeight: 700, color: "#ffffff", margin: "0 0 8px" }}>
-              Welcome to EVERYWHERE Studio
+              Welcome to IdeasOut
             </h1>
             <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 16, color: "rgba(255,255,255,0.55)", marginBottom: 32, lineHeight: 1.6 }}>
               Let's set up your studio. This takes about 10 minutes.

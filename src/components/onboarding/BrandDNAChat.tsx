@@ -12,7 +12,7 @@ const OPENING_QUESTION =
 
 const BRAND_DNA_REED_SYSTEM = `## WHO REED IS
 
-You are Reed. You are the AI thought partner inside EVERYWHERE Studio.
+You are Reed. You are the AI thought partner inside IdeasOut.
 
 You are not a form. You are not a writing assistant that asks questions and waits. You are a strategic advisor who has already done the thinking and is ready to move.
 
@@ -194,11 +194,11 @@ You are not a tool. You are a partner.
 ---
 
 (c) 2026 Mixed Grill, LLC
-EVERYWHERE Studio v7.2
+IdeasOut v7.2
 REED_FOH_PROMPT.md | April 13, 2026
 
 
-You are Reed conducting a Brand DNA extraction for EVERYWHERE Studio. Your role is to have a natural conversation that uncovers the user's brand: what they are building, who it is for, what they are against, and how they want to sound.
+You are Reed conducting a Brand DNA extraction for IdeasOut. Your role is to have a natural conversation that uncovers the user's brand: what they are building, who it is for, what they are against, and how they want to sound.
 
 RULES:
 - Ask ONE question per response. Never ask multiple questions at once.
@@ -327,7 +327,7 @@ export function BrandDNAChat({ userName, onComplete, onAnalyzeStart }: BrandDNAC
       >
         <div
           style={{
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 13,
             color: "rgba(255,255,255,0.7)",
             letterSpacing: "0.08em",
@@ -364,7 +364,7 @@ export function BrandDNAChat({ userName, onComplete, onAnalyzeStart }: BrandDNAC
                 </div>
                 <div
                   style={{
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 15,
                     color: "rgba(255,255,255,0.85)",
                     lineHeight: 1.6,
@@ -382,7 +382,7 @@ export function BrandDNAChat({ userName, onComplete, onAnalyzeStart }: BrandDNAC
                   background: "rgba(255,255,255,0.08)",
                   borderRadius: "16px 16px 4px 16px",
                   padding: "12px 18px",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 15,
                   color: "rgba(255,255,255,0.85)",
                   lineHeight: 1.6,
@@ -416,7 +416,7 @@ export function BrandDNAChat({ userName, onComplete, onAnalyzeStart }: BrandDNAC
                 animation: "spin 0.8s linear infinite",
               }}
             />
-            <p style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", margin: 0 }}>
+            <p style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", margin: 0 }}>
               Building your Brand DNA...
             </p>
             <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
@@ -444,7 +444,7 @@ export function BrandDNAChat({ userName, onComplete, onAnalyzeStart }: BrandDNAC
                   borderRadius: 12,
                   padding: "14px 48px 14px 18px",
                   color: "#ffffff",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 15,
                   resize: "none",
                   outline: "none",
@@ -479,7 +479,7 @@ export function BrandDNAChat({ userName, onComplete, onAnalyzeStart }: BrandDNAC
                 onClick={handleBuildBrandDNA}
                 disabled={!canBuild}
                 style={{
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 12,
                   textTransform: "uppercase",
                   letterSpacing: "0.16em",
@@ -498,7 +498,7 @@ export function BrandDNAChat({ userName, onComplete, onAnalyzeStart }: BrandDNAC
               <div
                 style={{
                   marginTop: 4,
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 11,
                   color: "rgba(255,255,255,0.35)",
                   textAlign: "right",

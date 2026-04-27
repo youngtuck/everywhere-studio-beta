@@ -1,7 +1,7 @@
 import React from "react";
 
 const CTA_BODY =
-  "You're not a marketer. You're not a content creator. You're a practitioner with something important to say. You've been waiting too long for the system to catch up to the thinking. EVERYWHERE Studio was built for you.";
+  "You're not a marketer. You're not a content creator. You're a practitioner with something important to say. You've been waiting too long for the system to catch up to the thinking. IdeasOut was built for you.";
 
 export interface MarketingBuiltForCtaProps {
   onRequestAccess: () => void;

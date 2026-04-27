@@ -32,7 +32,7 @@ export default function MarketingFooter() {
             Cookie Policy
           </Link>
         </div>
-        <span style={{ fontSize: 12, color: "var(--xp-ter)" }}>&copy; {new Date().getFullYear()} Mixed Grill, LLC. All rights reserved.</span>
+        <span style={{ fontSize: 12, color: "var(--xp-ter)" }}>&copy; {new Date().getFullYear()} Mixed Grill, LLC. IdeasOut&trade;. All rights reserved.</span>
       </div>
     </footer>
   );

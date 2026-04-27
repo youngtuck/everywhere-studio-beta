@@ -1,63 +1,70 @@
-# EVERYWHERE STUDIO™ — Wordmark Implementation
+# IdeasOut Wordmark Spec
 
-Official wordmark system (Mixed Grill, LLC · v2.0 · March 8, 2026). Use the **EverywhereWordmark** component and this spec when implementing the brand lockup anywhere on the site.
+Official wordmark system (Mixed Grill, LLC v3.0, April 2026). Use the `Logo` component when implementing the brand lockup anywhere on the site.
 
 ## Component
 
-**File:** `src/components/EverywhereWordmark.tsx`
+**File:** `src/components/Logo.tsx`
 
 ```tsx
-import EverywhereWordmark from "@/components/EverywhereWordmark";
+import Logo from "@/components/Logo";
 
-// Full color (blue + gold) — e.g. on deep navy
-<EverywhereWordmark variant="fullColor" size="md" />
+// Wordmark only (dark on light backgrounds)
+<Logo size="sm" variant="light" />
 
-// B&W on dark backgrounds
-<EverywhereWordmark variant="bwDark" size="sm" />
+// Wordmark only (light on dark backgrounds)
+<Logo size="md" variant="dark" />
 
-// B&W on light backgrounds
-<EverywhereWordmark variant="bwLight" size="lg" />
+// Full lockup with tagline (dark background)
+<Logo size="lg" variant="lockup" />
 ```
 
 ### Props
 
-| Prop      | Type                                      | Default      | Description |
-|-----------|-------------------------------------------|--------------|-------------|
-| `variant` | `"fullColor"` \| `"bwDark"` \| `"bwLight"` | `"fullColor"` | Color treatment per background. |
-| `size`    | `"xs"` \| `"sm"` \| `"md"` \| `"lg"` \| `"xl"` | `"md"`    | Size scale. |
-| `className` | `string`                               | —            | Optional CSS class. |
-| `style`   | `React.CSSProperties`                    | —            | Optional inline styles. |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `size` | `"sm"` \| `"md"` \| `"lg"` \| `number` | `"md"` | Size scale (sm=20px, md=28px, lg=42px, or custom px). |
+| `variant` | `"dark"` \| `"light"` \| `"lockup"` | auto from theme | `dark` = white text, `light` = navy text, `lockup` = white text + tagline below. |
+| `onDark` | `boolean` | --- | Legacy prop. Prefer `variant`. |
+| `onClick` | `() => void` | --- | Click handler (e.g., navigate to dashboard). |
 
-## Spec Summary
+## Typography
 
-- **Font:** Afacad Flux (loaded globally via `index.html`).
-- **EVERYWHERE:** weight 700, uppercase.
-- **STUDIO™:** weight 300, uppercase; ™ is superscript (smaller size, `vertical-align: top`, `margin-left: 2px`).
-- **Letter-spacing:** -1px on the lockup.
+- **Font:** Inter (loaded globally via Google Fonts).
+- **"Ideas":** weight 400 (Regular).
+- **"Out":** weight 600 (SemiBold).
+- **TM superscript:** weight 400 (Regular), ~30% of wordmark height, positioned at top-right of "Out" with breathing room.
+- **Letter-spacing:** -0.08em on the wordmark lockup.
+- **Tagline (lockup variant only):** "Out of your head and into the world." in Inter ExtraLight (200), -0.04em spacing, 38% of wordmark height.
 
 ### Colors
 
-| Variant     | EVERYWHERE | STUDIO™   | Use case        |
-|------------|------------|-----------|------------------|
-| fullColor  | #4A90D9    | #F5C642   | On deep navy/dark |
-| bwDark     | #FFFFFF    | #FFFFFF   | On dark backgrounds |
-| bwLight    | #1A1A1A    | #1A1A1A   | On light backgrounds |
+| Variant | Text Color | Use Case |
+|---------|-----------|----------|
+| light | #0D1B2A (Deep Navy) | On light/white backgrounds |
+| dark | #FFFFFF | On dark/navy backgrounds |
+| lockup | #FFFFFF | Marketing hero, login screen |
 
-### Sizes (base / ™)
+### Sizes
 
-| Size | Base (px) | ™ (px) |
-|------|-----------|--------|
-| xs   | 14        | 10     |
-| sm   | 20        | 14     |
-| md   | 32        | 22     |
-| lg   | 48        | 34     |
-| xl   | 64        | 45     |
+| Size | Wordmark (px) | TM (px) | Tagline (px) |
+|------|--------------|---------|--------------|
+| sm | 20 | 7 | n/a |
+| md | 28 | 8 | n/a |
+| lg | 42 | 13 | 16 |
 
 ## Where to use
 
-- **Nav / header:** `EverywhereWordmark` with `variant="bwDark"` or `variant="bwLight"` depending on theme; size `sm` or `md`.
-- **Footer:** Same as nav; often `size="sm"`.
-- **Landing hero / full-color sections:** `variant="fullColor"` with `size="lg"` or `xl`.
-- **Auth, emails, PDFs:** Use the same variants and sizes for consistency.
+- **Sidebar header:** `<Logo size="sm" variant="dark" />` (navigates to dashboard on click)
+- **Marketing nav:** `<Logo size="sm" variant={theme} />`
+- **Marketing footer:** `<Logo size="sm" variant="light" />`
+- **Login/auth screen:** Tagline rendered separately below Logo as text
+- **Marketing hero:** `<Logo size="lg" variant="lockup" />` for full brand lockup
 
-Do not alter the lockup (e.g. “Everywhere Studio” in sentence case, or dropping the ™) when implementing the official wordmark. For other treatments, use the existing `Logo` component or typography as designed.
+## TM mark
+
+Required on all wordmark renderings (the Logo component includes it automatically) and copyright lines. Not required in body copy mentions of IdeasOut.
+
+## Brand weight contrast
+
+The visual weight shift from "Ideas" (Regular 400) to "Out" (SemiBold 600) is the defining brand characteristic. Do not render both words at the same weight.

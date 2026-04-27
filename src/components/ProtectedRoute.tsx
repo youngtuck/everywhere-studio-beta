@@ -121,7 +121,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
             border: "1px solid rgba(255,255,255,0.12)",
             borderRadius: 16,
             padding: 40,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
           }}
         >
           <p
@@ -133,7 +133,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
               lineHeight: 1.6,
             }}
           >
-            EVERYWHERE Studio is in private Alpha.
+            IdeasOut is in private Alpha.
           </p>
           <form onSubmit={handleGoogleAccessCodeSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <label

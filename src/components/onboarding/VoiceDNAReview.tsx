@@ -49,7 +49,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
     <div style={{ maxWidth: 640, margin: "0 auto", color: "#ffffff" }}>
       <h1
         style={{
-          fontFamily: "'Afacad Flux', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 36,
           fontWeight: 600,
           margin: "0 0 8px",
@@ -59,7 +59,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
       </h1>
       <p
         style={{
-          fontFamily: "'Afacad Flux', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 14,
           color: "rgba(255,255,255,0.5)",
           margin: "0 0 24px",
@@ -81,7 +81,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
       >
         <p
           style={{
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 15,
             lineHeight: 1.5,
             color: "rgba(255,255,255,0.85)",
@@ -96,7 +96,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
       <div style={{ marginBottom: 32 }}>
         <div
           style={{
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 13,
             fontWeight: 600,
             letterSpacing: "0.12em",
@@ -117,7 +117,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
                   <div
                     style={{
-                      fontFamily: "'Afacad Flux', sans-serif",
+                      fontFamily: "'Inter', sans-serif",
                       fontSize: 14,
                       fontWeight: 600,
                       color: "rgba(255,255,255,0.85)",
@@ -127,7 +127,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
                   </div>
                   <div
                     style={{
-                      fontFamily: "'Afacad Flux', sans-serif",
+                      fontFamily: "'Inter', sans-serif",
                       fontSize: 13,
                       fontWeight: 600,
                       color: "var(--gold)",
@@ -138,7 +138,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
                 </div>
                 <div
                   style={{
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 12,
                     color: "rgba(255,255,255,0.4)",
                     marginBottom: 8,
@@ -178,7 +178,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
                   >
                     <summary
                       style={{
-                        fontFamily: "'Afacad Flux', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                         fontSize: 12,
                         fontWeight: 600,
                         color: "rgba(245,198,66,0.95)",
@@ -190,7 +190,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
                     </summary>
                     <p
                       style={{
-                        fontFamily: "'Afacad Flux', sans-serif",
+                        fontFamily: "'Inter', sans-serif",
                         fontSize: 12,
                         color: "rgba(255,255,255,0.5)",
                         lineHeight: 1.5,
@@ -203,7 +203,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
                       <p
                         key={i}
                         style={{
-                          fontFamily: "'Afacad Flux', sans-serif",
+                          fontFamily: "'Inter', sans-serif",
                           fontSize: 12,
                           color: "rgba(255,255,255,0.72)",
                           lineHeight: 1.55,
@@ -240,7 +240,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
             padding: "14px 18px",
             background: "var(--gold)",
             color: "var(--bg)",
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 14,
             fontWeight: 600,
             cursor: "pointer",
@@ -260,7 +260,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
               border: "1px solid rgba(255,255,255,0.35)",
               background: "transparent",
               color: "#ffffff",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 14,
               fontWeight: 500,
               cursor: "pointer",
@@ -277,7 +277,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
               border: "none",
               background: "none",
               color: "rgba(255,255,255,0.65)",
-              fontFamily: "'Afacad Flux', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               fontSize: 13,
               textDecoration: "underline",
               cursor: "pointer",

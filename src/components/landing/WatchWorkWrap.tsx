@@ -4,7 +4,7 @@ const DATA = [
   {
     num:"01", id:"watch", label:"Watch", accent:"#4A90D9",
     heading:"Signal, not noise.",
-    body:"Before a word gets written, EVERYWHERE Studio does the intelligence work. Sentinel monitors your category overnight, surfacing what's moving, what's forming, what has your name on it.",
+    body:"Before a word gets written, IdeasOut does the intelligence work. Sentinel monitors your category overnight, surfacing what's moving, what's forming, what has your name on it.",
     detail:"You wake up to a briefing. Content triggers with angles. Competitor moves. Trend signals. Everything organized and scannable. Tap what resonates.",
     items:["Overnight category monitoring","Content triggers with ready angles","Competitor intelligence","Event radar with local scope","Trend signal detection"],
   },
@@ -42,16 +42,16 @@ export default function WatchWorkWrap() {
               <div style={{ order:i===1?2:1 }}>
                 {/* Number + label */}
                 <div style={{ display:"flex", alignItems:"center", gap:14, marginBottom:24 }}>
-                  <span style={{ fontFamily:"'Afacad Flux', sans-serif", fontSize:14, color:"var(--fg-3)", fontStyle:"normal" }}>{s.num}</span>
+                  <span style={{ fontFamily:"'Inter', sans-serif", fontSize:14, color:"var(--fg-3)", fontStyle:"normal" }}>{s.num}</span>
                   <span style={{ width:24, height:1, background:"var(--line-2)", display:"block" }} />
-                  <span style={{ fontSize:13, fontWeight:500, letterSpacing:"1px", textTransform:"uppercase", color:s.accent, fontFamily:"'Afacad Flux', sans-serif" }}>{s.label}</span>
+                  <span style={{ fontSize:13, fontWeight:500, letterSpacing:"1px", textTransform:"uppercase", color:s.accent, fontFamily:"'Inter', sans-serif" }}>{s.label}</span>
                 </div>
 
-                <h2 style={{ fontFamily:"'Afacad Flux', sans-serif", fontSize:"clamp(32px,3.8vw,56px)", fontWeight:400, letterSpacing:"-0.5px", color:"var(--fg)", marginBottom:22, lineHeight:1.08 }}>
+                <h2 style={{ fontFamily:"'Inter', sans-serif", fontSize:"clamp(32px,3.8vw,56px)", fontWeight:400, letterSpacing:"-0.5px", color:"var(--fg)", marginBottom:22, lineHeight:1.08 }}>
                   {s.heading}
                 </h2>
-                <p style={{ fontSize:16, lineHeight:1.82, color:"var(--fg-2)", marginBottom:14, fontFamily:"'Afacad Flux', sans-serif", fontWeight:300 }}>{s.body}</p>
-                <p style={{ fontSize:14, lineHeight:1.78, color:"var(--fg-3)", fontFamily:"'Afacad Flux', sans-serif", fontWeight:300 }}>{s.detail}</p>
+                <p style={{ fontSize:16, lineHeight:1.82, color:"var(--fg-2)", marginBottom:14, fontFamily:"'Inter', sans-serif", fontWeight:300 }}>{s.body}</p>
+                <p style={{ fontSize:14, lineHeight:1.78, color:"var(--fg-3)", fontFamily:"'Inter', sans-serif", fontWeight:300 }}>{s.detail}</p>
               </div>
 
               <div style={{ order:i===1?1:2 }}>
@@ -59,7 +59,7 @@ export default function WatchWorkWrap() {
                   {s.items.map((item,j) => (
                     <div key={j} style={{ display:"flex", alignItems:"center", gap:14, padding:"16px 22px", borderBottom:j<s.items.length-1?"1px solid var(--line)":undefined }}>
                       <span style={{ width:5, height:5, borderRadius:"50%", background:s.accent, flexShrink:0, opacity:0.7, display:"block" }} />
-                      <span style={{ fontSize:14, color:"var(--fg-2)", fontFamily:"'Afacad Flux', sans-serif", fontWeight:300 }}>{item}</span>
+                      <span style={{ fontSize:14, color:"var(--fg-2)", fontFamily:"'Inter', sans-serif", fontWeight:300 }}>{item}</span>
                     </div>
                   ))}
                 </div>

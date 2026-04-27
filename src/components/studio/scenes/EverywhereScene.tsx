@@ -32,7 +32,7 @@ export default function EverywhereScene({ isActive }: { isActive: boolean }) {
               transform: visible ? "translateY(0) scale(1)" : "translateY(20px) scale(0.9)",
               transition: "all 0.5s ease",
             }}>
-              <span style={{ fontSize: 11, fontWeight: 600, color: visible ? "rgba(200,150,26,0.8)" : "rgba(255,255,255,0.2)", fontFamily: "'Afacad Flux', sans-serif", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
+              <span style={{ fontSize: 11, fontWeight: 600, color: visible ? "rgba(200,150,26,0.8)" : "rgba(255,255,255,0.2)", fontFamily: "'Inter', sans-serif", textTransform: "uppercase" as const, letterSpacing: "0.06em" }}>
                 {name}
               </span>
             </div>
@@ -46,10 +46,10 @@ export default function EverywhereScene({ isActive }: { isActive: boolean }) {
         opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(12px)",
         transition: "all 0.8s ease",
       }}>
-        <p style={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1.4, margin: "0 0 12px", fontFamily: "'Afacad Flux', sans-serif" }}>
+        <p style={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1.4, margin: "0 0 12px", fontFamily: "'Inter', sans-serif" }}>
           One idea. Everywhere.
         </p>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: 0, fontFamily: "'Afacad Flux', sans-serif" }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: 0, fontFamily: "'Inter', sans-serif" }}>
           The output is yours because the input was yours.
         </p>
       </div>

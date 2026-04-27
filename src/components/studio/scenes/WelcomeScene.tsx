@@ -77,10 +77,10 @@ export default function WelcomeScene({ isActive }: { isActive: boolean }) {
         opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(12px)",
         transition: "all 0.8s ease",
       }}>
-        <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--gold)", marginBottom: 16, fontFamily: "'Afacad Flux', sans-serif" }}>
-          EVERYWHERE Studio
+        <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--gold)", marginBottom: 16, fontFamily: "'Inter', sans-serif" }}>
+          IdeasOut
         </div>
-        <p style={{ fontSize: 24, fontWeight: 600, color: "#fff", lineHeight: 1.4, margin: 0, fontFamily: "'Afacad Flux', sans-serif" }}>
+        <p style={{ fontSize: 24, fontWeight: 600, color: "#fff", lineHeight: 1.4, margin: 0, fontFamily: "'Inter', sans-serif" }}>
           You bring the idea.<br />Reed and the studio carry it to the line.
         </p>
       </div>

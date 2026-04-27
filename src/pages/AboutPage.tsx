@@ -41,7 +41,7 @@ export default function AboutPage() {
             letterSpacing: "-0.04em", lineHeight: 1.08,
             color: "var(--xp-on-dark)", marginBottom: 24,
             animation: `xpHeroHead 1s ${EASE} 0.6s both`,
-          }}>Why EVERYWHERE Studio Exists</h1>
+          }}>Why IdeasOut Exists</h1>
         </div>
       </section>
 
@@ -53,7 +53,7 @@ export default function AboutPage() {
               <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--xp-text)", marginBottom: 4 }}>Mark Sylvester</div>
               <div className="xp-mono" style={{ fontSize: 12, letterSpacing: "0.08em", color: "var(--xp-ter)", marginBottom: 22 }}>Co-founder, Coastal Intelligence</div>
               <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-sec)", margin: "0 0 28px" }}>
-                Mark Sylvester is a co-founder of Coastal Intelligence, an AI think tank and consultancy, based in Santa Barbara. EVERYWHERE Studio™ is his platform for thought leaders, because the ideas in your head belong everywhere.
+                Mark Sylvester is a co-founder of Coastal Intelligence, an AI think tank and consultancy, based in Santa Barbara. IdeasOut™ is his platform for thought leaders, because the ideas in your head belong everywhere.
               </p>
               <div style={{
                 height: 1,
@@ -73,7 +73,7 @@ export default function AboutPage() {
                 So I started building one. One week at a time. A function here, a checkpoint there. Each piece solving the specific problem in front of me. After enough weeks, I looked up and realized I hadn't just fixed my own workflow. I'd built infrastructure that any practitioner with something important to say could use.
               </p>
               <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-text)", fontWeight: 500, margin: 0 }}>
-                That's EVERYWHERE Studio. Built from the inside out, by someone who needed it first.
+                That's IdeasOut. Built from the inside out, by someone who needed it first.
               </p>
             </div>
           </Reveal>
@@ -90,7 +90,7 @@ export default function AboutPage() {
           </Reveal>
           <Reveal delay={100}>
             <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-sec)", marginBottom: 24 }}>
-              EVERYWHERE Studio was built inside Mixed Grill, LLC after watching the same pattern repeat: leaders with real thinking to share, no system capable of keeping pace with it. The tools existed. But tools don't think. Tools don't ask questions. Tools don't push back when the premise is weak or tell you the hook isn't working. What was missing was a system. Something that watches the landscape, works the idea all the way through, and wraps the output for the world, without losing what made the thinking valuable in the first place. That system is EVERYWHERE Studio.
+              IdeasOut was built inside Mixed Grill, LLC after watching the same pattern repeat: leaders with real thinking to share, no system capable of keeping pace with it. The tools existed. But tools don't think. Tools don't ask questions. Tools don't push back when the premise is weak or tell you the hook isn't working. What was missing was a system. Something that watches the landscape, works the idea all the way through, and wraps the output for the world, without losing what made the thinking valuable in the first place. That system is IdeasOut.
             </p>
           </Reveal>
         </div>
@@ -109,7 +109,7 @@ export default function AboutPage() {
           </Reveal>
           <Reveal delay={100}>
             <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-dim-dark)", marginBottom: 24 }}>
-              EVERYWHERE Studio is not an AI writing tool. Not a content scheduler. Not a prompt library dressed up as a platform. It's a new category: Structured Intelligence.
+              IdeasOut is not an AI writing tool. Not a content scheduler. Not a prompt library dressed up as a platform. It's a new category: Structured Intelligence.
             </p>
           </Reveal>
           <Reveal delay={200}>
@@ -131,7 +131,7 @@ export default function AboutPage() {
           <Reveal delay={100}>
             <div className="xp-glass-card" style={{ padding: "32px 36px", borderLeft: "3px solid var(--xp-gold)" }}>
               <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-sec)", marginBottom: 24 }}>
-                EVERYWHERE Studio never trains on your content. Never shares it. Never uses it to improve outputs for anyone else.
+                IdeasOut never trains on your content. Never shares it. Never uses it to improve outputs for anyone else.
               </p>
               <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-text)", fontWeight: 500, margin: 0 }}>
                 Your ideas, your voice profile, your content catalog. They belong to you. Full stop.
@@ -151,7 +151,7 @@ export default function AboutPage() {
           </Reveal>
           <Reveal delay={100}>
             <p style={{ fontSize: 17, lineHeight: 1.7, color: "var(--xp-sec)", marginBottom: 24 }}>
-              EVERYWHERE Studio is a product of Mixed Grill, LLC. Mixed Grill builds systems at the intersection of strategy and communication.
+              IdeasOut is a product of Mixed Grill, LLC. Mixed Grill builds systems at the intersection of strategy and communication.
             </p>
           </Reveal>
         </div>

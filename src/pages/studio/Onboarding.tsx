@@ -87,7 +87,7 @@ export default function Onboarding() {
       alignItems: "center",
       justifyContent: "center",
       padding: 40,
-      fontFamily: "var(--font, 'Afacad Flux', sans-serif)",
+      fontFamily: "var(--font, 'Inter', sans-serif)",
     }}>
       {/* Progress bar */}
       <div style={{ width: "100%", maxWidth: 520, marginBottom: 48 }}>
@@ -128,7 +128,7 @@ export default function Onboarding() {
               fontSize: 14,
               lineHeight: 1.7,
               color: "#E8E8E6",
-              fontFamily: "var(--font, 'Afacad Flux', sans-serif)",
+              fontFamily: "var(--font, 'Inter', sans-serif)",
               resize: "vertical",
               outline: "none",
               boxSizing: "border-box",
@@ -152,7 +152,7 @@ export default function Onboarding() {
               padding: "16px 20px",
               fontSize: 16,
               color: "#E8E8E6",
-              fontFamily: "var(--font, 'Afacad Flux', sans-serif)",
+              fontFamily: "var(--font, 'Inter', sans-serif)",
               outline: "none",
               boxSizing: "border-box",
             }}
@@ -174,7 +174,7 @@ export default function Onboarding() {
             borderRadius: 100,
             fontSize: 14,
             fontWeight: 700,
-            fontFamily: "var(--font, 'Afacad Flux', sans-serif)",
+            fontFamily: "var(--font, 'Inter', sans-serif)",
             cursor: value.trim() ? "pointer" : "default",
             transition: "all 0.2s",
           }}
