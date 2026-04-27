@@ -42,7 +42,7 @@ export default function TermsOfServicePage() {
 
           <h2>1. Agreement to These Terms</h2>
           <p>
-            These Terms of Service (the <strong>Terms</strong>) govern your access to and use of EVERYWHERE Studio and
+            These Terms of Service (the <strong>Terms</strong>) govern your access to and use of IdeasOut and
             related websites, applications, and services (collectively, the <strong>Service</strong>) operated by Mixed
             Grill, LLC (<strong>we</strong>, <strong>us</strong>, or <strong>our</strong>). By accessing or using the
             Service, you agree to these Terms. If you do not agree, do not use the Service.
@@ -54,7 +54,7 @@ export default function TermsOfServicePage() {
 
           <h2>2. The Service</h2>
           <p>
-            EVERYWHERE Studio is a software platform that helps users capture ideas, run structured workflows, and
+            IdeasOut is a software platform that helps users capture ideas, run structured workflows, and
             generate content outputs using composed intelligence features, including integrations with third-party
             infrastructure and model providers. We may modify, suspend, or discontinue features at any time, with or
             without notice, subject to applicable law and any separate agreement that applies to you.

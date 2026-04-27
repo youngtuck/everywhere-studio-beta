@@ -46,7 +46,7 @@ export default function CheckpointsScene({ isActive }: { isActive: boolean }) {
               }}>
                 {done && "\u2713"}
               </div>
-              <span style={{ fontSize: 14, color: done ? "#fff" : "rgba(255,255,255,0.4)", fontFamily: "'Afacad Flux', sans-serif", transition: "color 0.3s ease" }}>
+              <span style={{ fontSize: 14, color: done ? "#fff" : "rgba(255,255,255,0.4)", fontFamily: "'Inter', sans-serif", transition: "color 0.3s ease" }}>
                 {name}
               </span>
             </div>
@@ -60,10 +60,10 @@ export default function CheckpointsScene({ isActive }: { isActive: boolean }) {
         opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(12px)",
         transition: "all 0.8s ease",
       }}>
-        <p style={{ fontSize: 20, fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: "0 0 12px", fontFamily: "'Afacad Flux', sans-serif" }}>
+        <p style={{ fontSize: 20, fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: "0 0 12px", fontFamily: "'Inter', sans-serif" }}>
           Reed runs Review. The pipeline does not blink.
         </p>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: 0, fontFamily: "'Afacad Flux', sans-serif" }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: 0, fontFamily: "'Inter', sans-serif" }}>
           Voice match. Fact check. Hook strength. AI detection. Editorial standards. Nothing ships until the checks clear.
         </p>
       </div>

@@ -65,10 +65,10 @@ export default function RoomScene({ isActive }: { isActive: boolean }) {
         opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(12px)",
         transition: "all 0.8s ease",
       }}>
-        <p style={{ fontSize: 20, fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: "0 0 12px", fontFamily: "'Afacad Flux', sans-serif" }}>
+        <p style={{ fontSize: 20, fontWeight: 600, color: "#fff", lineHeight: 1.5, margin: "0 0 12px", fontFamily: "'Inter', sans-serif" }}>
           Then the Writer's Room takes over.
         </p>
-        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: 0, fontFamily: "'Afacad Flux', sans-serif" }}>
+        <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: 0, fontFamily: "'Inter', sans-serif" }}>
           They explore angles. Build the structure. Write the draft. You're in control at every step.
         </p>
       </div>

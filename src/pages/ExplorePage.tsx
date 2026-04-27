@@ -8,9 +8,9 @@ import MarketingBuiltForCta from "../components/marketing/MarketingBuiltForCta";
 import { MARKETING_CSS, EASE } from "../styles/marketing";
 
 /* ═══════════════════════════════════════════════════════════
-   EVERYWHERE STUDIO — EXPLORE PAGE v5
+   IDEASOUT — EXPLORE PAGE v5
    Liquid glass: blur + static corner luminance (no sweeping specular loop).
-   Instrument Sans + DM Mono. Earned scroll.
+   Inter + DM Mono. Earned scroll.
    ═══════════════════════════════════════════════════════════ */
 
 // ══════════════════════════════════
@@ -130,7 +130,7 @@ const PROBLEMS = [
 ];
 
 const ROOMS = [
-  { name: "Watch", desc: "Know what's moving before your competitors do. EVERYWHERE monitors your category overnight and delivers a structured briefing every morning. Signals scored. Opportunities ranked. Content angles ready to go." },
+  { name: "Watch", desc: "Know what's moving before your competitors do. IdeasOut monitors your category overnight and delivers a structured briefing every morning. Signals scored. Opportunities ranked. Content angles ready to go." },
   { name: "Work", desc: "One idea, worked all the way through. Your first listener asks the right questions. Structure emerges. The draft gets written, refined, and run through blocking quality checkpoints. Nothing ships until it's ready." },
   { name: "Wrap", desc: "From approved to published. Choose a format. Choose a channel. Your thinking reaches the people who need to hear it." },
 ];
@@ -345,13 +345,13 @@ export default function ExplorePage() {
           }}>
             {isMobile ? (
               <>
-                EVERYWHERE Studio moves your thinking
+                IdeasOut moves your thinking
                 <br />
                 from private to published, at the level your ideas deserve.
               </>
             ) : (
               <>
-                EVERYWHERE Studio moves your thinking from private to published,
+                IdeasOut moves your thinking from private to published,
                 <br />
                 at the level your ideas deserve.
               </>
@@ -445,7 +445,7 @@ export default function ExplorePage() {
               Cookie Policy
             </Link>
           </div>
-          <span style={{ fontSize: 12, color: "var(--xp-ter)" }}>&copy; {new Date().getFullYear()} Mixed Grill, LLC. All rights reserved.</span>
+          <span style={{ fontSize: 12, color: "var(--xp-ter)" }}>&copy; {new Date().getFullYear()} Mixed Grill, LLC. IdeasOut&trade;. All rights reserved.</span>
         </div>
       </footer>
     </div>
@@ -552,7 +552,7 @@ function SplitSection() {
             <div className="xp-mono" style={{
               fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase",
               color: "var(--xp-gold)", marginBottom: 24,
-            }}>With EVERYWHERE Studio</div>
+            }}>With IdeasOut</div>
             {PROBLEMS.map((p, i) => (
               <Reveal key={i} delay={300 + i * 100}>
                 <div style={{
@@ -664,7 +664,7 @@ function ReedSection({ isMobile }: { isMobile: boolean }) {
                   <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#FEBC2E" }} />
                   <div style={{ width: 11, height: 11, borderRadius: "50%", background: "#28C840" }} />
                 </div>
-                <div style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--xp-ter)", fontWeight: 500 }}>EVERYWHERE Studio</div>
+                <div style={{ flex: 1, textAlign: "center", fontSize: 12, color: "var(--xp-ter)", fontWeight: 500 }}>IdeasOut</div>
                 <div style={{ width: 48 }} />
               </div>
 

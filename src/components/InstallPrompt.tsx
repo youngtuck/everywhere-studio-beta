@@ -50,7 +50,7 @@ export default function InstallPrompt() {
         gap: 16,
         boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
         zIndex: 9999,
-        fontFamily: "'Afacad Flux', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         fontSize: 14,
         maxWidth: 420,
         animation: "slideUp 0.4s ease-out",
@@ -63,7 +63,7 @@ export default function InstallPrompt() {
         }
       `}</style>
       <div style={{ flex: 1 }}>
-        <div style={{ fontWeight: 600, marginBottom: 2 }}>Install EVERYWHERE Studio</div>
+        <div style={{ fontWeight: 600, marginBottom: 2 }}>Install IdeasOut</div>
         <div style={{ fontSize: 12, opacity: 0.6 }}>Add to your home screen for the full experience</div>
       </div>
       <button
@@ -78,7 +78,7 @@ export default function InstallPrompt() {
           fontSize: 13,
           cursor: "pointer",
           whiteSpace: "nowrap",
-          fontFamily: "'Afacad Flux', sans-serif",
+          fontFamily: "'Inter', sans-serif",
         }}
       >
         Install

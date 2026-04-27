@@ -91,7 +91,7 @@ export default function PolishLoadingAnimation({ currentIndex = 0, completedScor
           );
         })}
       </div>
-      <div style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "'Afacad Flux', sans-serif", textAlign: "center", fontStyle: "normal" }}>
+      <div style={{ fontSize: 13, color: "var(--text-secondary)", fontFamily: "'Inter', sans-serif", textAlign: "center", fontStyle: "normal" }}>
         {POLISH_PHASES[Math.min(activeIndex, POLISH_PHASES.length - 1)]?.desc || "Finishing up..."}
       </div>
     </div>

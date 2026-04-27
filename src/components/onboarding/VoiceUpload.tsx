@@ -156,7 +156,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
         <p
           style={{
             margin: 0,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 14,
             lineHeight: 1.55,
             color: "rgba(255,255,255,0.88)",
@@ -197,7 +197,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
         <p
           style={{
             marginTop: 16,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 16,
             fontWeight: 500,
             color: "#ffffff",
@@ -208,7 +208,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
         <p
           style={{
             marginTop: 8,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 14,
             color: "rgba(255,255,255,0.55)",
           }}
@@ -218,7 +218,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
         <p
           style={{
             marginTop: 16,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 11,
             color: "rgba(255,255,255,0.35)",
           }}
@@ -245,7 +245,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div
                   style={{
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 14,
                     color: "#ffffff",
                     whiteSpace: "nowrap",
@@ -257,7 +257,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
                 </div>
                 <div
                   style={{
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 12,
                     color: "rgba(255,255,255,0.5)",
                   }}
@@ -288,7 +288,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
         <p
           style={{
             marginTop: 16,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 13,
             color: "#f87171",
             lineHeight: 1.45,
@@ -310,7 +310,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
           border: "none",
           borderRadius: 999,
           padding: "14px 16px",
-          fontFamily: "'Afacad Flux', sans-serif",
+          fontFamily: "'Inter', sans-serif",
           fontSize: 14,
           fontWeight: 600,
           cursor: files.length && !processing ? "pointer" : "default",

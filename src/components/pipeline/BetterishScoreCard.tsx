@@ -43,10 +43,10 @@ export function ImpactScoreCard({ score, compact }: ImpactScoreCardProps) {
   // Guard: if no breakdown dimensions, show total-only view
   if (!score.breakdown || typeof score.breakdown !== "object" || Object.keys(score.breakdown).length === 0) {
     return (
-      <div style={{ padding: 20, borderRadius: 12, border: "1px solid var(--line)", background: "var(--surface)", fontFamily: "'Afacad Flux', sans-serif" }}>
+      <div style={{ padding: 20, borderRadius: 12, border: "1px solid var(--line)", background: "var(--surface)", fontFamily: "'Inter', sans-serif" }}>
         <div style={{ fontSize: 14, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--text-tertiary)", marginBottom: 4 }}>Betterish Score</div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
-          <span style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 28, fontWeight: 600, color }}>{Math.round(total / 10)}%</span>
+          <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 28, fontWeight: 600, color }}>{Math.round(total / 10)}%</span>
         </div>
         {score.topIssue && <div style={{ fontSize: 13, color: "var(--text-primary)", marginTop: 8 }}><strong>Top issue:</strong> {score.topIssue}</div>}
       </div>
@@ -61,7 +61,7 @@ export function ImpactScoreCard({ score, compact }: ImpactScoreCardProps) {
           alignItems: "center",
           gap: 4,
           fontFamily:
-            "'Afacad Flux', sans-serif",
+            "'Inter', sans-serif",
           fontSize: 12,
           color,
         }}
@@ -81,7 +81,7 @@ export function ImpactScoreCard({ score, compact }: ImpactScoreCardProps) {
         borderRadius: 12,
         border: "1px solid var(--line)",
         background: "var(--surface)",
-        fontFamily: "'Afacad Flux', sans-serif",
+        fontFamily: "'Inter', sans-serif",
       }}
     >
       <div
@@ -117,7 +117,7 @@ export function ImpactScoreCard({ score, compact }: ImpactScoreCardProps) {
             <span
               style={{
                 fontFamily:
-                  "'Afacad Flux', sans-serif",
+                  "'Inter', sans-serif",
                 fontSize: 28,
                 fontWeight: 600,
                 color,

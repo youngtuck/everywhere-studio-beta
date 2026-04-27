@@ -59,7 +59,7 @@ export default function HowItWorksPage() {
             fontSize: 17, lineHeight: 1.65, color: "var(--xp-dim-dark)",
             maxWidth: 520, margin: "0 auto",
             animation: `xpHeroSub 0.8s ${EASE} 0.9s both`,
-          }}>EVERYWHERE Studio runs on one sequence. Every session follows the same path.</p>
+          }}>IdeasOut runs on one sequence. Every session follows the same path.</p>
         </div>
       </section>
 
@@ -89,7 +89,7 @@ export default function HowItWorksPage() {
               <div className="xp-mono" style={{ fontSize: 10, letterSpacing: "0.14em", textTransform: "uppercase", color: "var(--xp-ter)", marginBottom: 12 }}>Watch · 02</div>
               <h3 style={{ fontSize: 20, fontWeight: 600, letterSpacing: "-0.02em", color: "var(--xp-text)", marginBottom: 12 }}>Open the briefing</h3>
               <p style={{ fontSize: 16, lineHeight: 1.65, color: "var(--xp-sec)", margin: 0 }}>
-                EVERYWHERE monitors your landscape overnight. By the time you arrive, the briefing is ready. Signals rank by impact, angles map toward Work, and you are looking at ranked triggers, not noise.
+                IdeasOut monitors your landscape overnight. By the time you arrive, the briefing is ready. Signals rank by impact, angles map toward Work, and you are looking at ranked triggers, not noise.
               </p>
             </div>
           </Reveal>

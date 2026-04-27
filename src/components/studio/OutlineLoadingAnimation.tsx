@@ -52,7 +52,7 @@ export default function OutlineLoadingAnimation() {
           />
         ))}
       </div>
-      <div style={{ fontSize: 14, color: "var(--text-secondary)", fontFamily: "'Afacad Flux', sans-serif", textAlign: "center", minHeight: 20 }}>
+      <div style={{ fontSize: 14, color: "var(--text-secondary)", fontFamily: "'Inter', sans-serif", textAlign: "center", minHeight: 20 }}>
         <span key={msgIndex} style={{ animation: "outlineFadeText 3s ease-in-out", display: "inline-block" }}>
           {MESSAGES[msgIndex]}
         </span>

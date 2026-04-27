@@ -12,7 +12,7 @@ const PROMPT_CHIPS = [
   "What competitor tone do you refuse to imitate, even subtly?",
 ];
 
-const font = "'Afacad Flux', sans-serif";
+const font = "'Inter', sans-serif";
 
 function summarizeCaptured(brand: Record<string, unknown>): { label: string; value: string }[] {
   const rows: { label: string; value: string }[] = [];

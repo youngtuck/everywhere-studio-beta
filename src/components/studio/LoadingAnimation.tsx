@@ -166,7 +166,7 @@ export default function LoadingAnimation({ variant = 'reed', progress, message, 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         {progress !== undefined && (
           <span style={{
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 14,
             fontWeight: 600,
             color: 'var(--cornflower)',
@@ -177,7 +177,7 @@ export default function LoadingAnimation({ variant = 'reed', progress, message, 
         )}
         {message && (
           <span style={{
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 13,
             color: 'var(--fg-3)',
           }}>
@@ -186,7 +186,7 @@ export default function LoadingAnimation({ variant = 'reed', progress, message, 
         )}
         {detailLabel && (
           <span style={{
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             fontSize: 12,
             color: 'var(--cornflower)',
             fontWeight: 600,

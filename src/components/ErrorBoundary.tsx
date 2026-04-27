@@ -35,7 +35,7 @@ export default class ErrorBoundary extends Component<Props, State> {
             padding: 24,
             background: "var(--bg-primary, #0a0a0a)",
             color: "var(--text-primary, #fff)",
-            fontFamily: "'Afacad Flux', system-ui, sans-serif",
+            fontFamily: "'Inter', system-ui, sans-serif",
             textAlign: "center",
           }}
         >
@@ -49,7 +49,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               marginBottom: 24,
             }}
           >
-            EVERYWHERE STUDIO
+            IdeasOut
           </div>
           <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>
             Something went wrong
@@ -77,7 +77,7 @@ export default class ErrorBoundary extends Component<Props, State> {
               border: "none",
               borderRadius: 8,
               cursor: "pointer",
-              fontFamily: "'Afacad Flux', system-ui, sans-serif",
+              fontFamily: "'Inter', system-ui, sans-serif",
               transition: "opacity 0.15s ease",
             }}
             onMouseEnter={(e) => {

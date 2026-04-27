@@ -430,7 +430,7 @@ export default function SpecialistPanel({
                   borderLeft: isSelected ? `3px solid ${info.color}` : "1px solid var(--glass-border)",
                   borderRadius: 12,
                   cursor: "pointer",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   textAlign: "left",
                   transition: "all 0.15s ease",
                   boxShadow: "none",

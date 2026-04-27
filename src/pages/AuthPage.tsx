@@ -394,7 +394,7 @@ const AuthPage = () => {
               fontFamily: "'Inter', system-ui, sans-serif",
             }}
           >
-            Ideas to Impact
+            Out of your head and into the world
           </span>
         </div>
 

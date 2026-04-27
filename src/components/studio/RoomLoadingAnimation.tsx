@@ -106,7 +106,7 @@ export default function RoomLoadingAnimation({ isLoading }: { isLoading: boolean
       <div style={{
         fontSize: 14,
         color: "var(--text-secondary)",
-        fontFamily: "'Afacad Flux', sans-serif",
+        fontFamily: "'Inter', sans-serif",
         textAlign: "center",
         minHeight: 20,
       }}>

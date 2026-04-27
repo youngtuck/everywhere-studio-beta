@@ -53,7 +53,7 @@ export default function AnimatedWalkthrough({ onComplete }: { onComplete: () => 
         background: "rgba(0, 0, 0, 0.92)",
         display: "flex", flexDirection: "column",
         alignItems: "center", justifyContent: "center",
-        fontFamily: "'Afacad Flux', sans-serif",
+        fontFamily: "'Inter', sans-serif",
       }}
       onClick={advance}
     >
@@ -82,7 +82,7 @@ export default function AnimatedWalkthrough({ onComplete }: { onComplete: () => 
           style={{
             background: "none", border: "none", cursor: "pointer",
             fontSize: 13, color: "rgba(255,255,255,0.35)",
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             transition: "color 0.15s ease",
           }}
           onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,0.6)"; }}
@@ -114,7 +114,7 @@ export default function AnimatedWalkthrough({ onComplete }: { onComplete: () => 
             fontSize: 14,
             fontWeight: isLast ? 600 : 500,
             cursor: "pointer",
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             transition: "all 0.15s ease",
           }}
           onMouseEnter={e => { e.currentTarget.style.background = isLast ? "var(--gold)" : "rgba(255,255,255,0.15)"; }}

@@ -19,14 +19,14 @@ export default function Nav() {
       <div style={{ display:"flex", alignItems:"center", gap:20 }}>
         {LINKS.map(s=>(
           <a key={s} href={`#${s.toLowerCase()}`}
-            style={{ fontSize:13, fontWeight:400, color:linkC, textDecoration:"none", fontFamily:"'Afacad Flux', sans-serif", transition:"color 0.15s", letterSpacing:"-0.01em" }}
+            style={{ fontSize:13, fontWeight:400, color:linkC, textDecoration:"none", fontFamily:"'Inter', sans-serif", transition:"color 0.15s", letterSpacing:"-0.01em" }}
             onMouseEnter={e=>(e.currentTarget.style.color=linkH)}
             onMouseLeave={e=>(e.currentTarget.style.color=linkC)}>
             {s}
           </a>
         ))}
         <a href="/auth" onClick={(e)=>{e.preventDefault();navigate("/auth");}}
-          style={{ padding:"8px 20px", borderRadius:8, background:"#F5C642", color:"#0D1B2A", fontSize:13, fontWeight:700, textDecoration:"none", textTransform:"uppercase", letterSpacing:"0.06em", fontFamily:"'Afacad Flux', sans-serif", transition:"opacity 0.15s" }}
+          style={{ padding:"8px 20px", borderRadius:8, background:"#F5C642", color:"#0D1B2A", fontSize:13, fontWeight:700, textDecoration:"none", textTransform:"uppercase", letterSpacing:"0.06em", fontFamily:"'Inter', sans-serif", transition:"opacity 0.15s" }}
           onMouseEnter={e=>(e.currentTarget.style.opacity="0.88")}
           onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
           Open Studio

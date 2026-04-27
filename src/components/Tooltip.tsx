@@ -35,7 +35,7 @@ export default function Tooltip({ text, children, position = "top" }: TooltipPro
             padding: "8px 14px",
             borderRadius: 6,
             fontSize: 13,
-            fontFamily: "'Afacad Flux', sans-serif",
+            fontFamily: "'Inter', sans-serif",
             whiteSpace: "nowrap",
             maxWidth: 280,
             lineHeight: 1.4,

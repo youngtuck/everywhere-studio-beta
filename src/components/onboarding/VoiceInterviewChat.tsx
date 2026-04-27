@@ -204,7 +204,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
           marginBottom: 18,
         }}
       >
-        <div style={{ fontFamily: "'Afacad Flux', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
+        <div style={{ fontFamily: "'Inter', sans-serif", fontSize: 13, color: "rgba(255,255,255,0.7)", letterSpacing: "0.08em", textTransform: "uppercase" }}>
           Building your voice profile
         </div>
       </div>
@@ -243,7 +243,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
                 <div
                   style={{
                     maxWidth: 480,
-                    fontFamily: "'Afacad Flux', sans-serif",
+                    fontFamily: "'Inter', sans-serif",
                     fontSize: 15,
                     color: "rgba(255,255,255,0.85)",
                     lineHeight: 1.6,
@@ -270,7 +270,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
                   background: "rgba(255,255,255,0.08)",
                   borderRadius: "16px 16px 4px 16px",
                   padding: "12px 18px",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 15,
                   color: "#ffffff",
                   lineHeight: 1.6,
@@ -315,7 +315,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
             />
             <p
               style={{
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 13,
                 color: "rgba(255,255,255,0.7)",
                 margin: 0,
@@ -348,7 +348,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
                   borderRadius: 12,
                   padding: voiceSupported ? "14px 88px 14px 18px" : "14px 48px 14px 18px",
                   color: "#ffffff",
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 15,
                   resize: "none",
                   outline: "none",
@@ -419,7 +419,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
                 borderRadius: 8,
                 background: "rgba(200,150,26,0.1)",
                 border: "1px solid rgba(200,150,26,0.25)",
-                fontFamily: "'Afacad Flux', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 fontSize: 13,
                 color: "rgba(255,255,255,0.7)",
                 lineHeight: 1.4,
@@ -440,7 +440,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
                 onClick={handleAnalyzeNow}
                 disabled={messages.filter(m => m.role === "user").length < 2 || loading}
                 style={{
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 12,
                   textTransform: "uppercase",
                   letterSpacing: "0.16em",
@@ -463,7 +463,7 @@ export function VoiceInterviewChat({ onComplete, onCancel }: VoiceInterviewChatP
               <div
                 style={{
                   marginTop: 4,
-                  fontFamily: "'Afacad Flux', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   fontSize: 11,
                   color: "rgba(255,255,255,0.35)",
                   textAlign: "right",

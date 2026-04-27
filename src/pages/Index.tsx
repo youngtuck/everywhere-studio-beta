@@ -219,12 +219,12 @@ export default function Index() {
   return (
     <div style={{
       width: "100vw", height: "100vh", overflow: "hidden",
-      position: "relative", fontFamily: "'Afacad Flux', sans-serif",
+      position: "relative", fontFamily: "'Inter', sans-serif",
       /* Fallback if canvas fails to paint - prevents white screen */
       background: "linear-gradient(180deg, #1c2c9e 0%, #111f88 50%, #0d1a70 100%)",
     }}>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@100..900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         ::selection { background: rgba(255,220,80,.28); color: #fff; }
         @keyframes shimmer {
@@ -242,7 +242,7 @@ export default function Index() {
         .cta-pill {
           display: inline-flex; align-items: center; gap: 10px;
           background: rgba(255,255,255,.92); border: none; color: #1e2da0;
-          font-family: 'Afacad Flux', sans-serif;
+          font-family: 'Inter', sans-serif;
           font-size: 16px; font-weight: 600; letter-spacing: .01em;
           padding: 15px 44px; border-radius: 100px;
           box-shadow: 0 6px 30px rgba(10,20,130,.35), 0 2px 8px rgba(255,255,255,.15);
@@ -327,12 +327,12 @@ export default function Index() {
 
         {/* Minimal footer */}
         <footer style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", paddingBottom: 26, gap: 8, ...fi(.95), pointerEvents: zoomingToExplore ? "none" : "auto" }}>
-          <div style={{ display: "flex", alignItems: "baseline", gap: 6, fontFamily: "'Afacad Flux', sans-serif", fontSize: 11, color: "rgba(255,255,255,.30)" }}>
-            <span style={{ letterSpacing: "-1px", display: "inline-flex", alignItems: "baseline" }}>
-              <span style={{ color: "rgba(74,144,217,0.5)", fontWeight: 700 }}>EVERYWHERE</span>
-              <span style={{ fontWeight: 300 }}>STUDIO</span>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 6, fontFamily: "'Inter', sans-serif", fontSize: 11, color: "rgba(255,255,255,.30)" }}>
+            <span style={{ letterSpacing: "-0.08em", display: "inline-flex", alignItems: "baseline" }}>
+              <span style={{ fontWeight: 400 }}>Ideas</span>
+              <span style={{ fontWeight: 600 }}>Out</span>
             </span>
-            <span>· Ideas to Impact</span>
+            <span>· Out of your head and into the world</span>
           </div>
         </footer>
       </div>

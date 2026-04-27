@@ -57,7 +57,7 @@ function getHeadingsFromMarkdown(content: string): { id: string; text: string }[
 }
 
 // ─── Styles ─────────────────────────────────────────────────────────────────
-const font = "'Afacad Flux', sans-serif";
+const font = "'Inter', sans-serif";
 
 const toolbarBtn = (active = false): React.CSSProperties => ({
   display: "inline-flex",
@@ -326,11 +326,11 @@ export default function OutputDetail() {
       );
     });
     const navHtml = headings.length > 0
-      ? `<nav style="position:sticky;top:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.06);padding:12px 0;margin-bottom:24px;z-index:10;"><div style="max-width:720px;margin:0 auto;padding:0 24px;"><div style="display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-family:'Afacad Flux', sans-serif;">${headings.map(h => `<a href="#${h.id}" style="color:rgba(0,0,0,0.6);text-decoration:none;">${escapeHtml(h.text)}</a>`).join("")}</div></div></nav>`
+      ? `<nav style="position:sticky;top:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(8px);border-bottom:1px solid rgba(0,0,0,0.06);padding:12px 0;margin-bottom:24px;z-index:10;"><div style="max-width:720px;margin:0 auto;padding:0 24px;"><div style="display:flex;flex-wrap:wrap;gap:8px;font-size:13px;font-family:'Inter', sans-serif;">${headings.map(h => `<a href="#${h.id}" style="color:rgba(0,0,0,0.6);text-decoration:none;">${escapeHtml(h.text)}</a>`).join("")}</div></div></nav>`
       : "";
     const authorName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "";
     const dateStr = new Date(output.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-    const htmlString = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${titleEscaped}</title><link href="https://fonts.googleapis.com/css2?family=Afacad+Flux:wght@300;400;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box}body{font-family:'Afacad Flux',-apple-system,sans-serif;background:var(--fg);color:#F0F0EE;line-height:1.7;margin:0;padding:0}.header{padding:32px 24px 0;max-width:720px;margin:0 auto}.wordmark{font-size:12px;letter-spacing:-1px;text-transform:uppercase;margin-bottom:40px;display:inline-flex;align-items:baseline}.wordmark .ew{color:var(--cornflower);font-weight:700}.wordmark .st{color:var(--gold);font-weight:300}.wordmark .tm{color:var(--gold);font-size:6px;vertical-align:top;margin-left:2px}h1{font-size:32px;font-weight:700;margin:0 0 12px;letter-spacing:-0.02em;color:#fff}.meta{font-size:14px;color:rgba(240,240,238,0.4);margin-bottom:32px}.content-wrap{max-width:720px;margin:0 auto;padding:0 24px 48px}.content{font-size:16px;line-height:1.7;color:rgba(240,240,238,0.85)}.content h2{font-size:22px;font-weight:600;margin:36px 0 16px;color:#fff}.content h3{font-size:18px;font-weight:600;margin:28px 0 12px;color:#fff}.content p{margin:0 0 18px}.footer{max-width:720px;margin:0 auto;padding:32px 24px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;color:rgba(240,240,238,0.3)}@media(max-width:640px){h1{font-size:24px}.content{font-size:15px}}</style></head><body><div class="header"><div class="wordmark"><span class="ew">EVERYWHERE</span><span class="st">STUDIO<span class="tm">™</span></span></div><h1>${titleEscaped}</h1><div class="meta">${authorName ? escapeHtml(String(authorName)) + " &middot; " : ""}${dateStr}</div></div>${navHtml}<div class="content-wrap"><div class="content">${contentHtml}</div></div><div class="footer">Made with EVERYWHERE Studio</div></body></html>`;
+    const htmlString = `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>${titleEscaped}</title><link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box}body{font-family:'Inter',-apple-system,sans-serif;background:var(--fg);color:#F0F0EE;line-height:1.7;margin:0;padding:0}.header{padding:32px 24px 0;max-width:720px;margin:0 auto}.wordmark{font-size:12px;letter-spacing:-1px;text-transform:uppercase;margin-bottom:40px;display:inline-flex;align-items:baseline}.wordmark .ew{color:var(--cornflower);font-weight:700}.wordmark .st{color:var(--gold);font-weight:300}.wordmark .tm{color:var(--gold);font-size:6px;vertical-align:top;margin-left:2px}h1{font-size:32px;font-weight:700;margin:0 0 12px;letter-spacing:-0.02em;color:#fff}.meta{font-size:14px;color:rgba(240,240,238,0.4);margin-bottom:32px}.content-wrap{max-width:720px;margin:0 auto;padding:0 24px 48px}.content{font-size:16px;line-height:1.7;color:rgba(240,240,238,0.85)}.content h2{font-size:22px;font-weight:600;margin:36px 0 16px;color:#fff}.content h3{font-size:18px;font-weight:600;margin:28px 0 12px;color:#fff}.content p{margin:0 0 18px}.footer{max-width:720px;margin:0 auto;padding:32px 24px;border-top:1px solid rgba(255,255,255,0.08);font-size:12px;color:rgba(240,240,238,0.3)}@media(max-width:640px){h1{font-size:24px}.content{font-size:15px}}</style></head><body><div class="header"><div class="wordmark"><span class="ew">Ideas</span><span class="st">Out<span class="tm">TM</span></span></div><h1>${titleEscaped}</h1><div class="meta">${authorName ? escapeHtml(String(authorName)) + " &middot; " : ""}${dateStr}</div></div>${navHtml}<div class="content-wrap"><div class="content">${contentHtml}</div></div><div class="footer">Made with IdeasOut</div></body></html>`;
     setPreviewHtml(htmlString);
   }, [output, user]);
 
@@ -350,9 +350,9 @@ export default function OutputDetail() {
     if (!output) return;
     const contentHtml = safeMarkdownToHtml(output.content);
     const titleEscaped = escapeHtml(output.title);
-    const authorName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "EVERYWHERE Studio";
+    const authorName = user?.user_metadata?.full_name || user?.email?.split("@")[0] || "IdeasOut";
     const dateStr = new Date(output.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
-    const htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:Calibri,sans-serif;font-size:11pt;line-height:1.6;max-width:6.5in;margin:1in}h1{font-size:18pt;margin-bottom:6pt}h2{font-size:14pt;margin-top:18pt;margin-bottom:8pt}h3{font-size:12pt;margin-top:14pt;margin-bottom:6pt}p{margin-bottom:8pt}.meta{font-size:10pt;color:#666;margin-bottom:18pt}.footer{margin-top:36pt;padding-top:12pt;border-top:1px solid #ddd;font-size:9pt;color:#999}</style></head><body><h1>${titleEscaped}</h1><div class="meta">${escapeHtml(String(authorName))} &middot; ${dateStr}</div>${contentHtml}<div class="footer">Created with EVERYWHERE Studio</div></body></html>`;
+    const htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset="utf-8"><style>body{font-family:Calibri,sans-serif;font-size:11pt;line-height:1.6;max-width:6.5in;margin:1in}h1{font-size:18pt;margin-bottom:6pt}h2{font-size:14pt;margin-top:18pt;margin-bottom:8pt}h3{font-size:12pt;margin-top:14pt;margin-bottom:6pt}p{margin-bottom:8pt}.meta{font-size:10pt;color:#666;margin-bottom:18pt}.footer{margin-top:36pt;padding-top:12pt;border-top:1px solid #ddd;font-size:9pt;color:#999}</style></head><body><h1>${titleEscaped}</h1><div class="meta">${escapeHtml(String(authorName))} &middot; ${dateStr}</div>${contentHtml}<div class="footer">Created with IdeasOut</div></body></html>`;
     const blob = new Blob([htmlContent], { type: "application/msword" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -396,13 +396,13 @@ export default function OutputDetail() {
   );
 
   if (notFound) return (
-    <div style={{ padding: 48, textAlign: "center", fontFamily: "'Afacad Flux', sans-serif" }}>
+    <div style={{ padding: 48, textAlign: "center", fontFamily: "'Inter', sans-serif" }}>
       <div style={{ fontSize: 18, color: "var(--fg-2)", marginBottom: 16 }}>
         This output may not have been saved yet.
       </div>
       <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-        <button className="btn-ghost" onClick={() => navigate("/studio/outputs")} style={{ padding: "10px 20px", borderRadius: 8, border: "1px solid var(--glass-border)", background: "transparent", fontSize: 14, cursor: "pointer", color: "var(--fg-2)", fontFamily: "'Afacad Flux', sans-serif" }}>Back to The Vault</button>
-        <button className="btn-ghost" onClick={() => navigate("/studio/work")} style={{ padding: "10px 20px", borderRadius: 8, border: "1px solid var(--glass-border)", background: "transparent", fontSize: 14, cursor: "pointer", color: "var(--fg-2)", fontFamily: "'Afacad Flux', sans-serif" }}>Back to Work</button>
+        <button className="btn-ghost" onClick={() => navigate("/studio/outputs")} style={{ padding: "10px 20px", borderRadius: 8, border: "1px solid var(--glass-border)", background: "transparent", fontSize: 14, cursor: "pointer", color: "var(--fg-2)", fontFamily: "'Inter', sans-serif" }}>Back to The Vault</button>
+        <button className="btn-ghost" onClick={() => navigate("/studio/work")} style={{ padding: "10px 20px", borderRadius: 8, border: "1px solid var(--glass-border)", background: "transparent", fontSize: 14, cursor: "pointer", color: "var(--fg-2)", fontFamily: "'Inter', sans-serif" }}>Back to Work</button>
       </div>
     </div>
   );
