@@ -1,16 +1,18 @@
 /**
  * SundayEditionDetail.tsx
- * Read-mode view of a Sunday Edition with all 12 deliverable cards.
- * Brand DNA v2.0 styling scoped to this page via CSS variables on wrapper.
- * Phase 1: read-only. Phase 2 adds click-to-edit.
+ * Sunday Edition detail page with click-to-edit, auto-save, and sticky nav.
+ * Brand DNA v2.0 styling scoped via CSS variables on wrapper div.
+ * Phase 2: all 12 deliverable cards are editable with debounced auto-save.
  */
-import { useState, useEffect, useLayoutEffect } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabase";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useShell } from "../../components/studio/StudioShell";
 import "./shared.css";
+
+// ---- Types ----
 
 interface EditionData {
   id: string;
@@ -23,62 +25,136 @@ interface EditionData {
   updated_at: string;
 }
 
+type SaveState = "idle" | "saving" | "saved" | "failed";
+
+// ---- Helpers ----
+
 function formatDate(iso: string): string {
-  const d = new Date(iso);
-  return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
+  return new Date(iso).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const colors: Record<string, { bg: string; text: string }> = {
-    draft: { bg: "rgba(107,107,107,0.12)", text: "#6B6B6B" },
-    ready: { bg: "rgba(237,204,115,0.18)", text: "#B8960A" },
-    published: { bg: "rgba(45,140,78,0.12)", text: "#2D8C4E" },
-  };
-  const c = colors[status] || colors.draft;
-  return (
-    <span style={{
-      fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" as const,
-      padding: "3px 10px", borderRadius: 3, background: c.bg, color: c.text,
-    }}>{status}</span>
-  );
-}
-
-/** Reads a nested string from the content jsonb. */
-function c(content: Record<string, unknown>, ...path: string[]): string {
+/** Deep-get a string from nested content object. */
+function g(content: Record<string, unknown>, ...path: string[]): string {
   let obj: unknown = content;
   for (const key of path) {
     if (obj && typeof obj === "object" && key in (obj as Record<string, unknown>)) {
       obj = (obj as Record<string, unknown>)[key];
-    } else {
-      return "";
-    }
+    } else return "";
   }
   return typeof obj === "string" ? obj : "";
 }
 
-/** Reads a nested array of strings from the content jsonb. */
-function cArr(content: Record<string, unknown>, ...path: string[]): string[] {
+/** Deep-get a string array from nested content object. */
+function gArr(content: Record<string, unknown>, ...path: string[]): string[] {
   let obj: unknown = content;
   for (const key of path) {
     if (obj && typeof obj === "object" && key in (obj as Record<string, unknown>)) {
       obj = (obj as Record<string, unknown>)[key];
-    } else {
-      return [];
-    }
+    } else return [];
   }
   return Array.isArray(obj) ? obj.filter((v): v is string => typeof v === "string") : [];
 }
 
-function Placeholder({ text }: { text: string }) {
-  return <span style={{ fontStyle: "italic", color: "var(--ed-slate)", opacity: 0.4 }}>{text}</span>;
+/** Deep-set a value in a content object (immutable, returns new object). */
+function setNested(obj: Record<string, unknown>, path: string[], value: unknown): Record<string, unknown> {
+  if (path.length === 0) return obj;
+  if (path.length === 1) return { ...obj, [path[0]]: value };
+  const key = path[0];
+  const child = (obj[key] && typeof obj[key] === "object" ? obj[key] : {}) as Record<string, unknown>;
+  return { ...obj, [key]: setNested(child, path.slice(1), value) };
 }
 
-function Card({ number, title, children }: { number: string; title: string; children: React.ReactNode }) {
+function nextCheckpointState(current: boolean | undefined): boolean | undefined {
+  if (current === undefined) return true;
+  if (current === true) return false;
+  return undefined;
+}
+
+const DEBOUNCE_MS = 500;
+
+const CHECKPOINT_LABELS = [
+  "Voice DNA Hard Rules", "Verified Claims", "Voice Match", "7-Second Hook",
+  "Zero AI Padding", "Publication Grade", "SEO Meta Description", "Cultural Sensitivity",
+];
+
+const NAV_ITEMS = [
+  { id: "article", label: "Article" }, { id: "callout", label: "Callout" },
+  { id: "notes", label: "Notes" }, { id: "podcast", label: "Podcast" },
+  { id: "hero", label: "Hero" }, { id: "broll", label: "B-Roll" },
+  { id: "music", label: "Music" }, { id: "shownotes", label: "Show Notes" },
+  { id: "descript", label: "Descript" }, { id: "linkedin", label: "LinkedIn" },
+  { id: "seo", label: "SEO" }, { id: "checks", label: "Checks" },
+];
+
+// ---- Shared field styles ----
+
+const inputBase: React.CSSProperties = {
+  width: "100%", border: "1.5px solid var(--ed-honey)", borderRadius: 4,
+  outline: "none", background: "rgba(237,204,115,0.04)", color: "var(--ed-slate)",
+  fontFamily: "'Inter', sans-serif", padding: "8px 10px", fontSize: 14, lineHeight: "1.7",
+};
+const hoverEditable: React.CSSProperties = { cursor: "text", borderRadius: 3, transition: "background 0.12s" };
+
+// ---- Reusable sub-components ----
+
+function EditableText({ value, placeholder, fieldPath, multiline, large, onUpdate }: {
+  value: string; placeholder: string; fieldPath: string; multiline?: boolean; large?: boolean;
+  onUpdate: (path: string, val: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const ref = useRef<HTMLTextAreaElement | HTMLInputElement>(null);
+
+  useEffect(() => { if (!editing) setDraft(value); }, [value, editing]);
+  useEffect(() => { if (editing) ref.current?.focus(); }, [editing]);
+
+  const save = () => { onUpdate(fieldPath, draft); setEditing(false); };
+  const cancel = () => { setDraft(value); setEditing(false); };
+
+  if (editing) {
+    if (multiline) {
+      return (
+        <textarea
+          ref={ref as React.RefObject<HTMLTextAreaElement>}
+          value={draft}
+          onChange={e => setDraft(e.target.value)}
+          onBlur={save}
+          onKeyDown={e => { if (e.key === "Escape") { e.preventDefault(); cancel(); } }}
+          rows={large ? 12 : 4}
+          style={{ ...inputBase, resize: "vertical" as const, minHeight: large ? 200 : 80 }}
+        />
+      );
+    }
+    return (
+      <input
+        ref={ref as React.RefObject<HTMLInputElement>}
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={save}
+        onKeyDown={e => { if (e.key === "Enter") save(); if (e.key === "Escape") cancel(); }}
+        style={inputBase}
+      />
+    );
+  }
+
   return (
-    <div style={{
+    <div
+      onClick={() => { setDraft(value); setEditing(true); }}
+      style={{ ...hoverEditable, padding: "4px 6px", margin: "-4px -6px" }}
+      onMouseEnter={e => { (e.currentTarget as HTMLElement).style.background = "rgba(237,204,115,0.06)"; }}
+      onMouseLeave={e => { (e.currentTarget as HTMLElement).style.background = ""; }}
+    >
+      {value ? <span style={{ whiteSpace: multiline ? "pre-wrap" : undefined }}>{value}</span> : <span style={{ fontStyle: "italic", color: "var(--ed-slate)", opacity: 0.4 }}>{placeholder}</span>}
+    </div>
+  );
+}
+
+function Card({ id: cardId, number, title, children }: { id: string; number: string; title: string; children: React.ReactNode }) {
+  return (
+    <div id={cardId} style={{
       background: "var(--ed-card)", borderRadius: 4, marginBottom: 24,
       overflow: "hidden", boxShadow: "0 1px 3px rgba(43,52,65,0.08)",
-      borderTop: "3px solid var(--ed-honey)",
+      borderTop: "3px solid var(--ed-honey)", scrollMarginTop: 120,
     }}>
       <div style={{
         background: "var(--ed-slate)", color: "#F4EDDD", padding: "12px 24px",
@@ -94,60 +170,79 @@ function Card({ number, title, children }: { number: string; title: string; chil
   );
 }
 
-function NoteCard({ label, text }: { label: string; text: string }) {
-  return (
-    <div style={{
-      background: "var(--ed-card)", border: "1px solid rgba(43,52,65,0.08)",
-      borderRadius: 4, padding: "12px 14px", minHeight: 80,
-    }}>
-      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 6 }}>{label}</div>
-      <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--ed-slate)" }}>
-        {text || <Placeholder text="Add note..." />}
-      </div>
-    </div>
-  );
-}
-
-function ImagePromptCard({ label, prompt, url }: { label: string; prompt: string; url?: string }) {
-  return (
-    <div style={{
-      background: "var(--ed-card)", border: "1px solid rgba(43,52,65,0.08)",
-      borderRadius: 4, padding: "12px 14px", minHeight: 80,
-    }}>
-      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 6 }}>{label}</div>
-      {url && <img src={url} alt={label} style={{ width: "100%", borderRadius: 3, marginBottom: 8, maxHeight: 160, objectFit: "cover" }} />}
-      <div style={{ fontSize: 14, lineHeight: 1.5, color: "var(--ed-slate)" }}>
-        {prompt || <Placeholder text="Add image prompt..." />}
-      </div>
-    </div>
-  );
-}
-
-function CheckpointBadge({ label, status }: { label: string; status: string }) {
+function CheckpointBadge({ label, status, onClick }: { label: string; status: string; onClick: () => void }) {
   const bg = status === "pass" ? "rgba(45,140,78,0.1)" : status === "fail" ? "rgba(192,57,43,0.1)" : "rgba(107,107,107,0.06)";
   const color = status === "pass" ? "#2D8C4E" : status === "fail" ? "#C0392B" : "#6B6B6B";
   const text = status === "pass" ? "PASS" : status === "fail" ? "FAIL" : "PENDING";
   return (
-    <div style={{
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      padding: "8px 14px", borderRadius: 4, background: bg, marginBottom: 6,
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        display: "flex", alignItems: "center", justifyContent: "space-between",
+        padding: "8px 14px", borderRadius: 4, background: bg, marginBottom: 6, cursor: "pointer",
+        transition: "background 0.1s",
+      }}
+    >
       <span style={{ fontSize: 14, color: "var(--ed-slate)" }}>{label}</span>
       <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", color }}>{text}</span>
     </div>
   );
 }
 
-const CHECKPOINT_LABELS = [
-  "Voice DNA Hard Rules",
-  "Verified Claims",
-  "Voice Match",
-  "7-Second Hook",
-  "Zero AI Padding",
-  "Publication Grade",
-  "SEO Meta Description",
-  "Cultural Sensitivity",
-];
+function HashtagEditor({ tags, onUpdate }: { tags: string[]; onUpdate: (tags: string[]) => void }) {
+  const [input, setInput] = useState("");
+  const addTag = (raw: string) => {
+    const tag = raw.trim();
+    if (!tag) return;
+    const normalized = tag.startsWith("#") ? tag : `#${tag}`;
+    if (tags.includes(normalized) || tags.length >= 14) return;
+    onUpdate([...tags, normalized]);
+    setInput("");
+  };
+  return (
+    <div>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 8 }}>
+        {tags.map((tag, i) => (
+          <span key={i} style={{
+            display: "inline-flex", alignItems: "center", gap: 5, fontSize: 14, padding: "3px 10px",
+            borderRadius: 4, background: "rgba(43,52,65,0.06)", color: "var(--ed-slate)",
+          }}>
+            {tag}
+            <button type="button" onClick={() => onUpdate(tags.filter((_, j) => j !== i))} style={{
+              background: "none", border: "none", cursor: "pointer", color: "var(--ed-slate)", opacity: 0.4,
+              fontSize: 14, padding: 0, lineHeight: 1,
+            }}>&times;</button>
+          </span>
+        ))}
+      </div>
+      {tags.length < 14 && (
+        <input
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => { if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(input); } }}
+          onBlur={() => { if (input.trim()) addTag(input); }}
+          placeholder="Add hashtag..."
+          style={{ ...inputBase, width: 180 }}
+        />
+      )}
+    </div>
+  );
+}
+
+function SaveIndicator({ state }: { state: SaveState }) {
+  if (state === "idle") return null;
+  const dot = state === "saving" ? "#EDCC73" : state === "saved" ? "#2D8C4E" : "#C0392B";
+  const label = state === "saving" ? "Saving..." : state === "saved" ? "Saved" : "Save failed";
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 14, color: "var(--ed-slate)", opacity: 0.7 }}>
+      <span style={{ width: 6, height: 6, borderRadius: "50%", background: dot, flexShrink: 0, animation: state === "saving" ? "pulse 1s infinite" : undefined }} />
+      {label}
+      <style>{`@keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.3 } }`}</style>
+    </span>
+  );
+}
+
+// ---- Main component ----
 
 export default function SundayEditionDetail() {
   const { id } = useParams<{ id: string }>();
@@ -158,6 +253,14 @@ export default function SundayEditionDetail() {
 
   const [edition, setEdition] = useState<EditionData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
+  const [activeNav, setActiveNav] = useState("article");
+
+  const debounceRef = useRef<number>(0);
+  const contentRef = useRef<Record<string, unknown>>({});
+  const nameRef = useRef("");
+  const statusRef = useRef("draft");
+  const savedTimerRef = useRef<number>(0);
 
   useLayoutEffect(() => {
     setDashOpen(false);
@@ -165,24 +268,121 @@ export default function SundayEditionDetail() {
     return () => setDashContent(null);
   }, [setDashContent, setDashOpen]);
 
+  // Load edition
   useEffect(() => {
     if (!id || !user?.id) return;
     (async () => {
       setLoading(true);
       const { data, error } = await supabase
-        .from("sunday_editions")
-        .select("*")
-        .eq("id", id)
-        .single();
-      if (error || !data) {
-        toast("Edition not found.", "error");
-        nav("/studio/editions");
-        return;
-      }
-      setEdition(data as EditionData);
+        .from("sunday_editions").select("*").eq("id", id).single();
+      if (error || !data) { toast("Edition not found.", "error"); nav("/studio/editions"); return; }
+      const ed = data as EditionData;
+      setEdition(ed);
+      contentRef.current = ed.content || {};
+      nameRef.current = ed.name;
+      statusRef.current = ed.status;
       setLoading(false);
     })();
   }, [id, user?.id, nav, toast]);
+
+  // Cleanup debounce on unmount
+  useEffect(() => () => { window.clearTimeout(debounceRef.current); window.clearTimeout(savedTimerRef.current); }, []);
+
+  // Scroll-spy
+  useEffect(() => {
+    const sections = NAV_ITEMS.map(n => document.getElementById(n.id)).filter(Boolean) as HTMLElement[];
+    if (!sections.length) return;
+    const obs = new IntersectionObserver(entries => {
+      for (const e of entries) {
+        if (e.isIntersecting) { setActiveNav(e.target.id); break; }
+      }
+    }, { rootMargin: "-120px 0px -60% 0px", threshold: 0 });
+    sections.forEach(s => obs.observe(s));
+    return () => obs.disconnect();
+  }, [loading]);
+
+  // Debounced save
+  const persistEdition = useCallback(async () => {
+    if (!edition) return;
+    setSaveState("saving");
+    const { error } = await supabase
+      .from("sunday_editions")
+      .update({ content: contentRef.current, name: nameRef.current, status: statusRef.current, updated_at: new Date().toISOString() })
+      .eq("id", edition.id);
+    if (error) { setSaveState("failed"); return; }
+    setSaveState("saved");
+    window.clearTimeout(savedTimerRef.current);
+    savedTimerRef.current = window.setTimeout(() => setSaveState("idle"), 2000);
+  }, [edition]);
+
+  const scheduleSave = useCallback(() => {
+    window.clearTimeout(debounceRef.current);
+    debounceRef.current = window.setTimeout(() => { void persistEdition(); }, DEBOUNCE_MS);
+  }, [persistEdition]);
+
+  // Content field update
+  const updateField = useCallback((fieldPath: string, value: string) => {
+    const path = fieldPath.split(".");
+    contentRef.current = setNested(contentRef.current, path, value);
+    setEdition(prev => prev ? { ...prev, content: contentRef.current } : prev);
+    scheduleSave();
+  }, [scheduleSave]);
+
+  // Array field update (for show notes bullets/links stored as line-per-item text)
+  const updateArrayField = useCallback((fieldPath: string, text: string) => {
+    const path = fieldPath.split(".");
+    const arr = text.split("\n").map(s => s.trim()).filter(Boolean);
+    contentRef.current = setNested(contentRef.current, path, arr);
+    setEdition(prev => prev ? { ...prev, content: contentRef.current } : prev);
+    scheduleSave();
+  }, [scheduleSave]);
+
+  // Hashtag update
+  const updateHashtags = useCallback((tags: string[]) => {
+    contentRef.current = setNested(contentRef.current, ["seo", "hashtags"], tags);
+    setEdition(prev => prev ? { ...prev, content: contentRef.current } : prev);
+    scheduleSave();
+  }, [scheduleSave]);
+
+  // Checkpoint toggle
+  const toggleCheckpoint = useCallback((key: string) => {
+    const checks = (contentRef.current.checkpoints && typeof contentRef.current.checkpoints === "object"
+      ? { ...(contentRef.current.checkpoints as Record<string, boolean | undefined>) } : {}) as Record<string, boolean | undefined>;
+    checks[key] = nextCheckpointState(checks[key]);
+    if (checks[key] === undefined) delete checks[key];
+    contentRef.current = { ...contentRef.current, checkpoints: checks };
+    setEdition(prev => prev ? { ...prev, content: contentRef.current } : prev);
+    scheduleSave();
+  }, [scheduleSave]);
+
+  // Name update
+  const updateName = useCallback((name: string) => {
+    const n = name.trim() || "Untitled Edition";
+    nameRef.current = n;
+    setEdition(prev => prev ? { ...prev, name: n } : prev);
+    scheduleSave();
+  }, [scheduleSave]);
+
+  // Status update
+  const updateStatus = useCallback((status: string) => {
+    statusRef.current = status;
+    setEdition(prev => prev ? { ...prev, status } : prev);
+    scheduleSave();
+  }, [scheduleSave]);
+
+  // B-roll field update
+  const updateBrollField = useCallback((index: number, field: string, value: string) => {
+    const raw = Array.isArray(contentRef.current.brollImages) ? [...(contentRef.current.brollImages as unknown[])] : [];
+    while (raw.length < 5) raw.push({ label: `IMAGE ${raw.length + 1}`, prompt: "", generatedUrl: "" });
+    const item = (raw[index] && typeof raw[index] === "object" ? { ...(raw[index] as Record<string, unknown>) } : { label: `IMAGE ${index + 1}`, prompt: "", generatedUrl: "" });
+    item[field] = value;
+    raw[index] = item;
+    contentRef.current = { ...contentRef.current, brollImages: raw };
+    setEdition(prev => prev ? { ...prev, content: contentRef.current } : prev);
+    scheduleSave();
+  }, [scheduleSave]);
+
+  // ---- Render ----
 
   if (loading || !edition) {
     return (
@@ -194,225 +394,232 @@ export default function SundayEditionDetail() {
   }
 
   const ct = (edition.content || {}) as Record<string, unknown>;
-  const checkpoints = (ct.checkpoints && typeof ct.checkpoints === "object" ? ct.checkpoints : {}) as Record<string, boolean>;
+  const checkpoints = (ct.checkpoints && typeof ct.checkpoints === "object" ? ct.checkpoints : {}) as Record<string, boolean | undefined>;
+  const hashtags = gArr(ct, "seo", "hashtags");
+  const metaDesc = g(ct, "seo", "metaDescription");
+  const metaLen = metaDesc.length;
+  const metaOk = metaLen >= 50 && metaLen <= 160;
 
-  // B-roll images array
-  const broll: Array<{ label: string; prompt: string; generatedUrl?: string }> = (() => {
+  const broll: Array<{ label: string; prompt: string; generatedUrl: string }> = (() => {
     const raw = ct.brollImages;
-    if (!Array.isArray(raw)) return [];
-    return raw.map((item: unknown, i: number) => {
+    if (!Array.isArray(raw)) return Array.from({ length: 5 }, (_, i) => ({ label: `IMAGE ${i + 1}`, prompt: "", generatedUrl: "" }));
+    const mapped = raw.map((item: unknown, i: number) => {
       if (item && typeof item === "object") {
         const o = item as Record<string, unknown>;
-        return { label: String(o.label || `IMAGE ${i + 1}`), prompt: String(o.prompt || ""), generatedUrl: o.generatedUrl ? String(o.generatedUrl) : undefined };
+        return { label: String(o.label || `IMAGE ${i + 1}`), prompt: String(o.prompt || ""), generatedUrl: String(o.generatedUrl || "") };
       }
-      return { label: `IMAGE ${i + 1}`, prompt: "", generatedUrl: undefined };
+      return { label: `IMAGE ${i + 1}`, prompt: "", generatedUrl: "" };
     });
+    while (mapped.length < 5) mapped.push({ label: `IMAGE ${mapped.length + 1}`, prompt: "", generatedUrl: "" });
+    return mapped;
   })();
 
   return (
-    <div
-      style={{
-        "--ed-parchment": "#F4EDDD",
-        "--ed-slate": "#2B3441",
-        "--ed-honey": "#EDCC73",
-        "--ed-ink": "#1A1A1A",
-        "--ed-cornflower": "#7DA2D2",
-        "--ed-card": "#FFFFFF",
-      } as React.CSSProperties}
-    >
-      {/* Honey accent stripe */}
+    <div style={{ "--ed-parchment": "#F4EDDD", "--ed-slate": "#2B3441", "--ed-honey": "#EDCC73", "--ed-ink": "#1A1A1A", "--ed-cornflower": "#7DA2D2", "--ed-card": "#FFFFFF" } as React.CSSProperties}>
       <div style={{ height: 4, background: "var(--ed-honey)" }} />
 
-      <div style={{
-        maxWidth: 860, margin: "0 auto", padding: "28px 20px 48px",
-        fontFamily: "'Inter', sans-serif", background: "var(--ed-parchment)", minHeight: "100vh",
-      }}>
-        {/* Back link */}
-        <button
-          type="button"
-          onClick={() => nav("/studio/editions")}
-          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "var(--ed-cornflower)", padding: 0, marginBottom: 20, fontFamily: "inherit" }}
-        >
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 20px 48px", fontFamily: "'Inter', sans-serif", background: "var(--ed-parchment)", minHeight: "100vh" }}>
+        {/* Back */}
+        <button type="button" onClick={() => nav("/studio/editions")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "var(--ed-cornflower)", padding: 0, marginBottom: 20, fontFamily: "inherit" }}>
           &larr; All Editions
         </button>
 
-        {/* Page header */}
-        <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--ed-ink)", letterSpacing: "-0.02em", margin: "0 0 6px", lineHeight: 1.2 }}>
-            {edition.name}
-          </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 14, color: "var(--ed-slate)" }}>{formatDate(edition.created_at)}</span>
-            <StatusBadge status={edition.status} />
-            <span style={{ fontSize: 14, fontWeight: 600, color: edition.impact_score > 0 ? "var(--ed-honey)" : "var(--ed-slate)", opacity: edition.impact_score > 0 ? 1 : 0.4, marginLeft: "auto" }}>
-              {edition.impact_score > 0 ? `${edition.impact_score} / 1000` : "-"}
-            </span>
-          </div>
+        {/* Header */}
+        <div style={{ marginBottom: 8 }}>
+          <EditableText value={edition.name} placeholder="Untitled Edition" fieldPath="__name__" multiline={false} onUpdate={(_, val) => updateName(val)} />
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap", marginBottom: 24 }}>
+          <span style={{ fontSize: 14, color: "var(--ed-slate)" }}>{formatDate(edition.created_at)}</span>
+          <select
+            value={edition.status}
+            onChange={e => updateStatus(e.target.value)}
+            style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" as const, padding: "3px 8px", borderRadius: 3, border: "1px solid rgba(43,52,65,0.15)", background: "transparent", color: "var(--ed-slate)", cursor: "pointer", fontFamily: "inherit" }}
+          >
+            <option value="draft">Draft</option>
+            <option value="ready">Ready</option>
+            <option value="published">Published</option>
+          </select>
+          <span style={{ fontSize: 14, fontWeight: 600, color: edition.impact_score > 0 ? "var(--ed-honey)" : "var(--ed-slate)", opacity: edition.impact_score > 0 ? 1 : 0.4, marginLeft: "auto" }}>
+            {edition.impact_score > 0 ? `${edition.impact_score} / 1000` : "-"}
+          </span>
+          <SaveIndicator state={saveState} />
         </div>
 
-        {/* Deliverable 1: Substack Article */}
-        <Card number="01" title="Substack Article">
-          {c(ct, "article", "title") ? (
-            <>
-              <div style={{ fontSize: 20, fontWeight: 700, color: "var(--ed-ink)", marginBottom: 4 }}>{c(ct, "article", "title")}</div>
-              {c(ct, "article", "subtitle") && <div style={{ fontSize: 14, color: "var(--ed-slate)", opacity: 0.7, marginBottom: 16 }}>{c(ct, "article", "subtitle")}</div>}
-              <div style={{ whiteSpace: "pre-wrap" }}>{c(ct, "article", "body")}</div>
-            </>
-          ) : <Placeholder text="Add your article..." />}
-        </Card>
+        {/* Sticky nav */}
+        <div style={{
+          position: "sticky", top: 0, zIndex: 50, background: "var(--ed-slate)",
+          display: "flex", gap: 0, overflowX: "auto", borderRadius: 4, marginBottom: 24,
+          scrollbarWidth: "none" as const,
+        }}>
+          {NAV_ITEMS.map(n => (
+            <button
+              key={n.id}
+              type="button"
+              onClick={() => document.getElementById(n.id)?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              style={{
+                background: "none", border: "none", cursor: "pointer", flexShrink: 0,
+                padding: "10px 10px", fontSize: 10, fontWeight: 600, letterSpacing: "0.06em",
+                textTransform: "uppercase" as const, fontFamily: "inherit", whiteSpace: "nowrap",
+                color: activeNav === n.id ? "#F4EDDD" : "rgba(244,237,221,0.5)",
+                borderBottom: activeNav === n.id ? "2px solid var(--ed-honey)" : "2px solid transparent",
+                transition: "color 0.15s, border-color 0.15s",
+              }}
+            >{n.label}</button>
+          ))}
+        </div>
 
-        {/* Deliverable 1b: Callout Block */}
-        <Card number="01b" title="Callout Block">
-          {c(ct, "callout", "primary") ? (
-            <>
-              <blockquote style={{ borderLeft: "3px solid var(--ed-honey)", paddingLeft: 16, margin: "0 0 12px", fontStyle: "italic", fontSize: 16, lineHeight: 1.7 }}>
-                {c(ct, "callout", "primary")}
-              </blockquote>
-              {c(ct, "callout", "alternate") && (
-                <div style={{ fontSize: 14, color: "var(--ed-slate)", opacity: 0.6 }}>Alternate: {c(ct, "callout", "alternate")}</div>
-              )}
-            </>
-          ) : <Placeholder text="Add a callout quote..." />}
-        </Card>
-
-        {/* Deliverable 2: Substack Notes */}
-        <Card number="02" title="Substack Notes">
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-            <NoteCard label="Launch" text={c(ct, "notes", "launch")} />
-            <NoteCard label="Standalone #1" text={c(ct, "notes", "standalone1")} />
-            <NoteCard label="Standalone #2" text={c(ct, "notes", "standalone2")} />
-            <NoteCard label="Standalone #3" text={c(ct, "notes", "standalone3")} />
-            <NoteCard label="Standalone #4" text={c(ct, "notes", "standalone4")} />
-            <NoteCard label="Follow-up" text={c(ct, "notes", "followup")} />
+        {/* 01: Substack Article */}
+        <Card id="article" number="01" title="Substack Article">
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Title</div>
+            <EditableText value={g(ct, "article", "title")} placeholder="Add title..." fieldPath="article.title" onUpdate={updateField} />
           </div>
-        </Card>
-
-        {/* Deliverable 3: Podcast Script */}
-        <Card number="03" title="Podcast Script">
-          {c(ct, "podcast", "script") ? (
-            <div style={{ whiteSpace: "pre-wrap" }}>{c(ct, "podcast", "script")}</div>
-          ) : <Placeholder text="Add your podcast script..." />}
-        </Card>
-
-        {/* Deliverable 4: Hero Image */}
-        <Card number="04" title="Hero Image">
-          <ImagePromptCard label="Hero 16:9" prompt={c(ct, "heroImage", "prompt")} url={c(ct, "heroImage", "generatedUrl") || undefined} />
-        </Card>
-
-        {/* Deliverable 5: B-Roll Images */}
-        <Card number="05" title="B-Roll Companion Images">
-          {broll.length > 0 ? (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {broll.map((img, i) => (
-                <ImagePromptCard key={i} label={img.label} prompt={img.prompt} url={img.generatedUrl} />
-              ))}
-            </div>
-          ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              {[1, 2, 3, 4, 5].map(n => (
-                <ImagePromptCard key={n} label={`IMAGE ${n}`} prompt="" />
-              ))}
-            </div>
-          )}
-        </Card>
-
-        {/* Deliverable 6: Music */}
-        <Card number="06" title="Music Brief + Track">
-          {c(ct, "music", "brief") ? (
-            <>
-              {c(ct, "music", "vibe") && (
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 8 }}>
-                  {c(ct, "music", "vibe")}
-                </div>
-              )}
-              <div style={{ whiteSpace: "pre-wrap", marginBottom: 12 }}>{c(ct, "music", "brief")}</div>
-              {c(ct, "music", "trackUrl") && (
-                <a href={c(ct, "music", "trackUrl")} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: "var(--ed-cornflower)", textDecoration: "underline" }}>
-                  Listen on Suno
-                </a>
-              )}
-            </>
-          ) : <Placeholder text="Add music brief..." />}
-        </Card>
-
-        {/* Deliverable 7: Show Notes */}
-        <Card number="07" title="Show Notes">
-          {c(ct, "showNotes", "description") ? (
-            <>
-              <div style={{ marginBottom: 12 }}>{c(ct, "showNotes", "description")}</div>
-              {cArr(ct, "showNotes", "bullets").length > 0 && (
-                <ul style={{ paddingLeft: 18, marginBottom: 12 }}>
-                  {cArr(ct, "showNotes", "bullets").map((b, i) => <li key={i} style={{ marginBottom: 4 }}>{b}</li>)}
-                </ul>
-              )}
-              {cArr(ct, "showNotes", "links").length > 0 && (
-                <div>
-                  {cArr(ct, "showNotes", "links").map((link, i) => (
-                    <div key={i}><a href={link} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: "var(--ed-cornflower)", textDecoration: "underline" }}>{link}</a></div>
-                  ))}
-                </div>
-              )}
-            </>
-          ) : <Placeholder text="Add show notes..." />}
-        </Card>
-
-        {/* Deliverable 8: Descript Video Script */}
-        <Card number="08" title="Descript Video Script">
-          {c(ct, "descript", "script") ? (
-            <div style={{ whiteSpace: "pre-wrap" }}>{c(ct, "descript", "script")}</div>
-          ) : <Placeholder text="Add Descript script..." />}
-        </Card>
-
-        {/* Deliverable 9+10: LinkedIn */}
-        <Card number="09" title="LinkedIn Native Post + First Comment">
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 6 }}>Post Body</div>
-            {c(ct, "linkedin", "postBody") ? (
-              <div style={{ whiteSpace: "pre-wrap" }}>{c(ct, "linkedin", "postBody")}</div>
-            ) : <Placeholder text="Add LinkedIn post..." />}
-          </div>
-          <div style={{ borderTop: "1px solid rgba(43,52,65,0.08)", paddingTop: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 6 }}>First Comment</div>
-            {c(ct, "linkedin", "firstComment") ? (
-              <div>{c(ct, "linkedin", "firstComment")}</div>
-            ) : <Placeholder text="Add first comment..." />}
-          </div>
-        </Card>
-
-        {/* Deliverable 11: SEO */}
-        <Card number="11" title="SEO">
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 8 }}>Hashtags</div>
-            {cArr(ct, "seo", "hashtags").length > 0 ? (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
-                {cArr(ct, "seo", "hashtags").map((tag, i) => (
-                  <span key={i} style={{
-                    fontSize: 14, padding: "3px 10px", borderRadius: 4,
-                    background: "rgba(43,52,65,0.06)", color: "var(--ed-slate)",
-                  }}>{tag}</span>
-                ))}
-              </div>
-            ) : <Placeholder text="Add hashtags..." />}
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Subtitle</div>
+            <EditableText value={g(ct, "article", "subtitle")} placeholder="Add subtitle..." fieldPath="article.subtitle" onUpdate={updateField} />
           </div>
           <div>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 6 }}>Meta Description</div>
-            {c(ct, "seo", "metaDescription") ? (
-              <div>
-                <div>{c(ct, "seo", "metaDescription")}</div>
-                <div style={{ fontSize: 14, color: "var(--ed-slate)", opacity: 0.5, marginTop: 4 }}>
-                  {c(ct, "seo", "metaDescription").length} / 160 characters
-                </div>
-              </div>
-            ) : <Placeholder text="Add meta description..." />}
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Body</div>
+            <EditableText value={g(ct, "article", "body")} placeholder="Add your article..." fieldPath="article.body" multiline large onUpdate={updateField} />
           </div>
         </Card>
 
-        {/* Deliverable 12: Checkpoints */}
-        <Card number="12" title="Checkpoints">
+        {/* 01b: Callout Block */}
+        <Card id="callout" number="01b" title="Callout Block">
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Primary</div>
+            <EditableText value={g(ct, "callout", "primary")} placeholder="Add primary quote..." fieldPath="callout.primary" multiline onUpdate={updateField} />
+          </div>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Alternate</div>
+            <EditableText value={g(ct, "callout", "alternate")} placeholder="Add alternate..." fieldPath="callout.alternate" multiline onUpdate={updateField} />
+          </div>
+        </Card>
+
+        {/* 02: Substack Notes */}
+        <Card id="notes" number="02" title="Substack Notes">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {(["launch", "standalone1", "standalone2", "standalone3", "standalone4", "followup"] as const).map((key, i) => {
+              const labels = ["Launch", "Standalone #1", "Standalone #2", "Standalone #3", "Standalone #4", "Follow-up"];
+              return (
+                <div key={key} style={{ background: "var(--ed-card)", border: "1px solid rgba(43,52,65,0.08)", borderRadius: 4, padding: "12px 14px", minHeight: 80 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 6 }}>{labels[i]}</div>
+                  <EditableText value={g(ct, "notes", key)} placeholder="Add note..." fieldPath={`notes.${key}`} multiline onUpdate={updateField} />
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* 03: Podcast Script */}
+        <Card id="podcast" number="03" title="Podcast Script">
+          <EditableText value={g(ct, "podcast", "script")} placeholder="Add your podcast script..." fieldPath="podcast.script" multiline large onUpdate={updateField} />
+        </Card>
+
+        {/* 04: Hero Image */}
+        <Card id="hero" number="04" title="Hero Image">
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 4 }}>Prompt</div>
+            <EditableText value={g(ct, "heroImage", "prompt")} placeholder="Add image prompt..." fieldPath="heroImage.prompt" multiline onUpdate={updateField} />
+          </div>
+          {g(ct, "heroImage", "generatedUrl") && <img src={g(ct, "heroImage", "generatedUrl")} alt="Hero" style={{ width: "100%", borderRadius: 4, marginBottom: 8, maxHeight: 300, objectFit: "cover" }} />}
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 4 }}>Image URL</div>
+            <EditableText value={g(ct, "heroImage", "generatedUrl")} placeholder="Paste image URL..." fieldPath="heroImage.generatedUrl" onUpdate={updateField} />
+          </div>
+        </Card>
+
+        {/* 05: B-Roll Images */}
+        <Card id="broll" number="05" title="B-Roll Companion Images">
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            {broll.map((img, i) => (
+              <div key={i} style={{ background: "var(--ed-card)", border: "1px solid rgba(43,52,65,0.08)", borderRadius: 4, padding: "12px 14px" }}>
+                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-cornflower)", marginBottom: 6 }}>{img.label}</div>
+                {img.generatedUrl && <img src={img.generatedUrl} alt={img.label} style={{ width: "100%", borderRadius: 3, marginBottom: 6, maxHeight: 120, objectFit: "cover" }} />}
+                <EditableText value={img.prompt} placeholder="Add prompt..." fieldPath={`brollImages.${i}.prompt`} multiline onUpdate={(_, val) => updateBrollField(i, "prompt", val)} />
+                <div style={{ marginTop: 6 }}>
+                  <EditableText value={img.generatedUrl} placeholder="Paste URL..." fieldPath={`brollImages.${i}.generatedUrl`} onUpdate={(_, val) => updateBrollField(i, "generatedUrl", val)} />
+                </div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        {/* 06: Music */}
+        <Card id="music" number="06" title="Music Brief + Track">
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Vibe</div>
+            <EditableText value={g(ct, "music", "vibe")} placeholder="Add vibe..." fieldPath="music.vibe" onUpdate={updateField} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Suno Prompt</div>
+            <EditableText value={g(ct, "music", "brief")} placeholder="Add Suno prompt..." fieldPath="music.brief" multiline onUpdate={updateField} />
+          </div>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Track URL</div>
+            <EditableText value={g(ct, "music", "trackUrl")} placeholder="Paste track URL..." fieldPath="music.trackUrl" onUpdate={updateField} />
+            {g(ct, "music", "trackUrl") && (
+              <a href={g(ct, "music", "trackUrl")} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, color: "var(--ed-cornflower)", textDecoration: "underline", display: "inline-block", marginTop: 4 }}>Listen on Suno</a>
+            )}
+          </div>
+        </Card>
+
+        {/* 07: Show Notes */}
+        <Card id="shownotes" number="07" title="Show Notes">
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Description</div>
+            <EditableText value={g(ct, "showNotes", "description")} placeholder="Add description..." fieldPath="showNotes.description" multiline onUpdate={updateField} />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Bullets (one per line)</div>
+            <EditableText value={gArr(ct, "showNotes", "bullets").join("\n")} placeholder="One bullet per line..." fieldPath="showNotes.bullets" multiline onUpdate={(path, val) => updateArrayField(path, val)} />
+          </div>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Links (one per line)</div>
+            <EditableText value={gArr(ct, "showNotes", "links").join("\n")} placeholder="One link per line..." fieldPath="showNotes.links" multiline onUpdate={(path, val) => updateArrayField(path, val)} />
+          </div>
+        </Card>
+
+        {/* 08: Descript Video Script */}
+        <Card id="descript" number="08" title="Descript Video Script">
+          <EditableText value={g(ct, "descript", "script")} placeholder="Add Descript script..." fieldPath="descript.script" multiline large onUpdate={updateField} />
+        </Card>
+
+        {/* 09+10: LinkedIn */}
+        <Card id="linkedin" number="09" title="LinkedIn Native Post + First Comment">
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Post Body</div>
+            <EditableText value={g(ct, "linkedin", "postBody")} placeholder="Add LinkedIn post..." fieldPath="linkedin.postBody" multiline large onUpdate={updateField} />
+          </div>
+          <div style={{ borderTop: "1px solid rgba(43,52,65,0.08)", paddingTop: 16 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>First Comment</div>
+            <EditableText value={g(ct, "linkedin", "firstComment")} placeholder="Add first comment..." fieldPath="linkedin.firstComment" multiline onUpdate={updateField} />
+          </div>
+        </Card>
+
+        {/* 11: SEO */}
+        <Card id="seo" number="11" title="SEO">
+          <div style={{ marginBottom: 16 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 8 }}>Hashtags</div>
+            <HashtagEditor tags={hashtags} onUpdate={updateHashtags} />
+          </div>
+          <div>
+            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--ed-honey)", marginBottom: 4 }}>Meta Description</div>
+            <EditableText value={metaDesc} placeholder="Add meta description..." fieldPath="seo.metaDescription" multiline onUpdate={updateField} />
+            {metaDesc && (
+              <div style={{ fontSize: 14, color: metaOk ? "#2D8C4E" : "var(--ed-honey)", opacity: 0.7, marginTop: 4 }}>
+                {metaLen} / 160 characters {metaOk ? "" : metaLen < 50 ? "(under 50)" : "(over 160)"}
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* 12: Checkpoints */}
+        <Card id="checks" number="12" title="Checkpoints">
           {CHECKPOINT_LABELS.map((label, i) => {
             const key = label.toLowerCase().replace(/[^a-z0-9]/g, "_");
             const status = checkpoints[key] === true ? "pass" : checkpoints[key] === false ? "fail" : "pending";
-            return <CheckpointBadge key={i} label={label} status={status} />;
+            return <CheckpointBadge key={i} label={label} status={status} onClick={() => toggleCheckpoint(key)} />;
           })}
         </Card>
       </div>
