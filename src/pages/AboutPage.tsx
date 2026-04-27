@@ -16,13 +16,12 @@ export default function AboutPage() {
     return () => clearTimeout(t);
   }, []);
 
-  const goSignup = useCallback(() => navigate("/auth?mode=signup"), [navigate]);
   const goSignin = useCallback(() => navigate("/auth"), [navigate]);
 
   return (
     <div className="xp" style={{ opacity: pageLoaded ? 1 : 0, transition: `opacity 0.5s ${EASE}` }}>
       <style>{MARKETING_CSS}</style>
-      <MarketingNav onSignin={goSignin} onSignup={goSignup} />
+      <MarketingNav onSignin={goSignin} />
 
       {/* Hero */}
       <section data-nav-theme="dark" style={{
@@ -164,7 +163,7 @@ export default function AboutPage() {
       }}>
         <div style={{ position: "relative", zIndex: 1 }}>
           <Reveal>
-            <MarketingBuiltForCta onRequestAccess={goSignup} onSignIn={goSignin} />
+            <MarketingBuiltForCta onSignIn={goSignin} />
           </Reveal>
         </div>
       </section>

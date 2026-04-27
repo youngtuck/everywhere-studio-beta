@@ -26,14 +26,13 @@ export default function TermsOfServicePage() {
     return () => clearTimeout(t);
   }, []);
 
-  const goSignup = useCallback(() => navigate("/auth?mode=signup"), [navigate]);
   const goSignin = useCallback(() => navigate("/auth"), [navigate]);
 
   return (
     <div className="xp" style={{ opacity: pageLoaded ? 1 : 0, transition: `opacity 0.5s ${EASE}` }}>
       <style>{MARKETING_CSS}</style>
       <style>{LEGAL_DOC_TYPOGRAPHY_CSS}</style>
-      <MarketingNav onSignin={goSignin} onSignup={goSignup} />
+      <MarketingNav onSignin={goSignin} />
 
       <div data-nav-theme="light" style={{ minHeight: "100vh", background: "var(--xp-off)", paddingTop: 88 }}>
         <article className="xp-legal-doc" style={articleColumn}>
