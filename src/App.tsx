@@ -43,6 +43,8 @@ import Wrap from "./pages/studio/Wrap";
 import VisualWrap from "./pages/studio/VisualWrap";
 import AdminPanel from "./pages/studio/AdminPanel";
 import Templates from "./pages/studio/Templates";
+import SundayEditionsDashboard from "./pages/studio/SundayEditionsDashboard";
+import SundayEditionDetail from "./pages/studio/SundayEditionDetail";
 import ContentOutputs from "./pages/studio/ContentOutputs";
 import SocialOutputs from "./pages/studio/SocialOutputs";
 import BusinessOutputs from "./pages/studio/BusinessOutputs";
@@ -138,6 +140,8 @@ const App = () => (
             <Route path="settings/memory" element={<ComposerMemorySettings />} />
             <Route path="lot" element={<TheLot />} />
             <Route path="workbench" element={<Workbench />} />
+            <Route path="editions" element={<SundayEditionsDashboard />} />
+            <Route path="editions/:id" element={<SundayEditionDetail />} />
             <Route path="admin" element={<AdminPanel />} />
           </Route>
           <Route path="/terms" element={
