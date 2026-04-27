@@ -194,7 +194,6 @@ export default function ExplorePage() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  const goSignup = useCallback(() => navigate("/auth?mode=signup"), [navigate]);
   const goSignin = useCallback(() => navigate("/auth"), [navigate]);
 
   const isDarkNav = navTheme === "dark";
@@ -235,11 +234,6 @@ export default function ExplorePage() {
               <button className="xp-nav-link" onClick={goSignin} style={{
                 color: isDarkNav ? "rgba(255,255,255,0.55)" : "var(--xp-sec)",
               }}>Sign In</button>
-              <button className="xp-nav-cta" onClick={goSignup} style={
-                isDarkNav
-                  ? { background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)", color: "var(--xp-on-dark)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }
-                  : { background: "rgba(12,26,41,0.08)", border: "1px solid rgba(12,26,41,0.15)", color: "var(--xp-navy)", backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)" }
-              }>Request Access</button>
             </div>
           )}
           {isMobile && (
@@ -262,7 +256,6 @@ export default function ExplorePage() {
             { label: "The System", action: () => { setMobileMenuOpen(false); navigate("/the-system"); } },
             { label: "About", action: () => { setMobileMenuOpen(false); navigate("/about"); } },
             { label: "Sign In", action: () => { setMobileMenuOpen(false); goSignin(); } },
-            { label: "Request Access", action: () => { setMobileMenuOpen(false); goSignup(); } },
           ].map((link, i) => (
             <button key={link.label} onClick={link.action} style={{
               background: "none", border: "none", cursor: "pointer",
@@ -358,9 +351,6 @@ export default function ExplorePage() {
             )}
           </p>
 
-          <div style={{ animation: `xpHeroCta 0.7s ${EASE} 1.8s both` }}>
-            <button className="xp-btn xp-btn-liquid" onClick={goSignup}>See It Work</button>
-          </div>
         </div>
 
         {/* Scroll hint */}
@@ -410,7 +400,7 @@ export default function ExplorePage() {
 
         <div style={{ position: "relative", zIndex: 1 }}>
           <Reveal>
-            <MarketingBuiltForCta onRequestAccess={goSignup} onSignIn={goSignin} />
+            <MarketingBuiltForCta onSignIn={goSignin} />
           </Reveal>
         </div>
       </section>

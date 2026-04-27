@@ -4,12 +4,11 @@ const CTA_BODY =
   "You're not a marketer. You're not a content creator. You're a practitioner with something important to say. You've been waiting too long for the system to catch up to the thinking. IdeasOut was built for you.";
 
 export interface MarketingBuiltForCtaProps {
-  onRequestAccess: () => void;
   onSignIn: () => void;
 }
 
 /** Shared bottom CTA: centered headline, centered body, consistent across marketing pages. */
-export default function MarketingBuiltForCta({ onRequestAccess, onSignIn }: MarketingBuiltForCtaProps) {
+export default function MarketingBuiltForCta({ onSignIn }: MarketingBuiltForCtaProps) {
   return (
     <div
       style={{
@@ -50,14 +49,9 @@ export default function MarketingBuiltForCta({ onRequestAccess, onSignIn }: Mark
       >
         {CTA_BODY}
       </p>
-      <button type="button" className="xp-btn xp-btn-liquid" onClick={onRequestAccess} style={{ marginBottom: 16 }}>
-        Request Access
+      <button type="button" className="xp-btn xp-btn-glass" onClick={onSignIn}>
+        Sign In
       </button>
-      <div style={{ marginTop: 20 }}>
-        <button type="button" className="xp-btn xp-btn-glass" onClick={onSignIn}>
-          Sign In
-        </button>
-      </div>
       <div style={{ marginTop: 40 }}>
         <a href="mailto:beta@everywherestudio.ai" className="xp-mono" style={{ fontSize: 12, color: "var(--xp-dim-dark)", textDecoration: "none" }}>
           beta@everywherestudio.ai

@@ -90,11 +90,6 @@ export default function Hero() {
           </p>
 
           <div style={{ display:"flex", gap:10, flexWrap:"wrap", marginBottom:24 }}>
-            <button onClick={()=>navigate("/auth")}
-              style={{ background:headC, color:bg, border:"none", cursor:"pointer", fontSize:13, fontWeight:500, letterSpacing:"-0.01em", padding:"13px 28px", borderRadius:8, fontFamily:"'Inter', sans-serif", transition:"opacity 0.15s" }}
-              onMouseEnter={e=>(e.currentTarget.style.opacity="0.82")} onMouseLeave={e=>(e.currentTarget.style.opacity="1")}>
-              Request access
-            </button>
             <button onClick={()=>navigate("/studio/dashboard")}
               style={{ background:"transparent", border:`1px solid ${secBd}`, color:secC, cursor:"pointer", fontSize:13, fontWeight:400, letterSpacing:"-0.01em", padding:"12px 24px", borderRadius:8, fontFamily:"'Inter', sans-serif", transition:"all 0.15s" }}
               onMouseEnter={e=>{ e.currentTarget.style.borderColor=dark?"rgba(255,255,255,0.28)":"rgba(0,0,0,0.28)"; e.currentTarget.style.color=headC; }}

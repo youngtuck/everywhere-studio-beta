@@ -48,25 +48,6 @@ export default function Footer() {
           <FooterLink onClick={() => navigate("/studio/dashboard")}>Studio</FooterLink>
           <FooterLink onClick={() => navigate("/auth")}>Sign in</FooterLink>
           <span style={{ fontSize: 12, color: "#64748B", fontFamily: "'Inter', sans-serif" }}>mark@coastalintelligence.ai</span>
-          <button
-            onClick={() => navigate("/auth?mode=signup")}
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "#FFFFFF",
-              background: "#111111",
-              border: "none",
-              borderRadius: 100,
-              padding: "10px 24px",
-              fontFamily: "'Inter', sans-serif",
-              cursor: "pointer",
-              transition: `background 0.25s ${EASE}`,
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#4A90D9"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#111111"; }}
-          >
-            Get Early Access
-          </button>
         </div>
       </div>
       {/* Bottom row */}
