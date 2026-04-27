@@ -1,0 +1,29 @@
+{
+  "version": "1.0",
+  "rules": [
+    {
+      "id": "em-dash",
+      "name": "Zero Em Dashes",
+      "severity": "block",
+      "description": "Em dashes and en dashes are not allowed. Replace with commas, periods, colons, semicolons, or restructure the sentence."
+    },
+    {
+      "id": "anaphoric-triple",
+      "name": "Zero Anaphoric Triples",
+      "severity": "warn",
+      "description": "Three or more consecutive sentences sharing the same opening word. Vary the openings or combine into flowing prose."
+    },
+    {
+      "id": "staccato-cluster",
+      "name": "Zero Staccato Fragments",
+      "severity": "warn",
+      "description": "Two or more consecutive sentences of three words or fewer. Combine into flowing prose with commas, colons, or semicolons."
+    },
+    {
+      "id": "fabrication-flag",
+      "name": "Verify Claims",
+      "severity": "warn",
+      "description": "Specific factual claim detected. Verify the source before publishing."
+    }
+  ]
+}
