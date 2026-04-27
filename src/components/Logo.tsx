@@ -22,6 +22,7 @@ const Logo = ({ size = "md", onDark, variant, onClick }: LogoProps) => {
         : theme === "dark";
 
   const fs = typeof size === "number" ? size : SIZE_MAP[size];
+  const showTm = fs >= 18;
   const tmFs = Math.max(7, Math.round(fs * 0.30));
   const taglineFs = Math.max(10, Math.round(fs * 0.38));
   const color = isDark ? "#FFFFFF" : "#0D1B2A";
@@ -47,17 +48,19 @@ const Logo = ({ size = "md", onDark, variant, onClick }: LogoProps) => {
         </span>
         <span style={{ color, fontWeight: 600, fontSize: fs, position: "relative" }}>
           Out
-          <span style={{
-            color,
-            fontSize: tmFs,
-            fontWeight: 400,
-            position: "absolute",
-            top: "0.1em",
-            right: Math.round(fs * -0.48),
-            lineHeight: 1,
-            letterSpacing: "0.02em",
-            opacity: 0.65,
-          }}>TM</span>
+          {showTm && (
+            <span style={{
+              color,
+              fontSize: tmFs,
+              fontWeight: 400,
+              position: "absolute",
+              top: "0.1em",
+              right: Math.round(fs * -0.48),
+              lineHeight: 1,
+              letterSpacing: "0.02em",
+              opacity: 0.65,
+            }}>TM</span>
+          )}
         </span>
       </span>
       {isLockup && (
