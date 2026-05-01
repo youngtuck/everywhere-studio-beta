@@ -880,8 +880,6 @@ function SearchIconButton({ onClick }: { onClick: () => void }) {
 
 // ── Main TopBar ─────────────────────────────────────────────────
 export default function StudioTopBar() {
-  const nav = useNavigate();
-  const loc = useLocation();
   const { setDiscoverOpen, setSearchOpen } = useShell();
   const { center, showReturnPill, onReturnToSession } = useStudioTopBarCenterBreadcrumbs();
 
@@ -938,24 +936,10 @@ export default function StudioTopBar() {
         {center}
       </div>
 
-      {/* Right: system actions */}
+      {/* Right: system actions. CO_038A removed the "+ New Session"
+          button and its trailing Divider; New Session now lives in the
+          left sidebar above Watch (StudioSidebar.tsx, NewSessionButton). */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-        <button
-          type="button"
-          className="liquid-glass-btn-gold"
-          onClick={() => {
-            if (loc.pathname === "/studio/work") {
-              window.dispatchEvent(new CustomEvent("ew-new-session-request"));
-              return;
-            }
-            sessionStorage.setItem("ew-new-session", "1");
-            nav("/studio/work");
-          }}
-          style={{ fontSize: 14, padding: "6px 14px", flexShrink: 0 }}
-        >
-          <span className="liquid-glass-btn-gold-label">+ New Session</span>
-        </button>
-        <Divider />
         <SearchIconButton onClick={() => setSearchOpen(true)} />
 
         <button
@@ -979,6 +963,3 @@ export default function StudioTopBar() {
   );
 }
 
-function Divider() {
-  return <div className="studio-topbar-divider" aria-hidden />;
-}

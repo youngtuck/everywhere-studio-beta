@@ -45,10 +45,8 @@ import AdminPanel from "./pages/studio/AdminPanel";
 import Templates from "./pages/studio/Templates";
 import SundayEditionsDashboard from "./pages/studio/SundayEditionsDashboard";
 import SundayEditionDetail from "./pages/studio/SundayEditionDetail";
-import ContentOutputs from "./pages/studio/ContentOutputs";
-import SocialOutputs from "./pages/studio/SocialOutputs";
-import BusinessOutputs from "./pages/studio/BusinessOutputs";
-import ExtendedOutputs from "./pages/studio/ExtendedOutputs";
+// CO_038A: per-category output routes (content/social/business/extended)
+// were consolidated into the single /studio/outputs Library landing.
 
 // Page transition: only for marketing/auth pages, not studio
 function PageTransition({ children }: { children: ReactNode }) {
@@ -123,10 +121,6 @@ const App = () => (
             <Route path="work/:id" element={<WorkSession />} />
             <Route path="watch" element={<Watch />} />
             <Route path="outputs" element={<OutputLibrary />} />
-            <Route path="outputs/content" element={<ContentOutputs />} />
-            <Route path="outputs/social" element={<SocialOutputs />} />
-            <Route path="outputs/business" element={<BusinessOutputs />} />
-            <Route path="outputs/extended" element={<ExtendedOutputs />} />
             <Route path="outputs/templates" element={<Templates />} />
             <Route path="outputs/:id" element={<OutputDetail />} />
             <Route path="wrap" element={<Wrap />} />

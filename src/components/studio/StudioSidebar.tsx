@@ -3,7 +3,6 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { supabase } from "../../lib/supabase";
 import { APP_VERSION } from "../../lib/constants";
-import { StudioUserAccountMenu } from "./StudioUserAccountMenu";
 import Logo from "../Logo";
 
 type NavItemDef = {
@@ -13,106 +12,82 @@ type NavItemDef = {
   icon: ReactNode;
 };
 
-type NavGroupDef = {
-  group: string;
-  collapsible?: boolean;
-  items: NavItemDef[];
-};
-
-// ── Nav structure matching wireframe ───────────────────────────
-const NAV: NavGroupDef[] = [
+// CO_038A: single flat list of top-level studio items. The collapsible
+// Outputs group is gone; Catalog became Library and now lives at the
+// same level as Watch / Work / Wrap. New Session is rendered separately
+// above this list (NewSessionButton).
+const NAV_ITEMS: NavItemDef[] = [
   {
-    group: "Studio",
-    items: [
-      {
-        path: "/studio/watch",
-        label: "Watch",
-        desc: "Your daily intelligence briefing. Signals, competitors, opportunities.",
-        icon: (
-          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" />
-          </svg>
-        ),
-      },
-      {
-        path: "/studio/work",
-        label: "Work",
-        desc: "Talk to Reed, build outlines, write drafts, run checkpoints.",
-        icon: (
-          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-            <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-          </svg>
-        ),
-      },
-      {
-        path: "/studio/wrap",
-        label: "Wrap",
-        desc: "Turn drafts into formatted deliverables for every channel.",
-        icon: (
-          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-            <polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" />
-          </svg>
-        ),
-      },
-    ],
+    path: "/studio/watch",
+    label: "Watch",
+    desc: "Your daily intelligence briefing. Signals, competitors, opportunities.",
+    icon: (
+      <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="3" />
+      </svg>
+    ),
   },
   {
-    group: "Library",
-    items: [
-      {
-        path: "/studio/outputs",
-        label: "Catalog",
-        desc: "Every piece you have published or exported lives here.",
-        icon: (
-          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-            <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
-            <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
-          </svg>
-        ),
-      },
-      {
-        path: "/studio/editions",
-        label: "Editions",
-        desc: "Sunday Story production packages.",
-        icon: (
-          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-          </svg>
-        ),
-      },
-      {
-        path: "/studio/lot",
-        label: "Pipeline",
-        desc: "Ideas parked for later. Resurfaces when timing is right.",
-        icon: (
-          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
-          </svg>
-        ),
-      },
-      {
-        path: "/studio/resources",
-        label: "Files",
-        desc: "Uploaded reference docs, brand assets, research materials.",
-        icon: (
-          <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
-          </svg>
-        ),
-      },
-    ],
+    path: "/studio/work",
+    label: "Work",
+    desc: "Talk to Reed, build outlines, write drafts, run checkpoints.",
+    icon: (
+      <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+        <path d="M12 20h9" /><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
+      </svg>
+    ),
   },
   {
-    group: "Outputs",
-    collapsible: true,
-    items: [
-      { path: "/studio/outputs/content", label: "Content", desc: "Essays, podcasts, video scripts, emails.", icon: <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" /><polyline points="14 2 14 8 20 8" /></svg> },
-      { path: "/studio/outputs/business", label: "Business", desc: "Presentations, proposals, case studies, SOWs.", icon: <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2" /><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" /></svg> },
-      { path: "/studio/outputs/social", label: "Social", desc: "Social media content across platforms.", icon: <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22 6 12 13 2 6" /></svg> },
-      { path: "/studio/outputs/extended", label: "Extended", desc: "Books, websites, newsletters, social media projects.", icon: <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" /><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" /></svg> },
-      { path: "/studio/outputs/templates", label: "Templates", desc: "System and custom output templates.", icon: <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="21" x2="9" y2="9" /></svg> },
-    ],
+    path: "/studio/wrap",
+    label: "Wrap",
+    desc: "Turn drafts into formatted deliverables for every channel.",
+    icon: (
+      <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+        <polyline points="21 8 21 21 3 21 3 8" /><rect x="1" y="3" width="22" height="5" /><line x1="10" y1="12" x2="14" y2="12" />
+      </svg>
+    ),
+  },
+  {
+    path: "/studio/outputs",
+    label: "Library",
+    desc: "Every output type you can produce, organized by category.",
+    icon: (
+      <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+        <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" />
+        <rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
+      </svg>
+    ),
+  },
+  {
+    path: "/studio/editions",
+    label: "Editions",
+    desc: "Sunday Story production packages.",
+    icon: (
+      <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      </svg>
+    ),
+  },
+  {
+    path: "/studio/lot",
+    label: "Pipeline",
+    desc: "Ideas parked for later. Resurfaces when timing is right.",
+    icon: (
+      <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
+  },
+  {
+    path: "/studio/resources",
+    label: "Files",
+    desc: "Uploaded reference docs, brand assets, research materials.",
+    icon: (
+      <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
   },
 ];
 
@@ -122,37 +97,11 @@ interface SidebarProps {
   onMobileClose?: () => void;
 }
 
-const STORAGE_OUTPUTS_OPEN = "ew-sidebar-outputs-open";
-
 export default function StudioSidebar({ collapsed = false, onToggleCollapsed, onMobileClose }: SidebarProps) {
   const nav = useNavigate();
   const loc = useLocation();
   const { user } = useAuth();
   const [isAdmin, setIsAdmin] = useState(false);
-  const [outputsOpen, setOutputsOpen] = useState(() => {
-    try {
-      const v = localStorage.getItem(STORAGE_OUTPUTS_OPEN);
-      if (v === "0") return false;
-      if (v === "1") return true;
-    } catch { /* ignore */ }
-    return true;
-  });
-
-  const toggleOutputsOpen = useCallback(() => {
-    setOutputsOpen(prev => {
-      const next = !prev;
-      try {
-        localStorage.setItem(STORAGE_OUTPUTS_OPEN, next ? "1" : "0");
-      } catch { /* ignore */ }
-      return next;
-    });
-  }, []);
-
-  useEffect(() => {
-    if (loc.pathname.startsWith("/studio/outputs")) {
-      setOutputsOpen(true);
-    }
-  }, [loc.pathname]);
 
   useEffect(() => {
     if (!user) return;
@@ -173,6 +122,26 @@ export default function StudioSidebar({ collapsed = false, onToggleCollapsed, on
     nav(path);
     onMobileClose?.();
   }, [nav, onMobileClose]);
+
+  // CO_038A: replicates the topbar "+ New Session" button branching.
+  // On Work, dispatch the park-session event the WorkSession listener
+  // consumes. Elsewhere, set the new-session sessionStorage flag and
+  // navigate to Work.
+  const handleNewSession = useCallback(() => {
+    if (loc.pathname === "/studio/work") {
+      window.dispatchEvent(new CustomEvent("ew-new-session-request"));
+    } else {
+      sessionStorage.setItem("ew-new-session", "1");
+      nav("/studio/work");
+    }
+    onMobileClose?.();
+  }, [loc.pathname, nav, onMobileClose]);
+
+  // On mobile, the bottom nav owns Watch / Work / Wrap / Settings / Dashboard.
+  // The slide-over sidebar shows the rest (Library, Editions, Pipeline, Files).
+  const visibleItems = onMobileClose
+    ? NAV_ITEMS.filter(i => !["/studio/dashboard", "/studio/watch", "/studio/work", "/studio/wrap", "/studio/settings"].includes(i.path))
+    : NAV_ITEMS;
 
   return (
     <aside
@@ -229,102 +198,144 @@ export default function StudioSidebar({ collapsed = false, onToggleCollapsed, on
           </div>
 
           <nav className="studio-sidebar-nav">
-        {NAV.map((group, gi) => {
-          // On mobile, skip items already in bottom nav
-          const items = onMobileClose
-            ? group.items.filter(i => !["/studio/dashboard", "/studio/watch", "/studio/work", "/studio/wrap", "/studio/settings"].includes(i.path))
-            : group.items;
-          if (items.length === 0) return null;
+            {/* New Session is the first item, above Watch. Replaces the
+                old topbar "+ New Session" button. */}
+            <NewSessionButton collapsed={collapsed} onClick={handleNewSession} />
 
-          const isOutputsCollapsible = Boolean(group.collapsible && group.group === "Outputs");
-          const showOutputNavItems = !isOutputsCollapsible || collapsed || outputsOpen;
+            {visibleItems.map(({ path, label, icon, desc }) => {
+              const active = isActive(path);
+              return (
+                <NavItem
+                  key={path}
+                  label={label}
+                  desc={desc}
+                  icon={icon}
+                  active={active}
+                  collapsed={collapsed}
+                  onClick={() => goNav(path)}
+                />
+              );
+            })}
 
-          return (
-            <div key={group.group}>
-              {!collapsed && !isOutputsCollapsible && (
-                <div className="studio-sidebar-group-label">
-                  {group.group}
-                </div>
-              )}
-              {!collapsed && isOutputsCollapsible && (
-                <button
-                  type="button"
-                  className="studio-sidebar-outputs-toggle"
-                  onClick={toggleOutputsOpen}
-                  aria-expanded={outputsOpen}
-                >
-                  <span>Outputs</span>
-                  <svg className={`studio-sidebar-outputs-chevron ${outputsOpen ? "is-open" : ""}`} viewBox="0 0 24 24" aria-hidden>
-                    <polyline points="6 9 12 15 18 9" />
-                  </svg>
-                </button>
-              )}
-              {collapsed && gi > 0 && (
-                <div className="studio-sidebar-group-rule" />
-              )}
-
-              {showOutputNavItems && items.map(({ path, label, icon, desc }) => {
-                const active = isActive(path);
-                return (
-                  <NavItem
-                    key={path}
-                    label={label}
-                    desc={desc}
-                    icon={icon}
-                    active={active}
-                    collapsed={collapsed}
-                    onClick={() => goNav(path)}
-                  />
-                );
-              })}
-            </div>
-          );
-        })}
-
-        {/* Admin */}
-        {isAdmin && (
-          <>
-            {!collapsed && (
-              <div className="studio-sidebar-group-label">
-                Admin
-              </div>
+            {/* Admin */}
+            {isAdmin && (
+              <>
+                {!collapsed && (
+                  <div className="studio-sidebar-group-label">
+                    Admin
+                  </div>
+                )}
+                {collapsed && <div className="studio-sidebar-group-rule" />}
+                <NavItem
+                  label="Admin Panel"
+                  active={loc.pathname === "/studio/admin"}
+                  collapsed={collapsed}
+                  onClick={() => { nav("/studio/admin"); onMobileClose?.(); }}
+                  icon={
+                    <svg style={{ width: 16, height: 16, stroke: "var(--gold)", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+                      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                  }
+                />
+              </>
             )}
-            {collapsed && <div className="studio-sidebar-group-rule" />}
-            <NavItem
-              label="Admin Panel"
-              active={loc.pathname === "/studio/admin"}
-              collapsed={collapsed}
-              onClick={() => { nav("/studio/admin"); onMobileClose?.(); }}
-              icon={
-                <svg style={{ width: 16, height: 16, stroke: "var(--gold)", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
-                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </nav>
+
+          {/* CO_038A: Gear icon placeholder. Pinned to the bottom of the
+              rail via margin-top: auto in the wrapper (see studio-liquid-glass.css).
+              Click navigates to /studio/settings. The full Settings drawer
+              consolidation (Voice DNA, Brand DNA, Composer memory, Research)
+              lands in CO_038B. */}
+          {user && (
+            <div className="studio-sidebar-gear-wrap">
+              <button
+                type="button"
+                onClick={() => { nav("/studio/settings"); onMobileClose?.(); }}
+                className="studio-sidebar-icon-btn studio-sidebar-gear"
+                aria-label="Settings"
+                title="Settings"
+              >
+                <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 1.75, fill: "none" }} viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="3" />
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
                 </svg>
-              }
-            />
-          </>
-        )}
-      </nav>
+              </button>
+            </div>
+          )}
 
-      {user && (
-        <div
-          style={{
-            flexShrink: 0,
-            padding: collapsed ? "6px 6px 4px" : "8px 8px 6px",
-            borderTop: "1px solid rgba(255,255,255,0.06)",
-          }}
-        >
-          <StudioUserAccountMenu variant="sidebar" collapsed={collapsed} />
-        </div>
-      )}
-
-      {!collapsed && (
-        <div className="studio-sidebar-footer">
-          v{APP_VERSION}
-        </div>
-      )}
+          {!collapsed && (
+            <div className="studio-sidebar-footer">
+              v{APP_VERSION}
+            </div>
+          )}
         </div>
       </div>
     </aside>
+  );
+}
+
+// ── New Session button ──────────────────────────────────────────
+function NewSessionButton({ collapsed, onClick }: { collapsed: boolean; onClick: () => void }) {
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={() => setShowTooltip(true)}
+      onMouseLeave={() => setShowTooltip(false)}
+      className="studio-sidebar-nav-row studio-sidebar-new-session"
+      style={{
+        justifyContent: collapsed ? "center" : "flex-start",
+        textAlign: collapsed ? "center" as const : "left",
+      }}
+      aria-label="New Session"
+    >
+      <div style={{
+        width: 20, height: 20,
+        display: "flex", alignItems: "center", justifyContent: "center",
+        flexShrink: 0,
+        color: "var(--gold-bright, #F5C642)",
+      }}>
+        <svg style={{ width: 16, height: 16, stroke: "currentColor", strokeWidth: 2, fill: "none" }} viewBox="0 0 24 24">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </div>
+
+      {!collapsed && (
+        <span style={{
+          fontSize: 14,
+          color: "rgba(255,255,255,0.92)",
+          fontWeight: 600,
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          flex: 1,
+        }}>
+          New Session
+        </span>
+      )}
+
+      {showTooltip && collapsed && (
+        <div
+          className="studio-sidebar-tooltip"
+          style={{
+            position: "absolute",
+            left: 52,
+            top: "50%",
+            transform: "translateY(-50%)",
+            padding: "8px 11px",
+            fontSize: 14,
+            color: "rgba(255,255,255,0.92)",
+            whiteSpace: "nowrap",
+            zIndex: 200,
+            pointerEvents: "none",
+          }}
+        >
+          <div style={{ fontWeight: 600 }}>New Session</div>
+        </div>
+      )}
+    </button>
   );
 }
 
@@ -411,5 +422,3 @@ function NavItem({
     </button>
   );
 }
-
-

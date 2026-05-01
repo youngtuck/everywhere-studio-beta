@@ -584,7 +584,7 @@ export default function SundayEditionDetail() {
     <div style={{ "--ed-parchment": "#F4EDDD", "--ed-slate": "#2B3441", "--ed-honey": "#EDCC73", "--ed-ink": "#1A1A1A", "--ed-cornflower": "#7DA2D2", "--ed-card": "#FFFFFF" } as React.CSSProperties}>
       <div style={{ height: 4, background: "var(--ed-honey)" }} />
 
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 20px 48px", fontFamily: "'Inter', sans-serif", background: "var(--ed-parchment)", minHeight: "100vh" }}>
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 20px 48px", fontFamily: "'Inter', sans-serif", background: "var(--ed-parchment)" }}>
         {/* Back */}
         <button type="button" onClick={() => nav("/studio/editions")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 14, color: "var(--ed-cornflower)", padding: 0, marginBottom: 20, fontFamily: "inherit" }}>
           &larr; All Editions

@@ -425,7 +425,7 @@ export default function OutputDetail() {
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
-    <div style={{ fontFamily: font, minHeight: "100vh" }}>
+    <div style={{ fontFamily: font }}>
 
       {/* ── TOP BAR (sticky) ──────────────────────────────────────── */}
       <div

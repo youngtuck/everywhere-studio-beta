@@ -146,18 +146,27 @@ div:hover > .nav-tooltip { display: block !important; }
    The studio UI was designed at 1280px. At wider viewports everything
    scales up proportionally so text stays readable on large desktops.
    We use zoom on #root because it scales ALL px values (inline styles,
-   CSS px, box model) uniformly — no need to touch individual components.
+   CSS px, box model) uniformly, so we do not need to touch individual
+   components.
 
    Breakpoints:
-   < 1280px  → 1.00× (base, laptop)
-   1280–1440 → 1.05× (15" MBP, 1440p)
-   1440–1600 → 1.10× (16" MBP, common desktop)
-   1600–1920 → 1.18× (1080p external monitor)
-   1920–2560 → 1.30× (1440p monitor, 27" iMac)
-   > 2560    → 1.45× (4K / 5K displays)
+   < 1280px  to 1.00x (base, laptop)
+   1280-1440 to 1.05x (15" MBP, 1440p)
+   1440-1600 to 1.10x (16" MBP, common desktop)
+   1600-1920 to 1.18x (1080p external monitor)
+   1920-2560 to 1.30x (1440p monitor, 27" iMac)
+   > 2560    to 1.45x (4K / 5K displays)
 
-   Note: zoom doesn't affect scrollbar px widths (intentional).
+   Note: zoom does not affect scrollbar px widths (intentional).
    Firefox uses transform fallback via the .firefox-scale class added by JS.
+
+   CO_038A note on viewport units: zoom on #root scales the rendered size
+   of CSS pixels but does not change what 100vh resolves to. 100vh always
+   means 100% of the actual browser viewport height in unscaled CSS pixels.
+   The shell respects this by using 100vh / 100dvh on the outer container
+   only (see shared.css studio-app-shell--document-scroll), and child pages
+   must not stack their own minHeight: 100vh inside the shell, which would
+   force the document past the viewport boundary at any zoom level.
 ────────────────────────────────────────────────────────────────── */
 
 @media (min-width: 1280px) {
@@ -337,7 +346,9 @@ button { font-family: var(--font); }
 .marquee-track:hover { animation-play-state: paused; }
 
 /* ─── STUDIO LAYOUT ──────────────────────────────────────────── */
-.studio-layout { display: flex; height: 100vh; overflow: hidden; }
+/* .studio-layout removed in CO_038A. Active studio layout lives in
+   shared.css under .studio-app-shell--viewport-lock and
+   .studio-app-shell--document-scroll. */
 .studio-sidebar {
   width: 240px; flex-shrink: 0;
   background: var(--sidebar);

@@ -136,6 +136,43 @@ html:has(.studio-app-shell--viewport-lock) #root {
   overflow: hidden;
 }
 
+/* CO_038A: Stage canvas floats inside the content row with rounded
+   corners and breathing room from sidebar (left), topbar (top),
+   viewport edge or inspector (right), and bottom. Applies in both
+   viewport-lock and document-scroll modes.
+
+   The Reed inspector is a flex row sibling of the stage canvas inside
+   .studio-app-content-row, so the stage reflows automatically when
+   the inspector opens, and the inspector's top edge aligns with the
+   stage's top edge (both inherit the 8px margin from the content row).
+   The 8px margins keep the stage visually distinct from the
+   surrounding chrome. */
+.studio-stage-canvas {
+  margin: 8px;
+  border-radius: 12px;
+}
+
+/* Content row: flex row inside the main column that holds the stage
+   canvas and the Reed inspector below the topbar. Sized to match the
+   stage canvas's previous flex behavior in each viewport mode. */
+.studio-app-content-row {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  min-width: 0;
+  min-height: 0;
+}
+
+.studio-app-shell--viewport-lock .studio-app-content-row {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.studio-app-shell--document-scroll .studio-app-content-row {
+  flex: 0 1 auto;
+  overflow: visible;
+}
+
 /* Inspector flyout: scroll region (aside is flex column in studio-liquid-glass.css) */
 .studio-reed-flyout .studio-advisor-scroll {
   flex: 1 1 auto;

@@ -363,20 +363,30 @@ export default function StudioShell() {
             <StudioTopBar />
           )}
 
-          {/* Main canvas (Reed / dashboard is a floating glass flyout) */}
-          <div className="studio-stage-canvas" style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: "1 1 0%", overflow: "hidden" }}>
-            <main
-              className={`studio-main-inner studio-stage-scroll studio-content-substrate${studioGlassDense ? " studio-glass-dense" : ""}`}
-              style={{
-                minWidth: 0,
-                minHeight: 0,
-                overflow: "hidden",
-                paddingBottom: isMobile ? 80 : 0, position: "relative",
-                borderRadius: "12px 0 0 0",
-              }}
-            >
-              <Outlet />
-            </main>
+          {/* Main canvas. Stage container floats with rounded corners and
+              margins from sidebar, topbar, inspector, and bottom (CO_038A).
+              Floating effects defined in shared.css under .studio-stage-canvas.
+
+              The stage canvas and Reed inspector live inside a content-row
+              flex container so their top edges align (both sit at
+              content-row-top + their own 8px margin-top, which equals
+              topbar-bottom + 8px). */}
+          <div className="studio-app-content-row">
+            <div className="studio-stage-canvas" style={{ display: "flex", flexDirection: "column", minWidth: 0, flex: "1 1 0%", overflow: "hidden" }}>
+              <main
+                className={`studio-main-inner studio-stage-scroll studio-content-substrate${studioGlassDense ? " studio-glass-dense" : ""}`}
+                style={{
+                  minWidth: 0,
+                  minHeight: 0,
+                  overflow: "hidden",
+                  paddingBottom: isMobile ? 80 : 0, position: "relative",
+                }}
+              >
+                <Outlet />
+              </main>
+            </div>
+
+            <FloatingReedPanel isMobile={isMobile} open={dashOpen} setOpen={setDashOpen} />
           </div>
         </div>
 
@@ -388,8 +398,6 @@ export default function StudioShell() {
         )}
 
         {isMobile && <MobileBottomNav />}
-
-        <FloatingReedPanel isMobile={isMobile} open={dashOpen} setOpen={setDashOpen} />
       </div>
       </ProjectProvider>
     </ShellContext.Provider>
