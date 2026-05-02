@@ -4153,6 +4153,17 @@ export default function WorkSession() {
   }, []);
 
   useEffect(() => {
+    if (!newSessionParkConfirmOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && !newSessionParkBusy) {
+        setNewSessionParkConfirmOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [newSessionParkConfirmOpen, newSessionParkBusy]);
+
+  useEffect(() => {
     const onOutputTypeId = (e: Event) => {
       const ce = e as CustomEvent<{ outputTypeId?: string }>;
       const id = ce.detail?.outputTypeId;
@@ -5963,6 +5974,11 @@ export default function WorkSession() {
     handleNewSession();
   }, [handleNewSession]);
 
+  const handleNewSessionConfirmDismiss = useCallback(() => {
+    if (newSessionParkBusy) return;
+    setNewSessionParkConfirmOpen(false);
+  }, [newSessionParkBusy]);
+
   const handleNewSessionConfirmYes = useCallback(async () => {
     if (!user?.id) {
       toast("Sign in to park this in the Pipeline.", "info");
@@ -7089,9 +7105,41 @@ export default function WorkSession() {
               padding: "20px 20px 16px",
               borderRadius: 14,
               boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
+              position: "relative",
             }}
           >
-            <h2 id="ew-new-session-park-title" style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700, color: "var(--fg)" }}>
+            <button
+              type="button"
+              onClick={handleNewSessionConfirmDismiss}
+              disabled={newSessionParkBusy}
+              aria-label="Close"
+              style={{
+                position: "absolute",
+                top: 12,
+                right: 12,
+                width: 28,
+                height: 28,
+                borderRadius: 8,
+                border: "1px solid var(--glass-border)",
+                background: "transparent",
+                color: "var(--fg-3)",
+                cursor: newSessionParkBusy ? "not-allowed" : "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: 0,
+                fontFamily: FONT,
+                opacity: newSessionParkBusy ? 0.4 : 1,
+                transition: "background 0.12s, color 0.12s",
+              }}
+              onMouseEnter={e => { if (!newSessionParkBusy) { e.currentTarget.style.background = "rgba(0,0,0,0.04)"; e.currentTarget.style.color = "var(--fg)"; } }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "var(--fg-3)"; }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+              </svg>
+            </button>
+            <h2 id="ew-new-session-park-title" style={{ margin: "0 0 8px", paddingRight: 36, fontSize: 17, fontWeight: 700, color: "var(--fg)" }}>
               New session
             </h2>
             <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>

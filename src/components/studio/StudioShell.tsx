@@ -282,8 +282,6 @@ export default function StudioShell() {
     location.pathname.startsWith("/studio/admin") ||
     location.pathname.startsWith("/studio/lot");
 
-  const studioViewportLock = location.pathname.startsWith("/studio/work");
-
   return (
     <ShellContext.Provider value={{
       searchOpen, setSearchOpen,
@@ -302,7 +300,7 @@ export default function StudioShell() {
     }}>
       <ProjectProvider>
       <div
-        className={`studio-app-shell ${studioViewportLock ? "studio-app-shell--viewport-lock" : "studio-app-shell--document-scroll"}`}
+        className="studio-app-shell studio-app-shell--viewport-lock"
         style={{
           background: "var(--bg)", fontFamily: "var(--font)",
           width: "100%",

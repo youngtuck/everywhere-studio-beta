@@ -9,11 +9,16 @@
  * ─────────────────────────────────────────────────── */
 
 /* ─── STUDIO VIEWPORT (StudioShell) ─────────────────────────────
-   Default (.studio-app-shell--document-scroll): html/body scroll as one page.
-   Sidebar and main grow with content; no nested viewport trap.
+   Global mode (.studio-app-shell--viewport-lock): lock document; sidebar,
+   topbar, and Reed inspector stay pinned. The stage canvas owns the
+   scroll container, so html/body never grow past the viewport. Pages
+   that already manage internal scroll (Dashboard, Watch, Wrap,
+   OutputLibrary, WorkSession) continue to scroll inside their own
+   bounded flex children.
 
-   Work (.studio-app-shell--viewport-lock): lock document; flex column fills
-   one viewport so only WorkSession can bind overflow to the Reed chat list.
+   The .studio-app-shell--document-scroll rules below remain for
+   reference but are no longer applied. The shell hardcodes
+   viewport-lock for every studio route.
 ────────────────────────────────────────────────────────────────── */
 
 html:has(.studio-app-shell--viewport-lock),
@@ -123,7 +128,8 @@ html:has(.studio-app-shell--viewport-lock) #root {
   flex: 1 1 auto;
   min-height: 0;
   min-width: 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .studio-app-shell--viewport-lock .studio-main-inner.studio-stage-scroll {
@@ -133,7 +139,7 @@ html:has(.studio-app-shell--viewport-lock) #root {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* CO_038A: Stage canvas floats inside the content row with rounded
