@@ -3,7 +3,7 @@ import "../../pages/studio/shared.css";
 import { ShellContext, useShell } from "./StudioShellContext";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import StudioSidebar from "./StudioSidebar";
-import StudioTopBar from "./StudioTopBar";
+import StudioTopBar, { WorkStageRail } from "./StudioTopBar";
 import { StudioGlobalSearch } from "./StudioGlobalSearch";
 import { ProjectProvider } from "../../context/ProjectContext";
 import MobileBottomNav from "./MobileBottomNav";
@@ -360,6 +360,15 @@ export default function StudioShell() {
           ) : (
             <StudioTopBar />
           )}
+
+          {/* CO_038B WS6: Stage rail. Renders only on /studio/work routes
+              (component returns null elsewhere). Holds the Work pipeline
+              pills outside the topbar, satisfying the spec rule that stage
+              pills stay separate from the breadcrumb trail. Topbar height
+              remains 50px on every route; this rail adds ~36px on Work
+              routes only. Wrap viewport math is unaffected (Wrap is not
+              a Work route). */}
+          {!isMobile && <WorkStageRail />}
 
           {/* Main canvas. Stage container floats with rounded corners and
               margins from sidebar, topbar, inspector, and bottom (CO_038A).

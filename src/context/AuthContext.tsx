@@ -14,6 +14,7 @@ interface AuthContextType {
   profile: ProfileOnboarding;
   profileLoaded: boolean;
   displayName: string;
+  userTimezone: string | null;
   refreshProfile: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -41,6 +42,7 @@ const AuthContext = createContext<AuthContextType>({
   profile: null,
   profileLoaded: false,
   displayName: "",
+  userTimezone: null,
   refreshProfile: async () => {},
   signOut: async () => {},
 });
@@ -52,6 +54,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<ProfileOnboarding>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [displayName, setDisplayName] = useState("");
+  const [userTimezone, setUserTimezone] = useState<string | null>(null);
   const hasRoutedRef = useRef(false);
   const nameFixedRef = useRef(false);
 
@@ -59,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const { data } = await supabase
       .from("profiles")
-      .select("voice_dna_completed, onboarding_complete, full_name")
+      .select("voice_dna_completed, onboarding_complete, full_name, timezone")
       .eq("id", user.id)
       .single();
 
@@ -72,6 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         : null
     );
     setProfileLoaded(true);
+    setUserTimezone(typeof data?.timezone === "string" && data.timezone.trim() ? data.timezone : null);
 
     // Resolve display name with fallback chain
     const resolved = resolveDisplayName(user, data?.full_name ?? null);
@@ -131,6 +135,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setProfile(null);
       setProfileLoaded(false);
       setDisplayName("");
+      setUserTimezone(null);
       nameFixedRef.current = false;
       return;
     }
@@ -147,10 +152,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
     setProfileLoaded(false);
     setDisplayName("");
+    setUserTimezone(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, profile, profileLoaded, displayName, refreshProfile, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, profile, profileLoaded, displayName, userTimezone, refreshProfile, signOut }}>
       {children}
     </AuthContext.Provider>
   );

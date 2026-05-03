@@ -13,12 +13,10 @@ import {
 } from "../../lib/workSessionMetaBridge";
 import {
   loadSession,
-  workProjectKeyFromShellId,
   workSessionRowHasMeaningfulWork,
   sessionTitleFromWorkSessionRow,
   type WorkSessionDbRow,
 } from "../../lib/sessionPersistence";
-import type { StudioProject } from "../../context/ProjectContext";
 import { createPortal } from "react-dom";
 import { useWorkStageFromShell } from "../../hooks/useWorkStageBridge";
 import { useStudioProject } from "../../context/ProjectContext";
@@ -32,101 +30,75 @@ type CloudBarPickup = { title: string; projectKey: string; projectName: string }
 
 type CloudWorkRow = WorkSessionDbRow & { projects?: { name: string } | null };
 
-function resolveSessionProjectLabel(
-  projects: StudioProject[],
-  activeProject: StudioProject | null,
-  bar: ReturnType<typeof getStudioWorkSessionBarSnapshot>,
-  cloud: CloudBarPickup | null,
-): string {
-  const k = bar.projectKey ?? cloud?.projectKey ?? null;
-  if (k) {
-    const match = projects.find(p => workProjectKeyFromShellId(p.id) === k);
-    if (match) return match.name;
-  }
-  const pn = (cloud?.projectName || "").trim();
-  if (pn) return pn;
-  return activeProject?.name ?? "My Studio";
-}
+// CO_038B WS6 page label map. Used by useStudioTopBarCenterBreadcrumbs to
+// resolve the terminal segment of the breadcrumb trail. Work routes are
+// handled separately because they may include an additional session segment.
+const PAGE_LABEL_MAP: Record<string, string> = {
+  "/studio/dashboard": "Home",
+  "/studio/watch": "Watch",
+  "/studio/wrap": "Wrap",
+  "/studio/lot": "The Lot",
+  "/studio/outputs": "Library",
+  "/studio/projects": "Projects",
+  "/studio/resources": "Resources",
+  "/studio/settings": "Settings",
+  "/studio/settings/voice": "Voice DNA",
+  "/studio/settings/brand": "Brand DNA",
+  "/studio/settings/memory": "Composer memory",
+  "/studio/workbench": "Workbench",
+};
 
-function HomeRouteBreadcrumb({ path, nav }: { path: string; nav: ReturnType<typeof useNavigate> }) {
-  const labelMap: Record<string, string> = {
-    "/studio/dashboard": "Home",
-    "/studio/watch": "Watch",
-    "/studio/wrap": "Wrap",
-    "/studio/lot": "The Lot",
-    "/studio/outputs": "The Catalog",
-    "/studio/projects": "Projects",
-    "/studio/resources": "Resources",
-    "/studio/settings": "Settings",
-    "/studio/settings/voice": "Voice DNA",
-    "/studio/settings/brand": "Brand DNA",
-    "/studio/settings/memory": "Composer memory",
-    "/studio/workbench": "Workbench",
-  };
-
-  const label = labelMap[path] || "Studio";
-
+function BreadcrumbSeparator() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
-      <span
-        onClick={() => nav("/studio/dashboard")}
-        style={{ fontSize: 14, color: "var(--fg-3)", cursor: "pointer", transition: "color 0.1s" }}
-        onMouseEnter={e => { (e.target as HTMLElement).style.color = "var(--fg-2)"; }}
-        onMouseLeave={e => { (e.target as HTMLElement).style.color = "var(--fg-3)"; }}
-      >
-        Home
-      </span>
-      {label !== "Home" && (
-        <>
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--fg-3)", opacity: 0.85 }}>
-            <path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", padding: "3px 8px", borderRadius: 6, background: "rgba(200,169,110,0.1)", border: "1px solid rgba(200,169,110,0.18)" }}>
-            {label}
-          </span>
-        </>
-      )}
-    </div>
+    <span
+      aria-hidden
+      style={{
+        fontSize: 14,
+        fontWeight: 400,
+        color: "var(--fg-3)",
+        padding: "0 6px",
+        userSelect: "none" as const,
+        flexShrink: 0,
+        lineHeight: 1,
+      }}
+    >
+      {"›"}
+    </span>
   );
 }
 
-function SessionProjectSessionBreadcrumb({ projectLabel, sessionTitle }: { projectLabel: string; sessionTitle: string }) {
+function BreadcrumbTerminalLabel({ children }: { children: ReactNode }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6, minWidth: 0 }}>
-      <span
-        style={{
-          fontSize: 14,
-          fontWeight: 600,
-          color: "var(--fg)",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          maxWidth: "min(200px, 28vw)",
-        }}
-      >
-        {projectLabel}
-      </span>
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none" style={{ color: "var(--fg-3)", opacity: 0.85, flexShrink: 0 }}>
-        <path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-      <span
-        style={{
-          fontSize: 14,
-          fontWeight: 600,
-          color: "var(--fg)",
-          padding: "3px 8px",
-          borderRadius: 6,
-          background: "rgba(200,169,110,0.1)",
-          border: "1px solid rgba(200,169,110,0.18)",
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          whiteSpace: "nowrap",
-          maxWidth: "min(240px, 36vw)",
-        }}
-      >
-        {sessionTitle}
-      </span>
-    </div>
+    <span style={{
+      fontSize: 14,
+      fontWeight: 600,
+      color: "var(--fg)",
+      padding: "3px 8px",
+      borderRadius: 6,
+      background: "rgba(200,169,110,0.1)",
+      border: "1px solid rgba(200,169,110,0.18)",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      maxWidth: "min(240px, 36vw)",
+      flexShrink: 1,
+    }}>
+      {children}
+    </span>
+  );
+}
+
+function BreadcrumbParentLabel({ children }: { children: ReactNode }) {
+  return (
+    <span style={{
+      fontSize: 14,
+      fontWeight: 500,
+      color: "var(--fg-2)",
+      whiteSpace: "nowrap",
+      flexShrink: 0,
+    }}>
+      {children}
+    </span>
   );
 }
 
@@ -138,7 +110,7 @@ function useStudioTopBarCenterBreadcrumbs(): {
   const loc = useLocation();
   const nav = useNavigate();
   const { user } = useAuth();
-  const { projects, activeProject, setActiveProjectId } = useStudioProject();
+  const { setActiveProjectId } = useStudioProject();
   const [cloudBarPickup, setCloudBarPickup] = useState<CloudBarPickup | null>(null);
 
   const bar = useSyncExternalStore(
@@ -149,7 +121,7 @@ function useStudioTopBarCenterBreadcrumbs(): {
 
   const path = loc.pathname;
   const onWork = path.startsWith("/studio/work");
-  const hasContext = bar.hasWorkSessionContext || cloudBarPickup != null;
+  const sessionActive = bar.hasWorkSessionContext || cloudBarPickup != null;
 
   useEffect(() => {
     if (!user?.id || onWork || loadSession()) {
@@ -206,9 +178,6 @@ function useStudioTopBarCenterBreadcrumbs(): {
     };
   }, [user?.id, onWork, bar.hasLocalMirror]);
 
-  const projectLabel = resolveSessionProjectLabel(projects, activeProject, bar, cloudBarPickup);
-  const sessionTitleForDisplay = cloudBarPickup?.title ?? bar.title;
-
   const onReturnToSession = () => {
     const pk = bar.projectKey ?? cloudBarPickup?.projectKey ?? "default";
     if (pk !== "default") setActiveProjectId(pk);
@@ -220,18 +189,49 @@ function useStudioTopBarCenterBreadcrumbs(): {
     }
   };
 
+  // CO_038B WS6: project name absorbed into the center breadcrumb. The
+  // project segment is the ProjectSwitcher dropdown rendered in
+  // "breadcrumb" appearance (no border, fontSize 14 fontWeight 600).
+  // Non-Work routes:        Project › PageLabel
+  // Work without session:   Project › Work
+  // Work with session:      Project › Work › SessionTitle
+  // Stage pills render in a separate rail below the topbar (WorkStageRail
+  // mounted by StudioShell), not inside this breadcrumb.
+  let segments: ReactNode;
   if (onWork) {
-    return {
-      center: <WorkBreadcrumb />,
-      showReturnPill: false,
-      onReturnToSession,
-    };
+    const sessionVisible = sessionActive && bar.metaActive;
+    segments = (
+      <>
+        <ProjectSwitcher appearance="breadcrumb" />
+        <BreadcrumbSeparator />
+        {sessionVisible ? (
+          <>
+            <BreadcrumbParentLabel>Work</BreadcrumbParentLabel>
+            <BreadcrumbSeparator />
+            <WorkSessionTitleChip />
+          </>
+        ) : (
+          <BreadcrumbTerminalLabel>Work</BreadcrumbTerminalLabel>
+        )}
+      </>
+    );
+  } else {
+    const label = PAGE_LABEL_MAP[path] || "Studio";
+    segments = (
+      <>
+        <ProjectSwitcher appearance="breadcrumb" />
+        <BreadcrumbSeparator />
+        <BreadcrumbTerminalLabel>{label}</BreadcrumbTerminalLabel>
+      </>
+    );
   }
 
-  // CO_030: Session breadcrumb scoped to Work routes only.
-  // Non-Work pages show page-level breadcrumb, not the session title.
   return {
-    center: <HomeRouteBreadcrumb path={path} nav={nav} />,
+    center: (
+      <div style={{ display: "flex", alignItems: "center", minWidth: 0, flex: "0 1 auto" }}>
+        {segments}
+      </div>
+    ),
     showReturnPill: false,
     onReturnToSession,
   };
@@ -246,9 +246,18 @@ function workStagePillLabel(s: WorkStage): string {
   return s === "Edit" ? "Draft" : s;
 }
 
-function WorkBreadcrumb() {
+// CO_038B WS6: Renamed from WorkBreadcrumb. Now exported and rendered as a
+// thin rail directly below the topbar by StudioShell, on Work routes only.
+// The rail returns null off-route (StudioShell mounts it unconditionally).
+// Spec: stage pills stay separate from the breadcrumb; the breadcrumb shows
+// "Project ›  Work › SessionTitle" while this rail shows the stage pipeline.
+export function WorkStageRail() {
+  const loc = useLocation();
   const stageRaw = useWorkStageFromShell();
   const { intakeProgress } = useShell();
+
+  if (loc.pathname !== "/studio/work" && !loc.pathname.startsWith("/studio/work/")) return null;
+
   const stage: WorkStage = WORK_STAGES.includes(stageRaw as WorkStage)
     ? (stageRaw as WorkStage)
     : "Review";
@@ -260,7 +269,20 @@ function WorkBreadcrumb() {
   const activeIdx = stages.indexOf(stage);
 
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+    <div
+      role="navigation"
+      aria-label="Work stages"
+      style={{
+        flexShrink: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        padding: "6px 16px",
+        borderBottom: "1px solid rgba(0,0,0,0.04)",
+        background: "transparent",
+      }}
+    >
       {stages.map((s, i) => {
         const isDone = i < activeIdx;
         const isActive = i === activeIdx;
@@ -316,7 +338,7 @@ function WorkBreadcrumb() {
 }
 
 // ── Project dropdown (Supabase, matches StudioSidebar query) ──
-function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | "context" }) {
+function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | "context" | "breadcrumb" }) {
   const { user } = useAuth();
   const { projects, activeProject, activeProjectId, setActiveProjectId, refreshProjects, loading } = useStudioProject();
   const [open, setOpen] = useState(false);
@@ -652,47 +674,53 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
       )
     : null;
 
+  const isBreadcrumb = appearance === "breadcrumb";
   const isContext = appearance === "context";
-  const triggerStyle = isContext
+  const triggerStyle = isBreadcrumb
     ? {
         display: "flex" as const,
         alignItems: "center" as const,
         gap: 4,
-        maxWidth: 200,
+        maxWidth: 240,
         minWidth: 0,
         flexShrink: 1,
-        padding: "2px 4px",
-        borderRadius: 4,
+        padding: "3px 6px",
+        borderRadius: 6,
         border: "none",
         background: "transparent",
         cursor: "pointer" as const,
         fontFamily: "inherit" as const,
       }
-    : {
-        display: "flex" as const,
-        alignItems: "center" as const,
-        gap: 6,
-        maxWidth: 200,
-        padding: "5px 10px",
-        borderRadius: 10,
-        border: "1px solid rgba(0,0,0,0.08)",
-        background: "rgba(255,255,255,0.45)",
-        cursor: "pointer" as const,
-        fontFamily: "inherit" as const,
-      };
-  const labelStyle = isContext
+    : isContext
+      ? {
+          display: "flex" as const,
+          alignItems: "center" as const,
+          gap: 4,
+          maxWidth: 200,
+          minWidth: 0,
+          flexShrink: 1,
+          padding: "2px 4px",
+          borderRadius: 4,
+          border: "none",
+          background: "transparent",
+          cursor: "pointer" as const,
+          fontFamily: "inherit" as const,
+        }
+      : {
+          display: "flex" as const,
+          alignItems: "center" as const,
+          gap: 6,
+          maxWidth: 200,
+          padding: "5px 10px",
+          borderRadius: 10,
+          border: "1px solid rgba(0,0,0,0.08)",
+          background: "rgba(255,255,255,0.45)",
+          cursor: "pointer" as const,
+          fontFamily: "inherit" as const,
+        };
+  const labelStyle = isBreadcrumb
     ? {
-        fontSize: 12,
-        fontWeight: 500,
-        color: "var(--fg-2)",
-        whiteSpace: "nowrap" as const,
-        overflow: "hidden",
-        textOverflow: "ellipsis" as const,
-        flex: 1,
-        minWidth: 0,
-      }
-    : {
-        fontSize: 12,
+        fontSize: 14,
         fontWeight: 600,
         color: "var(--fg)",
         whiteSpace: "nowrap" as const,
@@ -700,11 +728,32 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
         textOverflow: "ellipsis" as const,
         flex: 1,
         minWidth: 0,
-      };
+      }
+    : isContext
+      ? {
+          fontSize: 14,
+          fontWeight: 500,
+          color: "var(--fg-2)",
+          whiteSpace: "nowrap" as const,
+          overflow: "hidden",
+          textOverflow: "ellipsis" as const,
+          flex: 1,
+          minWidth: 0,
+        }
+      : {
+          fontSize: 14,
+          fontWeight: 600,
+          color: "var(--fg)",
+          whiteSpace: "nowrap" as const,
+          overflow: "hidden",
+          textOverflow: "ellipsis" as const,
+          flex: 1,
+          minWidth: 0,
+        };
   const chevronColor = "var(--fg-3)";
 
   return (
-    <div style={{ position: "relative", flexShrink: isContext ? 1 : 0, minWidth: 0 }}>
+    <div style={{ position: "relative", flexShrink: isBreadcrumb || isContext ? 1 : 0, minWidth: 0 }}>
       <button
         type="button"
         ref={anchorRef}
@@ -725,32 +774,9 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
   );
 }
 
-/** "/" between project and session on Work when a session is active. */
-function WorkSessionPathDivider() {
-  const loc = useLocation();
-  const meta = useSyncExternalStore(
-    subscribeWorkSessionMeta,
-    getWorkSessionMetaSnapshot,
-    getServerWorkSessionMetaSnapshot,
-  );
-  if (!loc.pathname.startsWith("/studio/work") || !meta.active) return null;
-  return (
-    <span
-      aria-hidden
-      style={{
-        fontSize: 12,
-        color: "var(--fg-3)",
-        flexShrink: 0,
-        userSelect: "none",
-        lineHeight: 1,
-        padding: "0 2px",
-      }}
-    >
-      /
-    </span>
-  );
-}
-
+// CO_038B WS6: Renders the session segment of the breadcrumb trail on Work
+// routes. Click to rename. Styling matches BreadcrumbTerminalLabel so it
+// reads as the terminal segment of the trail.
 function WorkSessionTitleChip() {
   const loc = useLocation();
   const onWork = loc.pathname.startsWith("/studio/work");
@@ -796,15 +822,15 @@ function WorkSessionTitleChip() {
         }}
         style={{
           width: 200,
-          maxWidth: "min(280px, 36vw)",
+          maxWidth: "min(240px, 36vw)",
           boxSizing: "border-box",
-          padding: "4px 10px",
+          padding: "3px 8px",
           borderRadius: 6,
-          fontSize: 13,
-          fontWeight: 500,
+          fontSize: 14,
+          fontWeight: 600,
           fontFamily: "inherit",
-          border: "1px solid var(--glass-border)",
-          background: "rgba(0,0,0,0.03)",
+          border: "1px solid rgba(200,169,110,0.45)",
+          background: "rgba(255,255,255,0.5)",
           color: "var(--fg)",
           outline: "none",
         }}
@@ -821,22 +847,22 @@ function WorkSessionTitleChip() {
       }}
       title="Click to name this session (search and sync use this title)"
       style={{
-        maxWidth: "min(280px, 36vw)",
-        padding: "4px 10px",
+        maxWidth: "min(240px, 36vw)",
+        padding: "3px 8px",
         borderRadius: 6,
-        border: "1px solid var(--glass-border)",
-        background: "rgba(0,0,0,0.03)",
+        border: "1px solid rgba(200,169,110,0.18)",
+        background: "rgba(200,169,110,0.1)",
         cursor: "pointer",
         fontFamily: "inherit",
         textAlign: "left" as const,
         overflow: "hidden",
-        flexShrink: 0,
+        flexShrink: 1,
       }}
     >
       <span style={{
         display: "block",
-        fontSize: 13,
-        fontWeight: 500,
+        fontSize: 14,
+        fontWeight: 600,
         color: "var(--fg)",
         whiteSpace: "nowrap",
         overflow: "hidden",
@@ -845,6 +871,49 @@ function WorkSessionTitleChip() {
         {meta.title}
       </span>
     </button>
+  );
+}
+
+// CO_038B WS5: Live-ticking date and time. Reads timezone from the user's
+// profile when set; otherwise the browser's resolved zone. Re-renders every
+// 60s. Sized to match the topbar's canonical 14px / 500 weight scale.
+function TopBarDateTime() {
+  const { userTimezone } = useAuth();
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const tz = userTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const dateStr = now.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    timeZone: tz,
+  });
+  const timeStr = now.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
+    timeZone: tz,
+  });
+
+  return (
+    <div
+      aria-label="Current date and time"
+      style={{
+        fontSize: 14,
+        fontWeight: 500,
+        color: "var(--fg-2)",
+        whiteSpace: "nowrap" as const,
+        flexShrink: 0,
+        lineHeight: 1,
+        padding: "0 6px",
+      }}
+    >
+      {dateStr} · {timeStr}
+    </div>
   );
 }
 
@@ -879,6 +948,11 @@ function SearchIconButton({ onClick }: { onClick: () => void }) {
 }
 
 // ── Main TopBar ─────────────────────────────────────────────────
+// CO_038B WS6 + WS7: Left cluster removed (project name moved into the
+// breadcrumb). Center: breadcrumb trail (Project › PageLabel, or
+// Project › Work › SessionTitle on Work routes). Right: live date/time,
+// search, discover, account. Stage pills render in WorkStageRail below
+// this topbar, mounted by StudioShell.
 export default function StudioTopBar() {
   const { setDiscoverOpen, setSearchOpen } = useShell();
   const { center, showReturnPill, onReturnToSession } = useStudioTopBarCenterBreadcrumbs();
@@ -894,12 +968,6 @@ export default function StudioTopBar() {
       gap: 12,
       flexShrink: 0,
     }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0, minWidth: 0 }}>
-        <ProjectSwitcher />
-        <WorkSessionPathDivider />
-        <WorkSessionTitleChip />
-      </div>
-
       {showReturnPill && (
         <button
           type="button"
@@ -931,23 +999,25 @@ export default function StudioTopBar() {
         </button>
       )}
 
-      {/* Breadcrumbs */}
+      {/* Center: project-prefixed breadcrumb trail */}
       <div style={{ flex: 1, overflow: "hidden", display: "flex", alignItems: "center", minWidth: 0 }}>
         {center}
       </div>
 
-      {/* Right: system actions. CO_038A removed the "+ New Session"
-          button and its trailing Divider; New Session now lives in the
-          left sidebar above Watch (StudioSidebar.tsx, NewSessionButton). */}
+      {/* Right cluster: ambient context (date/time) followed by system
+          actions. CO_038A removed the "+ New Session" button; New Session
+          now lives in the left sidebar above Watch (StudioSidebar.tsx,
+          NewSessionButton). */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        <TopBarDateTime />
         <SearchIconButton onClick={() => setSearchOpen(true)} />
 
         <button
           onClick={() => setDiscoverOpen(true)}
           style={{
             background: "transparent", border: "none",
-            color: "var(--fg-3)", fontSize: 13, fontWeight: 600,
-            cursor: "pointer", padding: "4px", lineHeight: 1,
+            color: "var(--fg-3)", fontSize: 14, fontWeight: 600,
+            cursor: "pointer", padding: "4px 6px", lineHeight: 1,
             fontFamily: "var(--font)", transition: "color 0.12s",
           }}
           onMouseEnter={e => { (e.target as HTMLElement).style.color = "var(--fg)"; }}
