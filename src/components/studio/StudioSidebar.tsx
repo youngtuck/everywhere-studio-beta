@@ -230,11 +230,12 @@ export default function StudioSidebar({ collapsed = false, onToggleCollapsed, on
             )}
           </nav>
 
-          {/* CO_038A: Gear icon placeholder. Pinned to the bottom of the
-              rail via margin-top: auto in the wrapper (see studio-liquid-glass.css).
-              Click navigates to /studio/settings. The full Settings drawer
-              consolidation (Voice DNA, Brand DNA, Composer memory, Research)
-              lands in CO_038B. */}
+          {/* CO_038A: Gear icon. Pinned to the bottom of the rail via
+              margin-top: auto in the wrapper (see studio-liquid-glass.css).
+              Click navigates to /studio/settings (full route, not a drawer,
+              confirmed in CO_038B workstream 13). The Settings consolidation
+              (Voice DNA, Brand DNA, Composer memory, Research) lands in
+              CO_038C. */}
           {user && (
             <div className="studio-sidebar-gear-wrap">
               <button

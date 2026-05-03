@@ -78,7 +78,7 @@ function AdvisorFeedbackFallback({ pathname }: { pathname: string }) {
   const { ctx, stageLabel } = getAdvisorCtx(pathname);
   return (
     <div>
-      <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 8 }}>{stageLabel}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--fg-3)", marginBottom: 8 }}>{stageLabel}</div>
       <div style={{
         border: "1px solid rgba(74,144,217,0.16)",
         borderRadius: 8,
@@ -105,7 +105,7 @@ function AdvisorFeedbackFallback({ pathname }: { pathname: string }) {
             background: "var(--glass-card)",
           }}
         >
-          <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{card.role}</div>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{card.role}</div>
           <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>{card.text}</div>
         </div>
       ))}
@@ -655,7 +655,7 @@ function ReedPanel() {
                 onClick={() => { if (!disabled) runChip(chip.prefill, chip.label); }}
                 disabled={disabled}
                 style={{
-                  fontSize: 10, padding: "4px 10px", borderRadius: 99,
+                  fontSize: 12, padding: "4px 10px", borderRadius: 99,
                   background: "rgba(0,0,0,0.04)", border: "1px solid rgba(0,0,0,0.1)",
                   color: "var(--fg-2)", cursor: disabled ? "not-allowed" : "pointer",
                   fontFamily: "inherit",

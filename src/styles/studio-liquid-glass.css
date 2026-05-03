@@ -737,7 +737,7 @@
 .studio-sidebar-glass {
   flex: 1;
   min-height: 0;
-  margin: 10px 8px 10px 10px;
+  margin: 8px;
   display: flex;
   flex-direction: column;
 }

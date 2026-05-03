@@ -127,21 +127,15 @@ export default function Settings() {
     return () => setDashContent(null);
   }, [setDashContent, setDashOpen]);
 
-  // CO_034 Item 1: Ensure parent main is scrollable
-  useEffect(() => {
-    const main = document.querySelector(".studio-main-inner") as HTMLElement;
-    if (main) { main.style.overflow = ""; main.style.overflowY = "auto"; }
-  }, []);
-
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: FONT }}>
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
-        <div style={{ padding: "12px 20px 10px", maxWidth: isMobile ? "100%" : 560, margin: "0 auto", width: "100%" }}>
+        <div style={{ padding: "12px 20px 10px", maxWidth: isMobile ? "100%" : 720, margin: "0 auto", width: "100%" }}>
           <div style={{ fontSize: 18, fontWeight: 600, color: "var(--fg)" }}>Preferences</div>
         </div>
       </header>
 
-      <div style={{ padding: isMobile ? "20px 16px" : "24px 24px 32px", maxWidth: isMobile ? "100%" : 560, margin: "0 auto", width: "100%", overflowY: "auto", flex: 1, minHeight: 0 }}>
+      <div style={{ padding: isMobile ? "20px 16px" : "24px 24px 32px", maxWidth: isMobile ? "100%" : 720, margin: "0 auto", width: "100%", overflowY: "auto", flex: 1, minHeight: 0 }}>
 
       {/* Display */}
       <Card title="Display">

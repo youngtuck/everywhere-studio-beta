@@ -1582,7 +1582,7 @@ export default function WrapPage() {
   const readerCard = (
     <div className="liquid-glass-card" style={{
       width: "100%",
-      maxWidth: 640,
+      maxWidth: 720,
       margin: "0 auto",
       boxSizing: "border-box" as const,
       padding: isMobile ? "22px 20px" : "32px 36px",

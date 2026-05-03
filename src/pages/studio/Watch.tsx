@@ -764,7 +764,7 @@ export default function Watch() {
       <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
         {/* ── BRIEFING TAB ── */}
         {activeTab === "briefing" && (
-          <div style={{ padding: "20px 20px 28px", maxWidth: 760, margin: "0 auto", width: "100%" }}>
+          <div style={{ padding: "20px 20px 28px", maxWidth: 720, margin: "0 auto", width: "100%" }}>
             {loadingBriefing ? (
               <div style={{ fontSize: 14, color: "var(--fg-3)", padding: "40px 0", textAlign: "center" as const }}>Loading briefing...</div>
             ) : generatingBriefing ? (
@@ -854,7 +854,7 @@ export default function Watch() {
 
         {/* ── RESEARCH TAB ── */}
         {activeTab === "research" && (
-          <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 20px 24px", maxWidth: 820, margin: "0 auto", width: "100%" }}>
+          <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 20px 24px", maxWidth: 720, margin: "0 auto", width: "100%" }}>
             <div className="liquid-glass-card" style={{ padding: 18, marginBottom: 16, flexShrink: 0 }}>
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>
                 Discovery
@@ -992,7 +992,7 @@ export default function Watch() {
 
         {/* ── SETTINGS TAB ── */}
         {activeTab === "settings" && (
-          <div style={{ padding: "20px 20px 32px", maxWidth: 960, margin: "0 auto", width: "100%" }}>
+          <div style={{ padding: "20px 20px 32px", maxWidth: 720, margin: "0 auto", width: "100%" }}>
             {!hasSetup && keywords.length === 0 && competitors.length === 0 && newsletters.length === 0 && (
               <div className="liquid-glass-card" style={{
                 background: "rgba(245,198,66,0.05)", borderColor: "rgba(245,198,66,0.22)",
