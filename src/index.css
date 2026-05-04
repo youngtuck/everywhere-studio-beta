@@ -421,9 +421,9 @@ button { font-family: var(--font); }
   --studio-heading-size: 18px;
   --studio-heading-weight: 600;
   --studio-subhead-size: 14px;
-  --studio-subhead-weight: 500;
+  --studio-subhead-weight: 400;
   --studio-label-size: 11px;
-  --studio-label-weight: 700;
+  --studio-label-weight: 600;
   --studio-label-spacing: 0.08em;
   --studio-mono-font: 'DM Mono', monospace;
 }
