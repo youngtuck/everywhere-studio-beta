@@ -33,7 +33,7 @@ export function PipelineBlockedAlert({ blockedAt, feedback }: PipelineBlockedAle
         <div
           style={{
             fontSize: 13,
-            fontWeight: 500,
+            fontWeight: 400,
             color: "#b91c1c",
             marginBottom: 4,
           }}

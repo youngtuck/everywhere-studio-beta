@@ -262,7 +262,7 @@ export function VoiceDNAReview({ data, onConfirm, onRefine, onUploadMore }: Voic
               color: "#ffffff",
               fontFamily: "'Inter', sans-serif",
               fontSize: 14,
-              fontWeight: 500,
+              fontWeight: 400,
               cursor: "pointer",
             }}
           >

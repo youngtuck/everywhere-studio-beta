@@ -138,7 +138,7 @@ export function CheckpointResultsPanel({ results, blockedAt }: CheckpointResults
                   <span
                     style={{
                       fontSize: 13,
-                      fontWeight: 500,
+                      fontWeight: 400,
                       color: "var(--text-primary)",
                       whiteSpace: "nowrap",
                       overflow: "hidden",

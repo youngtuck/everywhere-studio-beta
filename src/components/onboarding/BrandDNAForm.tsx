@@ -450,7 +450,7 @@ export function BrandDNAForm({ onComplete, onSkip }: BrandDNAFormProps) {
             color: "#ffffff",
             fontFamily: "'Inter', sans-serif",
             fontSize: 14,
-            fontWeight: 500,
+            fontWeight: 400,
             cursor: "pointer",
           }}
         >

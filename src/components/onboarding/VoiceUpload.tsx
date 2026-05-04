@@ -199,7 +199,7 @@ export function VoiceUpload({ onComplete }: VoiceUploadProps) {
             marginTop: 16,
             fontFamily: "'Inter', sans-serif",
             fontSize: 16,
-            fontWeight: 500,
+            fontWeight: 400,
             color: "#ffffff",
           }}
         >

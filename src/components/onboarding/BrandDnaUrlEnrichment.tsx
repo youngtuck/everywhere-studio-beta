@@ -103,7 +103,7 @@ export function BrandDnaUrlEnrichment({ draft, getAccessToken, onBack, onComplet
 
   return (
     <section style={{ maxWidth: 640, margin: "0 auto" }}>
-      <h2 style={{ fontFamily: font, fontSize: 28, fontWeight: 700, color: "#fff", margin: "0 0 8px" }}>
+      <h2 style={{ fontFamily: font, fontSize: 28, fontWeight: 600, color: "#fff", margin: "0 0 8px" }}>
         Review Brand DNA from your site
       </h2>
       <p style={{ fontFamily: font, fontSize: 14, color: "rgba(255,255,255,0.55)", lineHeight: 1.55, marginBottom: 24 }}>
@@ -120,7 +120,7 @@ export function BrandDnaUrlEnrichment({ draft, getAccessToken, onBack, onComplet
           background: "rgba(200,169,110,0.06)",
         }}
       >
-        <div style={{ fontFamily: font, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 10 }}>
+        <div style={{ fontFamily: font, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", color: "rgba(255,255,255,0.5)", marginBottom: 10 }}>
           CAPTURED FROM SITE
         </div>
         <ul style={{ margin: 0, paddingLeft: 18, fontFamily: font, fontSize: 13, color: "rgba(255,255,255,0.88)", lineHeight: 1.55 }}>
@@ -133,7 +133,7 @@ export function BrandDnaUrlEnrichment({ draft, getAccessToken, onBack, onComplet
       </div>
 
       <div style={{ marginBottom: 20 }}>
-        <div style={{ fontFamily: font, fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", color: "rgba(255,255,255,0.45)", marginBottom: 10 }}>
+        <div style={{ fontFamily: font, fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", color: "rgba(255,255,255,0.45)", marginBottom: 10 }}>
           FIELD GUIDES
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
