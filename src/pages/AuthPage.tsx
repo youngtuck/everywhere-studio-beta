@@ -387,7 +387,7 @@ const AuthPage = () => {
             style={{
               display: "inline-block",
               fontSize: 10,
-              fontWeight: 700,
+              fontWeight: 600,
               letterSpacing: "0.14em",
               textTransform: "uppercase",
               color: "var(--gold-bright, #F5C642)",
@@ -446,7 +446,7 @@ const AuthPage = () => {
                       letterSpacing: "0.18em",
                       textTransform: "uppercase",
                       color: "rgba(240,237,228,0.4)",
-                      fontWeight: 500,
+                      fontWeight: 400,
                       fontFamily: "'DM Mono', ui-monospace, monospace",
                     }}
                   >

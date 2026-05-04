@@ -13,8 +13,8 @@ Primary content capture agent: Reed (not Watson, always Reed)
 ## Stack
 
 - React 18, TypeScript, Vite
-- Tailwind CSS + shadcn/ui for the studio dashboard
-- Inline styles + CSS-in-JS for the marketing/explore page (no Tailwind on marketing pages)
+- Inline styles plus CSS variables for the studio dashboard (defined in src/index.css; no Tailwind, no shadcn/ui)
+- Inline styles plus CSS-in-JS for the marketing/explore page (no Tailwind on marketing pages)
 - Supabase (auth, database, storage)
 - Anthropic Claude API (claude-sonnet-4-20250514) for all AI features
 - Vercel (deployment, serverless functions in /api)
@@ -115,6 +115,28 @@ These classes are defined in the CSS constant inside ExplorePage.tsx.
 - All animations use CSS keyframes defined in the CSS block (prefixed with xp)
 - No animation libraries. No GSAP, no Framer Motion, no Lottie.
 
+## Brand System: Studio Pages
+
+### Typography (CO_038D canon)
+
+Inter is the studio family. Allowed weights: **300, 400, 600**.
+
+- 300: small low-contrast text. Currently used only for the Logo tagline.
+- 400: body text, default labels, inactive nav rows, inactive tab labels, inactive review-format tabs.
+- 600: headings, active nav rows, active tab labels, CTA buttons, eyebrow and section labels, h1 through h4 in rendered Markdown.
+
+Canonized exception: weight 700 is reserved for the active WorkStageRail stage pill (`src/components/studio/StudioTopBar.tsx`, marked with an inline `// CO_038D canon` comment). This is the only inline 700 allowed in the studio.
+
+Loaded from Google Fonts in `index.html` at weights 300, 400, 600 plus italic 400 and 600. DM Mono remains at 400 and 500. No 200, 500, 700, or 800 are loaded for Inter.
+
+Studio CSS variable tokens (defined in src/index.css, currently unused but available for future adoption):
+- `--studio-display-weight`: 600
+- `--studio-heading-weight`: 600
+- `--studio-subhead-weight`: 400
+- `--studio-label-weight`: 600
+
+Marketing pages use Instrument Sans (see Brand System: Marketing Pages above). The CO_038D sweep does not touch marketing typography.
+
 ## Routing
 
 - `/` redirects to `/explore`
@@ -138,7 +160,7 @@ These classes are defined in the CSS constant inside ExplorePage.tsx.
 
 - TypeScript strict mode
 - Inline styles for marketing pages (no external CSS files, no Tailwind on marketing)
-- Tailwind + shadcn/ui for studio pages
+- Inline styles plus CSS variables for studio pages (no Tailwind, no shadcn/ui; tokens live in src/index.css and src/pages/studio/shared.css)
 - Functional components with hooks (no class components)
 - Named exports for page components, default exports acceptable for components
 - No console.log in production code (use console.error for actual errors only)
