@@ -3025,12 +3025,21 @@ function ReviewProgress({
 }
 
 // ── Format-aware review preview ──────────────────────────────────────────────
+// CO_038C WS12: `flagsInDraft` gates the per-paragraph flag lookup below. When
+// false, the lookup is skipped and the paragraph renders without any flag-derived
+// treatment. When true and a paragraph matches an hvtFlaggedLine, the outer div
+// gets a subtle blue tint and left border whose color matches HvtFlaggedSection
+// in the Inspector (rgba(74,144,217,...)). countDraftFlags, the inspector flag
+// list (HvtFlaggedSection), and the "Draft has flagged items" advance warning
+// are intentionally not gated, so users can hide the visual highlight while
+// still being blocked from advancing to Review with unfixed flags.
 function ReviewFormatPreview({
-  format, draft, hvtFlaggedLines, onApplySuggestion, onDirectReplace, highlightedParas,
+  format, draft, hvtFlaggedLines, flagsInDraft, onApplySuggestion, onDirectReplace, highlightedParas,
 }: {
   format: string;
   draft: string;
   hvtFlaggedLines: Array<{ lineIndex: number; original: string; issue: string; vector: string; suggestion: string }>;
+  flagsInDraft: boolean;
   onApplySuggestion?: (instruction: string) => void;
   onDirectReplace?: (original: string, replacement: string) => void;
   highlightedParas?: number[];
@@ -3040,8 +3049,21 @@ function ReviewFormatPreview({
   const body = paragraphs.slice(1);
   const [hoveredFlag, setHoveredFlag] = useState<number | null>(null);
 
+  // CO_038C WS12: visual treatment for flagged paragraphs in the Review preview.
+  // Color language matches the inspector card at HvtFlaggedSection (line 1023).
+  const flaggedParaStyle: CSSProperties = {
+    background: "rgba(74,144,217,0.04)",
+    borderLeft: "3px solid rgba(74,144,217,0.4)",
+    paddingLeft: 10,
+    paddingTop: 4,
+    paddingBottom: 4,
+    borderRadius: "0 4px 4px 0",
+  };
+
   const renderPara = (p: string, i: number) => {
-    const flagged = hvtFlaggedLines.find(f => p.includes(f.original) || f.original.includes(p.slice(0, 40)));
+    const flagged = flagsInDraft
+      ? hvtFlaggedLines.find(f => p.includes(f.original) || f.original.includes(p.slice(0, 40)))
+      : undefined;
     const isHighlighted = highlightedParas?.includes(i + 1);
 
     // If no flag, render normally
@@ -3055,9 +3077,9 @@ function ReviewFormatPreview({
       );
     }
 
-    // Render flagged paragraphs as normal text (no visual flags)
+    // Flagged branch only runs when flagsInDraft is true (gated above).
     return (
-      <div key={i} style={{ marginTop: i > 0 ? 12 : 0 }}>
+      <div key={i} style={{ marginTop: i > 0 ? 12 : 0, ...flaggedParaStyle }}>
         <p className={isHighlighted ? "para-highlight" : undefined}>
           {renderInlineMarkdown(p)}
         </p>
@@ -3605,7 +3627,7 @@ function PreWrapOutputGate({
 function StageReview({
   draft, pipelineRun, running, activeTab, tabs,
   onTabClick, onAdvance, onGoBack, onFix, onDirectReplace, formatDrafts,
-  showChannelPicker,
+  showChannelPicker, flagsInDraft,
 }: {
   draft: string; pipelineRun: PipelineRun | null; running: boolean;
   activeTab: Format | null;
@@ -3617,6 +3639,8 @@ function StageReview({
   formatDrafts: Record<string, { content: string; metadata: Record<string, string>; status: string }>;
   /** Only when the user picked multiple channels in session; hides default 4-way preview chrome. */
   showChannelPicker: boolean;
+  /** CO_038C WS12: when false, ReviewFormatPreview skips the per-paragraph flag lookup. */
+  flagsInDraft: boolean;
 }) {
   /** Internal readiness from pipeline aggregate; not shown to the user. */
   const publishAggregateOk = (pipelineRun?.impactScore?.total ?? 0) >= 75;
@@ -3712,6 +3736,7 @@ function StageReview({
                     format="Sunday Story"
                     draft={draft}
                     hvtFlaggedLines={hvtFlaggedLines}
+                    flagsInDraft={flagsInDraft}
                     onApplySuggestion={async (suggestion) => {
                       setHvtFixing(true);
                       try { await onFix(suggestion); } finally { setHvtFixing(false); }
@@ -3763,6 +3788,7 @@ function StageReview({
                     format={activeTab}
                     draft={adaptedContent}
                     hvtFlaggedLines={hvtFlaggedLines}
+                    flagsInDraft={flagsInDraft}
                     onApplySuggestion={async (suggestion) => {
                       setHvtFixing(true);
                       try { await onFix(suggestion); } finally { setHvtFixing(false); }
@@ -3863,6 +3889,17 @@ export default function WorkSession() {
   const nav = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const { voiceDnaMd, brandDnaMd, methodDnaMd } = useUserDNA(user?.id);
+
+  // CO_038C WS12: profiles.flags_in_draft gates the per-paragraph flag lookup
+  // in ReviewFormatPreview. countDraftFlags, the inspector flag list, and the
+  // advance warning are not gated. Default true matches the migration default
+  // and the prior local-only behavior.
+  const [flagsInDraft, setFlagsInDraft] = useState(true);
+  useEffect(() => {
+    if (!user?.id) return;
+    supabase.from("profiles").select("flags_in_draft").eq("id", user.id).single()
+      .then(({ data }) => { if (data) setFlagsInDraft(!!data.flags_in_draft); });
+  }, [user?.id]);
 
   // ── Restore persisted session on mount ────────────────────────
   const restored = useRef(false);
@@ -7492,6 +7529,7 @@ export default function WorkSession() {
             onDirectReplace={handleDirectReplace}
             formatDrafts={formatDrafts}
             showChannelPicker={selectedFormats.length > 1}
+            flagsInDraft={flagsInDraft}
           />
         )
       )}

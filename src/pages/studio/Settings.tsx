@@ -1,11 +1,22 @@
 /**
- * Settings.tsx — Preferences
+ * Settings.tsx, Preferences
  * Studio display is light mode only (see ThemeContext).
+ *
+ * CO_038C WS12: flag-highlight toggle moved from local useState to a Supabase-backed
+ * profiles.flags_in_draft column. WorkSession reads the same column to gate the
+ * draft flag-highlight overlay. The advance-warning and inspector flag list run
+ * regardless.
+ *
+ * CO_038C WS9: Research panel from Watch.tsx remounts here as a temporary section
+ * above the Voice/Brand/Memory link buttons. Commit 2 will move it under a tab.
  */
 import { useState, useLayoutEffect, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useShell } from "../../components/studio/StudioShell";
+import { useAuth } from "../../context/AuthContext";
 import { useMobile } from "../../hooks/useMobile";
+import { supabase } from "../../lib/supabase";
+import SettingsResearchPanel from "../../components/studio/SettingsResearchPanel";
 import "./shared.css";
 
 const FONT = "var(--font)";
@@ -101,6 +112,7 @@ export default function Settings() {
   const nav = useNavigate();
   const isMobile = useMobile();
   const { setDashContent, setDashOpen } = useShell();
+  const { user } = useAuth();
 
   // Font size: read from localStorage so it persists
   const [fontSize, setFontSize] = useState<number>(() => {
@@ -120,6 +132,21 @@ export default function Settings() {
     }
     try { localStorage.setItem("ew-font-size", String(fontSize)); } catch {}
   }, [fontSize]);
+
+  // CO_038C WS12: hydrate flags_in_draft from profiles on mount.
+  useEffect(() => {
+    if (!user?.id) return;
+    supabase.from("profiles").select("flags_in_draft").eq("id", user.id).single()
+      .then(({ data }) => { if (data) setFlagsInDraft(!!data.flags_in_draft); });
+  }, [user?.id]);
+
+  // CO_038C WS12: optimistic write-back. Caller updates state first; Supabase
+  // write is fire-and-forget. Failures fall back to the prior value on next load.
+  const handleFlagsInDraftChange = (next: boolean) => {
+    setFlagsInDraft(next);
+    if (!user?.id) return;
+    supabase.from("profiles").update({ flags_in_draft: next }).eq("id", user.id);
+  };
 
   useLayoutEffect(() => {
     setDashOpen(false);
@@ -162,8 +189,8 @@ export default function Settings() {
 
       {/* Edit stage */}
       <Card title="Edit stage">
-        <PrefRowLast label="Flags in draft" sublabel="Underline suggestions while editing">
-          <Toggle on={flagsInDraft} onToggle={() => setFlagsInDraft(v => !v)} />
+        <PrefRowLast label="Flag highlights in draft" sublabel="Show flag highlights in your draft">
+          <Toggle on={flagsInDraft} onToggle={() => handleFlagsInDraftChange(!flagsInDraft)} />
         </PrefRowLast>
       </Card>
 
@@ -181,6 +208,9 @@ export default function Settings() {
           />
         </PrefRowLast>
       </Card>
+
+      {/* CO_038C WS9: Research panel mounted here in Commit 1; Commit 2 moves it under a tab. */}
+      <SettingsResearchPanel />
 
       {/* Voice & Brand DNA links */}
       <div className="liquid-glass-card" style={{ marginTop: 8, padding: 16 }}>

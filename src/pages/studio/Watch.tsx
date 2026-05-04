@@ -1,6 +1,7 @@
 /**
- * Watch.tsx, Sentinel Briefing + Research + Settings
- * Rewritten to match Alpha 3.001 wireframe: three center tabs, simplified right panel
+ * Watch.tsx, Sentinel Briefing + Settings.
+ * CO_038C WS9: Research surface moved to /studio/settings; persistence
+ * helpers lifted to src/lib/watchSources.ts.
  */
 import { useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import { useNavigate, type NavigateFunction } from "react-router-dom";
@@ -11,6 +12,18 @@ import { supabase } from "../../lib/supabase";
 import { fetchWithRetry } from "../../lib/retry";
 import { DEFAULT_SOURCES, DEFAULT_KEYWORDS } from "../../lib/defaultWatchSources";
 import type { WatchSource } from "../../lib/defaultWatchSources";
+import {
+  addKeyword as persistAddKeyword,
+  removeKeyword as persistRemoveKeyword,
+  addConfigItem as persistAddConfigItem,
+  removeConfigItem as persistRemoveConfigItem,
+  addSourceItem as persistAddSourceItem,
+  removeSourceItem as persistRemoveSourceItem,
+  saveWatchConfig as persistSaveWatchConfig,
+  buildWatchConfig as composeWatchConfig,
+  type WatchConfigShape,
+  type WatchConfigFrequency,
+} from "../../lib/watchSources";
 import { useMobile } from "../../hooks/useMobile";
 import "./shared.css";
 
@@ -26,11 +39,10 @@ function goToWorkFromWatchItem(navigate: NavigateFunction, title: string, summar
   navigate("/studio/work");
 }
 
-type WatchTabId = "briefing" | "research" | "settings";
+type WatchTabId = "briefing" | "settings";
 
 const WATCH_TABS: { id: WatchTabId; label: string; hint: string }[] = [
   { id: "briefing", label: "Briefing", hint: "Signals from your watchlist" },
-  { id: "research", label: "Research", hint: "Find outlets and people to track" },
   { id: "settings", label: "Settings", hint: "Sources, keywords, and delivery" },
 ];
 
@@ -339,7 +351,7 @@ export default function Watch() {
   const { setFeedbackContent, setReedPrefill, setAskReedPlaceholder } = useShell();
   const isMobile = useMobile();
 
-  const [activeTab, setActiveTab] = useState<"briefing" | "research" | "settings">("briefing");
+  const [activeTab, setActiveTab] = useState<WatchTabId>("briefing");
 
   // Sources & config: start empty for new users, load from Supabase
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -352,9 +364,7 @@ export default function Watch() {
   const [redditCommunities, setRedditCommunities] = useState<string[]>([]);
   const [hasSetup, setHasSetup] = useState(true); // assume true until profile loads
 
-  const [frequency, setFrequency] = useState<"daily" | "weekly" | "realtime">("daily");
-  const [searching, setSearching] = useState(false);
-  const [searchResults, setSearchResults] = useState<Array<{ title?: string; url?: string; description?: string }>>([]);
+  const [frequency, setFrequency] = useState<WatchConfigFrequency>("daily");
 
   // Load user profile (sentinel_topics + watch_config) and watch_sources
   useEffect(() => {
@@ -406,10 +416,6 @@ export default function Watch() {
   const [briefingTime, setBriefingTime] = useState("Updated 6:00 AM");
   const [loadingBriefing, setLoadingBriefing] = useState(true);
   const [generatingBriefing, setGeneratingBriefing] = useState(false);
-
-  // Research state
-  const [researchQuery, setResearchQuery] = useState("");
-  const [researchMessage, setResearchMessage] = useState("");
 
   // Load latest briefing from Supabase
   useEffect(() => {
@@ -521,101 +527,93 @@ export default function Watch() {
     }
   };
 
-  // Keyword persistence helpers
-  const addKeyword = (v: string) => {
-    if (!v) return;
-    setKeywords(k => {
-      if (k.includes(v)) return k;
-      const updated = [...k, v];
-      if (user) supabase.from("profiles").update({ sentinel_topics: updated }).eq("id", user.id);
-      return updated;
-    });
-  };
-  const removeKeyword = (v: string) => {
-    setKeywords(k => {
-      const updated = k.filter(x => x !== v);
-      if (user) supabase.from("profiles").update({ sentinel_topics: updated }).eq("id", user.id);
-      return updated;
-    });
-  };
-  // Auto-save helpers: profiles.watch_config for config items, watch_sources for media
-  const saveWatchConfig = useCallback((patch: Record<string, unknown>) => {
-    if (!user) return;
-    // Read latest values from state refs isn't possible here, so callers pass the updated slice
-    supabase.from("profiles").update({ watch_config: patch }).eq("id", user.id)
-      .then(({ error }) => { if (error) toast("Couldn't save. Try again.", "error"); });
-  }, [user, toast]);
-
-  const buildWatchConfig = useCallback(() => ({
+  // Persistence helpers, thin wrappers over src/lib/watchSources.ts.
+  // Each wrapper preserves the existing call-site signature and routes the
+  // actual Supabase write through the shared module.
+  const buildWatchConfigSnapshot = useCallback((): WatchConfigShape => composeWatchConfig({
     competitors, thoughtLeaders, frequency, reddit: redditCommunities,
   }), [competitors, thoughtLeaders, frequency, redditCommunities]);
 
-  const addWatchSource = (type: string, name: string) => {
-    if (!user) return;
-    supabase.from("watch_sources").insert({ user_id: user.id, type, name })
-      .then(({ error }) => { if (error) toast("Couldn't save. Try again.", "error"); });
-  };
-
-  const deleteWatchSource = (type: string, name: string) => {
-    if (!user) return;
-    supabase.from("watch_sources").delete().eq("user_id", user.id).eq("type", type).eq("name", name)
-      .then(({ error }) => { if (error) toast("Couldn't save. Try again.", "error"); });
-  };
-
-  // Config-backed lists: auto-save the full watch_config on each change
-  // Persistence calls are OUTSIDE the setState updater (React purity contract)
-  const addConfigItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, field: string) => (v: string) => {
-    if (!v || currentList.includes(v)) return;
-    const updated = [...currentList, v];
-    setter(updated);
-    saveWatchConfig({ ...buildWatchConfig(), [field]: updated });
-  };
-  const removeConfigItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, field: string) => (v: string) => {
-    const updated = currentList.filter(x => x !== v);
-    setter(updated);
-    saveWatchConfig({ ...buildWatchConfig(), [field]: updated });
-  };
-
-  // Source-backed lists: auto-save with targeted insert/delete
-  const addSourceItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, type: string) => (v: string) => {
-    if (!v || currentList.includes(v)) return;
-    setter(prev => [...prev, v]);
-    addWatchSource(type, v);
-  };
-  const removeSourceItem = (currentList: string[], setter: React.Dispatch<React.SetStateAction<string[]>>, type: string) => (v: string) => {
-    setter(prev => prev.filter(x => x !== v));
-    deleteWatchSource(type, v);
-  };
-
-  // Research via Firecrawl
-  const handleResearch = useCallback(async () => {
-    if (!researchQuery.trim()) return;
-    setSearching(true);
-    setSearchResults([]);
-    setResearchMessage("");
-
+  const addKeyword = useCallback(async (v: string) => {
+    if (!v || !user) return;
     try {
-      const res = await fetch(`${API_BASE}/api/firecrawl-search`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: researchQuery.trim(), limit: 5 }),
-      });
-      if (!res.ok) throw new Error("Search failed");
-      const data = await res.json();
-      const results = data.results || [];
-
-      setSearchResults(results);
-      if (results.length > 0) {
-        setResearchMessage(`Found ${results.length} result${results.length !== 1 ? "s" : ""} for "${researchQuery}". Review the results below. You can add any of these to your Watch sources.`);
-      } else {
-        setResearchMessage(`No results found for "${researchQuery}". Try a different search term, or add it directly as a keyword in Settings.`);
-      }
+      const updated = await persistAddKeyword(user.id, v, keywords);
+      setKeywords(updated);
     } catch {
-      setResearchMessage("Search failed. Check your connection and try again.");
-    } finally {
-      setSearching(false);
+      toast("Couldn't save. Try again.", "error");
     }
-  }, [researchQuery]);
+  }, [user, keywords, toast]);
+
+  const removeKeyword = useCallback(async (v: string) => {
+    if (!user) return;
+    try {
+      const updated = await persistRemoveKeyword(user.id, v, keywords);
+      setKeywords(updated);
+    } catch {
+      toast("Couldn't save. Try again.", "error");
+    }
+  }, [user, keywords, toast]);
+
+  const saveWatchConfig = useCallback((patch: Record<string, unknown>) => {
+    if (!user) return;
+    persistSaveWatchConfig(user.id, patch).catch(() => toast("Couldn't save. Try again.", "error"));
+  }, [user, toast]);
+
+  const addConfigItem = (
+    currentList: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    field: keyof WatchConfigShape,
+  ) => async (v: string) => {
+    if (!v || !user || currentList.includes(v)) return;
+    try {
+      const updated = await persistAddConfigItem(user.id, currentList, v, field, buildWatchConfigSnapshot());
+      setter(updated);
+    } catch {
+      toast("Couldn't save. Try again.", "error");
+    }
+  };
+
+  const removeConfigItem = (
+    currentList: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    field: keyof WatchConfigShape,
+  ) => async (v: string) => {
+    if (!user) return;
+    try {
+      const updated = await persistRemoveConfigItem(user.id, currentList, v, field, buildWatchConfigSnapshot());
+      setter(updated);
+    } catch {
+      toast("Couldn't save. Try again.", "error");
+    }
+  };
+
+  const addSourceItem = (
+    currentList: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    type: string,
+  ) => async (v: string) => {
+    if (!v || !user || currentList.includes(v)) return;
+    try {
+      const updated = await persistAddSourceItem(user.id, currentList, v, type);
+      setter(updated);
+    } catch {
+      toast("Couldn't save. Try again.", "error");
+    }
+  };
+
+  const removeSourceItem = (
+    currentList: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>,
+    type: string,
+  ) => async (v: string) => {
+    if (!user) return;
+    try {
+      const updated = await persistRemoveSourceItem(user.id, currentList, v, type);
+      setter(updated);
+    } catch {
+      toast("Couldn't save. Try again.", "error");
+    }
+  };
 
   // Reconstruct sources array from user-configured items for briefing generation
   const activeSources = useMemo<WatchSource[]>(() => {
@@ -743,7 +741,7 @@ export default function Watch() {
                       type="button"
                       onClick={() => {
                         setFrequency(val);
-                        saveWatchConfig({ ...buildWatchConfig(), frequency: val });
+                        saveWatchConfig({ ...buildWatchConfigSnapshot(), frequency: val });
                       }}
                       style={{
                         fontSize: 14, fontWeight: frequency === val ? 600 : 500,
@@ -849,144 +847,6 @@ export default function Watch() {
                 )}
               </>
             )}
-          </div>
-        )}
-
-        {/* ── RESEARCH TAB ── */}
-        {activeTab === "research" && (
-          <div style={{ display: "flex", flexDirection: "column", height: "100%", padding: "20px 20px 24px", maxWidth: 720, margin: "0 auto", width: "100%" }}>
-            <div className="liquid-glass-card" style={{ padding: 18, marginBottom: 16, flexShrink: 0 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>
-                Discovery
-              </div>
-              <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg)", marginBottom: 8 }}>Find a person, publication, or topic</div>
-              <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.55, marginBottom: 16 }}>
-                Search pulls live pages. When something fits your watchlist, add it as a keyword, publication, or competitor without leaving this tab.
-              </div>
-              <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                <input
-                  value={researchQuery}
-                  onChange={e => setResearchQuery(e.target.value)}
-                  onKeyDown={e => { if (e.key === "Enter") handleResearch(); }}
-                  placeholder="e.g. Scott Galloway, Stratechery, fractional CAIO..."
-                  aria-label="Research query"
-                  style={{
-                    flex: "1 1 220px", minWidth: 0, background: "var(--glass-input)", border: "1px solid var(--glass-border)",
-                    borderRadius: 10, padding: "10px 14px", fontSize: 14, color: "var(--fg)", fontFamily: FONT, outline: "none",
-                    backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)",
-                  }}
-                />
-                <button
-                  type="button"
-                  onClick={handleResearch}
-                  disabled={searching}
-                  style={{
-                    padding: "10px 22px", borderRadius: 10, background: "var(--fg)", color: "var(--surface)", border: "none",
-                    fontSize: 14, fontWeight: 600, cursor: searching ? "not-allowed" : "pointer", fontFamily: FONT, opacity: searching ? 0.5 : 1,
-                  }}
-                >{searching ? "Searching..." : "Search"}</button>
-              </div>
-            </div>
-
-            {researchMessage && (
-              <div className="liquid-glass-card" style={{ padding: "14px 16px", marginBottom: 16, flexShrink: 0, background: "rgba(74,144,217,0.04)", borderColor: "rgba(74,144,217,0.2)" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--blue, #4A90D9)", marginBottom: 6 }}>
-                  Summary
-                </div>
-                <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{researchMessage}</div>
-              </div>
-            )}
-
-            <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
-              <div style={{
-                display: "flex", alignItems: "center", justifyContent: "space-between",
-                gap: 10, marginBottom: 10, paddingBottom: 8, borderBottom: "1px solid var(--glass-border)",
-              }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>
-                  Results
-                </div>
-                {!searching && searchResults.length > 0 ? (
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, color: "var(--fg-3)", padding: "3px 9px", borderRadius: 999,
-                    background: "var(--glass-surface)", border: "1px solid var(--glass-border)",
-                  }}>{searchResults.length}</span>
-                ) : null}
-              </div>
-
-              <div style={{ flex: 1, minHeight: 0, overflowY: "auto", paddingRight: 4 }}>
-                {searching && (
-                  <div style={{ fontSize: 14, color: "var(--fg-3)", textAlign: "center" as const, paddingTop: 36 }}>Searching...</div>
-                )}
-
-                {!searching && searchResults.length > 0 && searchResults.map((result, i) => (
-                  <div
-                    key={i}
-                    className="liquid-glass-card"
-                    style={{ padding: "14px 16px", marginBottom: 10 }}
-                  >
-                    {result.url ? (
-                      <a href={result.url} target="_blank" rel="noopener noreferrer" style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", textDecoration: "none", display: "inline-block", marginBottom: 4 }}>
-                        {result.title || result.url}
-                      </a>
-                    ) : (
-                      <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>{result.title || "Untitled"}</div>
-                    )}
-                    {result.url && (
-                      <div style={{ fontSize: 10, color: "var(--fg-3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const, maxWidth: "100%" }}>{result.url}</div>
-                    )}
-                    {result.description && (
-                      <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55, marginTop: 8, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical" as const, overflow: "hidden" }}>{result.description}</div>
-                    )}
-                    <div style={{ display: "flex", gap: 8, marginTop: 12, flexWrap: "wrap" }}>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const name = result.title || result.url || "";
-                          if (name) { addKeyword(name); toast("Added as keyword."); }
-                        }}
-                        style={{
-                          fontSize: 14, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
-                          background: "rgba(74,144,217,0.08)", border: "1px solid rgba(74,144,217,0.22)",
-                          color: "var(--blue, #4A90D9)", cursor: "pointer", fontFamily: FONT,
-                        }}
-                      >Add keyword</button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const name = result.title || result.url || "";
-                          if (name) { addSourceItem(publications, setPublications, "Publication")(name); toast("Added as source."); }
-                        }}
-                        style={{
-                          fontSize: 14, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
-                          background: "rgba(168,85,247,0.08)", border: "1px solid rgba(168,85,247,0.22)",
-                          color: "#7C3AED", cursor: "pointer", fontFamily: FONT,
-                        }}
-                      >Add publication</button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const name = result.title || result.url || "";
-                          if (name) { addConfigItem(competitors, setCompetitors, "competitors")(name); toast("Added as competitor."); }
-                        }}
-                        style={{
-                          fontSize: 14, fontWeight: 600, padding: "6px 12px", borderRadius: 8,
-                          background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.22)",
-                          color: "#DC2626", cursor: "pointer", fontFamily: FONT,
-                        }}
-                      >Add competitor</button>
-                    </div>
-                  </div>
-                ))}
-
-                {!searching && searchResults.length === 0 && !researchMessage && (
-                  <div className="liquid-glass-card" style={{ padding: "28px 20px", textAlign: "center" as const }}>
-                    <div style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.6 }}>
-                      Run a search to preview outlets and names. Promote anything promising straight into Settings.
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         )}
 
