@@ -139,7 +139,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
             <label
               style={{
                 fontSize: 13,
-                fontWeight: 700,
+                fontWeight: 600,
                 color: "rgba(255,255,255,0.55)",
                 letterSpacing: "0.08em",
                 textTransform: "uppercase",
@@ -177,7 +177,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
                 borderRadius: 10,
                 padding: "12px 14px",
                 fontSize: 14,
-                fontWeight: 700,
+                fontWeight: 600,
                 cursor: "pointer",
                 fontFamily: "inherit",
               }}

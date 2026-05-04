@@ -93,7 +93,7 @@ export default function OutputTypePicker({ selected, onSelect, compact, initialC
               flex: cat === "Freestyle" ? "none" : 1,
               padding: compact ? "6px 10px" : "8px 14px",
               fontSize: compact ? 10 : 11,
-              fontWeight: activeCategory === cat ? 700 : 500,
+              fontWeight: activeCategory === cat ? 600 : 400,
               color: activeCategory === cat ? "var(--fg)" : "var(--fg-3)",
               background: "transparent",
               border: "none",

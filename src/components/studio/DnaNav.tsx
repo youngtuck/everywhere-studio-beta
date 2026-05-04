@@ -81,7 +81,7 @@ export function DnaNav() {
               aria-selected={selected}
               onClick={() => nav(path)}
               style={{
-                fontSize: 11, fontWeight: selected ? 600 : 500, fontFamily: FONT,
+                fontSize: 11, fontWeight: selected ? 600 : 400, fontFamily: FONT,
                 color: selected ? "var(--fg)" : "var(--fg-3)",
                 padding: "7px 14px", borderRadius: 10, border: "none", cursor: "pointer",
                 background: selected ? "var(--glass-surface)" : "transparent",

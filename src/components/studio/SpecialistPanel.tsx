@@ -154,7 +154,7 @@ export function AdvisorCards({ onDiscuss }: AdvisorCardsProps) {
             {/* Header */}
             <div style={{ padding: "10px 12px" }}>
               <div style={{
-                fontSize: 9, fontWeight: 800, letterSpacing: "0.1em",
+                fontSize: 9, fontWeight: 600, letterSpacing: "0.1em",
                 textTransform: "uppercase" as const, color: advisor.color,
                 marginBottom: 4,
               }}>
@@ -330,16 +330,16 @@ export default function SpecialistPanel({
     return (
       <div style={{ padding: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-          <span style={{ width: 32, height: 32, borderRadius: 8, background: selectedInfo.color + "18", color: selectedInfo.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700 }}>
+          <span style={{ width: 32, height: 32, borderRadius: 8, background: selectedInfo.color + "18", color: selectedInfo.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 600 }}>
             {"\u2022"}
           </span>
           <div style={{ flex: 1 }}>
-            <div style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)" }}>{selectedInfo.name}</div>
+            <div style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)" }}>{selectedInfo.name}</div>
             <div style={{ fontSize: 12, color: "var(--fg-3)" }}>{selectedInfo.role}</div>
           </div>
           {selected.score !== undefined && (
             <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
-              <span style={{ fontSize: 24, fontWeight: 700, color: scoreColor(selected.score), fontVariantNumeric: "tabular-nums" }}>
+              <span style={{ fontSize: 24, fontWeight: 600, color: scoreColor(selected.score), fontVariantNumeric: "tabular-nums" }}>
                 {selected.score}
               </span>
               <span style={{ fontSize: 11, fontWeight: 600, color: selected.score >= 80 ? "#50c8a0" : selected.score >= 60 ? "var(--gold)" : "#E53935" }}>
@@ -363,7 +363,7 @@ export default function SpecialistPanel({
 
         {selected.feedback ? (
           <div style={{ marginBottom: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", color: "var(--fg-3)", marginBottom: 8 }}>Feedback</div>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", color: "var(--fg-3)", marginBottom: 8 }}>Feedback</div>
             <p style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.25, margin: 0, whiteSpace: "pre-wrap" }}>
               {selected.feedback}
             </p>
@@ -376,7 +376,7 @@ export default function SpecialistPanel({
 
         {selected.issues && selected.issues.length > 0 && (
           <div style={{ marginTop: 12 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "1px", textTransform: "uppercase", color: "var(--fg-3)", marginBottom: 8 }}>Issues Found</div>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", color: "var(--fg-3)", marginBottom: 8 }}>Issues Found</div>
             <ul style={{ margin: 0, paddingLeft: 18, display: "flex", flexDirection: "column", gap: 4 }}>
               {selected.issues.map((issue, i) => (
                 <li key={i} style={{ fontSize: 13, color: "var(--fg-2)", lineHeight: 1.25 }}>{issue}</li>
@@ -390,16 +390,16 @@ export default function SpecialistPanel({
 
   return (
     <div>
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "3px", textTransform: "uppercase", color: "var(--cornflower)", marginBottom: 16 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: "3px", textTransform: "uppercase", color: "var(--cornflower)", marginBottom: 16 }}>
         QUALITY PIPELINE
       </div>
       <p style={{ fontSize: 13, color: "var(--fg-3)", lineHeight: 1.25, marginBottom: 16, marginTop: -8 }}>
         Your content ran through the full quality pipeline. Open any step to see its evaluation.
       </p>
       <div style={{ display: "flex", gap: 16, marginBottom: 16, fontSize: 12, color: "var(--fg-3)" }}>
-        <span><span style={{ color: "#50c8a0", fontWeight: 700 }}>80+</span> Strong</span>
-        <span><span style={{ color: "var(--gold)", fontWeight: 700 }}>60-79</span> Needs work</span>
-        <span><span style={{ color: "#E53935", fontWeight: 700 }}>&lt;60</span> Needs attention</span>
+        <span><span style={{ color: "#50c8a0", fontWeight: 600 }}>80+</span> Strong</span>
+        <span><span style={{ color: "var(--gold)", fontWeight: 600 }}>60-79</span> Needs work</span>
+        <span><span style={{ color: "#E53935", fontWeight: 600 }}>&lt;60</span> Needs attention</span>
       </div>
 
       <div style={{ display: isMobile ? "flex" : "grid", gridTemplateColumns: "1fr 360px", flexDirection: "column", gap: 16, marginBottom: showTotal ? 24 : 0 }}>
@@ -439,7 +439,7 @@ export default function SpecialistPanel({
                 onMouseEnter={(e) => { if (!isSelected) e.currentTarget.style.background = "var(--glass-surface)"; }}
                 onMouseLeave={(e) => { if (!isSelected) e.currentTarget.style.background = "transparent"; }}
               >
-                <span style={{ width: 28, height: 28, borderRadius: 6, background: info.color + "18", color: info.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                <span style={{ width: 28, height: 28, borderRadius: 6, background: info.color + "18", color: info.color, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 600, flexShrink: 0 }}>
                   {"\u2022"}
                 </span>
                 <div style={{ flex: 1, minWidth: 0 }}>
@@ -448,7 +448,7 @@ export default function SpecialistPanel({
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
                   {isRevealed && g.score !== undefined ? (
-                    <span style={{ fontSize: 14, fontWeight: 700, color: scoreColor(g.score), fontVariantNumeric: "tabular-nums" }}>
+                    <span style={{ fontSize: 14, fontWeight: 600, color: scoreColor(g.score), fontVariantNumeric: "tabular-nums" }}>
                       {g.score}
                     </span>
                   ) : isRevealed && g.status === "pass" ? (
@@ -486,7 +486,7 @@ export default function SpecialistPanel({
       {/* Total score */}
       {showTotal && totalScore !== undefined && (
         <div style={{ textAlign: "center", padding: "24px 0", borderTop: "1px solid var(--glass-border)" }}>
-          <div style={{ fontSize: 48, fontWeight: 700, color: totalScore >= threshold ? "#50c8a0" : totalScore >= 700 ? "var(--gold)" : "#E53935", fontVariantNumeric: "tabular-nums", lineHeight: 1.1 }}>
+          <div style={{ fontSize: 48, fontWeight: 600, color: totalScore >= threshold ? "#50c8a0" : totalScore >= 700 ? "var(--gold)" : "#E53935", fontVariantNumeric: "tabular-nums", lineHeight: 1.1 }}>
             {totalScore}
           </div>
           <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 4 }}>

@@ -92,7 +92,7 @@ function BreadcrumbParentLabel({ children }: { children: ReactNode }) {
   return (
     <span style={{
       fontSize: 14,
-      fontWeight: 500,
+      fontWeight: 400,
       color: "var(--fg-2)",
       whiteSpace: "nowrap",
       flexShrink: 0,
@@ -323,7 +323,8 @@ export function WorkStageRail() {
                 style={{
                   position: "relative",
                   zIndex: 3,
-                  fontWeight: isActive ? 700 : 500,
+                  // CO_038D canon: 700 reserved for active WorkStageRail pill only.
+                  fontWeight: isActive ? 700 : 400,
                   color: isActive ? "var(--fg)" : "var(--fg-3)",
                 }}
               >
@@ -732,7 +733,7 @@ function ProjectSwitcher({ appearance = "context" }: { appearance?: "default" | 
     : isContext
       ? {
           fontSize: 14,
-          fontWeight: 500,
+          fontWeight: 400,
           color: "var(--fg-2)",
           whiteSpace: "nowrap" as const,
           overflow: "hidden",
@@ -904,7 +905,7 @@ function TopBarDateTime() {
       aria-label="Current date and time"
       style={{
         fontSize: 14,
-        fontWeight: 500,
+        fontWeight: 400,
         color: "var(--fg-2)",
         whiteSpace: "nowrap" as const,
         flexShrink: 0,

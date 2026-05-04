@@ -74,7 +74,7 @@ export default function InstallPrompt() {
           border: "none",
           padding: "8px 20px",
           borderRadius: 8,
-          fontWeight: 700,
+          fontWeight: 600,
           fontSize: 13,
           cursor: "pointer",
           whiteSpace: "nowrap",

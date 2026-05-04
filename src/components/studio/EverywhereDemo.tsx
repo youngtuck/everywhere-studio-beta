@@ -347,7 +347,7 @@ function DemoNav({ stage }: { stage: number }) {
               padding: "6px 7px",
               borderRadius: 8,
               fontSize: 10,
-              fontWeight: active ? 600 : 500,
+              fontWeight: active ? 600 : 400,
               letterSpacing: "0.04em",
               color: active ? "var(--xp-gold)" : "rgba(255,255,255,0.34)",
               background: active ? "rgba(200,169,110,0.08)" : "transparent",
@@ -570,7 +570,7 @@ function WatchCenter({ animKey, reducedMotion }: { animKey: string; reducedMotio
                   >
                     {row.src}
                   </div>
-                  <div style={{ fontSize: 12, fontWeight: 500, color: textWhite, lineHeight: 1.45 }}>{row.line}</div>
+                  <div style={{ fontSize: 12, fontWeight: 400, color: textWhite, lineHeight: 1.45 }}>{row.line}</div>
                 </div>
               </div>
               {i < SIGNAL_ROWS.length - 1 ? (
@@ -1250,7 +1250,7 @@ function WrapCenter({ animKey, reducedMotion }: { animKey: string; reducedMotion
                 borderRadius: 9,
                 padding: "9px 10px",
                 fontSize: 10,
-                fontWeight: selected ? 600 : 500,
+                fontWeight: selected ? 600 : 400,
                 letterSpacing: "0.02em",
                 color: selected ? "var(--xp-gold)" : "rgba(255,255,255,0.55)",
                 border: selected ? "1px solid rgba(200,169,110,0.32)" : "1px solid rgba(255,255,255,0.08)",

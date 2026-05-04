@@ -62,7 +62,7 @@ function getAdvisorCtx(pathname: string): { ctx: AdvisorContext; stageLabel: str
 function InspectorEyebrow({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
-      fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const,
+      fontSize: 9, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const,
       color: "var(--fg-3)", marginBottom: 8,
     }}>
       {children}
@@ -87,7 +87,7 @@ function AdvisorFeedbackFallback({ pathname }: { pathname: string }) {
         marginBottom: 10,
       }}>
         <div style={{
-          fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const,
+          fontSize: 9, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const,
           color: "var(--blue, #4A90D9)", marginBottom: 6,
         }}>
           Consensus
@@ -689,7 +689,7 @@ function ReedPanel() {
                 borderRadius: "0 6px 6px 0",
               }}>
                 <div style={{
-                  fontSize: 9, fontWeight: 700, color: "#F5C642",
+                  fontSize: 9, fontWeight: 600, color: "#F5C642",
                   letterSpacing: "0.06em", marginBottom: 3,
                   textTransform: "uppercase" as const,
                 }}>
@@ -882,7 +882,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
                 {detailItem.icon}
               </div>
               <div>
-                <div style={{ fontSize: 17, fontWeight: 700, color: "rgba(255,255,255,0.92)", marginBottom: 2 }}>{detailItem.name}</div>
+                <div style={{ fontSize: 17, fontWeight: 600, color: "rgba(255,255,255,0.92)", marginBottom: 2 }}>{detailItem.name}</div>
                 <div style={{ width: 32, height: 3, background: detailItem.color, borderRadius: 2 }} />
               </div>
             </div>
@@ -898,7 +898,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
               style={{
                 padding: "10px 20px", borderRadius: 6,
                 background: detailItem.color, border: "none",
-                color: "#fff", fontSize: 14, fontWeight: 700,
+                color: "#fff", fontSize: 14, fontWeight: 600,
                 cursor: "pointer", fontFamily: "var(--font)",
               }}
             >
@@ -909,7 +909,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
           /* ── List view ── */
           <>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.92)", letterSpacing: "0.01em" }}>Discover</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.92)", letterSpacing: "0.01em" }}>Discover</div>
               <button onClick={onClose} aria-label="Close panel" style={{ background: "none", border: "none", color: "rgba(255,255,255,0.66)", fontSize: 18, cursor: "pointer", lineHeight: 1, padding: 0 }}>✕</button>
             </div>
 
@@ -945,7 +945,7 @@ function DiscoverOverlay({ onClose, pathname }: { onClose: () => void; pathname:
                   <div style={{ width: 32, height: 32, borderRadius: 7, background: `${item.color}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, marginBottom: 10, color: item.color }}>
                     {item.icon}
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.92)", marginBottom: 3 }}>{item.name}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "rgba(255,255,255,0.92)", marginBottom: 3 }}>{item.name}</div>
                   <div style={{ fontSize: 14, color: "rgba(255,255,255,0.84)", lineHeight: 1.4, marginBottom: 5 }}>{item.desc}</div>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.66)", fontStyle: "normal", lineHeight: 1.4 }}>{item.rationale}</div>
                 </div>

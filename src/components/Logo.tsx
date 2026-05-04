@@ -66,7 +66,7 @@ const Logo = ({ size = "md", onDark, variant, onClick }: LogoProps) => {
       {isLockup && (
         <span style={{
           color,
-          fontWeight: 200,
+          fontWeight: 300,
           fontSize: taglineFs,
           letterSpacing: "-0.04em",
           marginTop: Math.max(4, Math.round(fs * 0.14)),

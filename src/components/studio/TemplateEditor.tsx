@@ -92,7 +92,7 @@ export default function TemplateEditor({ selected, onSelect, compact }: { select
       <div style={{ width: "44%", borderRight: "1px solid var(--glass-border)", overflowY: "auto", padding: "16px 14px" }}>
         {/* SYSTEM section */}
         <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>System</span>
+          <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>System</span>
           <span style={{ fontSize: 9, color: "var(--fg-3)", padding: "1px 6px", borderRadius: 3, background: "var(--line)" }}>Read only</span>
         </div>
         {systemTemplates.map(t => (
@@ -113,7 +113,7 @@ export default function TemplateEditor({ selected, onSelect, compact }: { select
 
         {/* YOURS section */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 16, marginBottom: 10 }}>
-          <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>Yours</span>
+          <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>Yours</span>
           <span style={{ fontSize: 10, color: "var(--blue, #4A90D9)", cursor: "pointer" }}>+ New</span>
         </div>
         {userTemplates.length === 0 ? (

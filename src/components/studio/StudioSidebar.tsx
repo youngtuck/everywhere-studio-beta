@@ -174,7 +174,7 @@ export default function StudioSidebar({ collapsed = false, onToggleCollapsed, on
 
             {onMobileClose && (
               <div style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.55)" }}>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "rgba(255,255,255,0.55)" }}>
                   Navigation
                 </span>
               </div>
@@ -376,7 +376,7 @@ function NavItem({
         <span style={{
           fontSize: 14,
           color: active ? "rgba(255,255,255,0.96)" : "rgba(255,255,255,0.78)",
-          fontWeight: active ? 600 : 500,
+          fontWeight: active ? 600 : 400,
           whiteSpace: "nowrap",
           overflow: "hidden",
           flex: 1,

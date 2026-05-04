@@ -75,7 +75,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
 
         {/* Content */}
         <div key={step} style={{ animation: "onboardFade 0.2s ease" }}>
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: "var(--text-primary)", margin: "0 0 16px", letterSpacing: "-0.02em" }}>
+          <h2 style={{ fontSize: 24, fontWeight: 600, color: "var(--text-primary)", margin: "0 0 16px", letterSpacing: "-0.02em" }}>
             {current.title}
           </h2>
           {current.body.split("\n\n").map((para, i) => (
@@ -128,7 +128,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
                   style={{
                     padding: "12px 24px", borderRadius: 8, border: "none",
                     background: "var(--gold)", color: "#fff",
-                    fontSize: 14, fontWeight: 700, cursor: "pointer",
+                    fontSize: 14, fontWeight: 600, cursor: "pointer",
                     fontFamily: "'Inter', sans-serif",
                   }}
                 >
@@ -141,7 +141,7 @@ export default function OnboardingOverlay({ onClose }: { onClose: () => void }) 
                 style={{
                   padding: "12px 24px", borderRadius: 8, border: "none",
                   background: "var(--gold)", color: "#fff",
-                  fontSize: 14, fontWeight: 700, cursor: "pointer",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer",
                   fontFamily: "'Inter', sans-serif",
                 }}
               >

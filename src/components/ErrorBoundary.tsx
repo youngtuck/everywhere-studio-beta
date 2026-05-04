@@ -42,7 +42,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           <div
             style={{
               fontSize: 13,
-              fontWeight: 700,
+              fontWeight: 600,
               letterSpacing: "0.15em",
               textTransform: "uppercase" as const,
               color: "var(--gold-dark, #C8961A)",
@@ -51,7 +51,7 @@ export default class ErrorBoundary extends Component<Props, State> {
           >
             IdeasOut
           </div>
-          <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 8 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 8 }}>
             Something went wrong
           </h1>
           <p

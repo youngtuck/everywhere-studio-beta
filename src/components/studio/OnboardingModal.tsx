@@ -75,7 +75,7 @@ export default function OnboardingModal({ onComplete }: { onComplete: () => void
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: 12,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   background: step >= s ? "var(--fg)" : "var(--bg-3)",
                   color: step >= s ? "var(--bg)" : "var(--fg-3)",
                   border: step === s ? "2px solid var(--fg)" : "none",
@@ -102,7 +102,7 @@ export default function OnboardingModal({ onComplete }: { onComplete: () => void
         {/* Step 1: Welcome */}
         {step === 1 && (
           <div>
-            <h2 id="onboarding-title" style={{ fontSize: 22, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.03em", marginBottom: 10 }}>
+            <h2 id="onboarding-title" style={{ fontSize: 22, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.03em", marginBottom: 10 }}>
               Let&apos;s set up your studio
             </h2>
             <p style={{ fontSize: 14, color: "var(--fg-3)", lineHeight: 1.6, marginBottom: 28 }}>
@@ -122,7 +122,7 @@ export default function OnboardingModal({ onComplete }: { onComplete: () => void
         {/* Step 2: Your Voice */}
         {step === 2 && (
           <div>
-            <h2 id="onboarding-title" style={{ fontSize: 22, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.03em", marginBottom: 10 }}>
+            <h2 id="onboarding-title" style={{ fontSize: 22, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.03em", marginBottom: 10 }}>
               Tell Reed how you write
             </h2>
             <textarea
@@ -153,10 +153,10 @@ export default function OnboardingModal({ onComplete }: { onComplete: () => void
         {/* Step 3: Your Watch */}
         {step === 3 && (
           <div>
-            <h2 id="onboarding-title" style={{ fontSize: 22, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.03em", marginBottom: 10 }}>
+            <h2 id="onboarding-title" style={{ fontSize: 22, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.03em", marginBottom: 10 }}>
               What should Sentinel monitor?
             </h2>
-            <label style={{ display: "block", marginBottom: 8, fontSize: 13, color: "var(--fg-2)", fontWeight: 500 }}>
+            <label style={{ display: "block", marginBottom: 8, fontSize: 13, color: "var(--fg-2)", fontWeight: 400 }}>
               What industry or topic are you known for?
             </label>
             <input

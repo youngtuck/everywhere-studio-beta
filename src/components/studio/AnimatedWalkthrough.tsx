@@ -112,7 +112,7 @@ export default function AnimatedWalkthrough({ onComplete }: { onComplete: () => 
             background: isLast ? "var(--gold)" : "rgba(255,255,255,0.1)",
             color: isLast ? "var(--fg)" : "rgba(255,255,255,0.7)",
             fontSize: 14,
-            fontWeight: isLast ? 600 : 500,
+            fontWeight: isLast ? 600 : 400,
             cursor: "pointer",
             fontFamily: "'Inter', sans-serif",
             transition: "all 0.15s ease",

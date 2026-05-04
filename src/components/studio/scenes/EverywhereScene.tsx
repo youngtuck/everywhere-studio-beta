@@ -46,7 +46,7 @@ export default function EverywhereScene({ isActive }: { isActive: boolean }) {
         opacity: textVisible ? 1 : 0, transform: textVisible ? "translateY(0)" : "translateY(12px)",
         transition: "all 0.8s ease",
       }}>
-        <p style={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1.4, margin: "0 0 12px", fontFamily: "'Inter', sans-serif" }}>
+        <p style={{ fontSize: 22, fontWeight: 600, color: "#fff", lineHeight: 1.4, margin: "0 0 12px", fontFamily: "'Inter', sans-serif" }}>
           One idea. Everywhere.
         </p>
         <p style={{ fontSize: 15, color: "rgba(255,255,255,0.6)", lineHeight: 1.6, margin: 0, fontFamily: "'Inter', sans-serif" }}>

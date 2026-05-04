@@ -241,7 +241,7 @@ export function StudioGlobalSearch() {
                   cursor: "pointer",
                   fontFamily: "var(--font)",
                   fontSize: 14,
-                  fontWeight: 500,
+                  fontWeight: 400,
                   color: "rgba(255,255,255,0.9)",
                   textAlign: "left",
                   display: "flex",
@@ -253,7 +253,7 @@ export function StudioGlobalSearch() {
                 onMouseEnter={() => setSelectedIndex(i)}
               >
                 <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", minWidth: 72 }}>
+                  <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(255,255,255,0.45)", minWidth: 72 }}>
                     {isSession ? "Session" : "Go to"}
                   </span>
                   <span style={{ flex: 1 }}>{row.label}</span>

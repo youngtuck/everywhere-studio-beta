@@ -127,12 +127,12 @@ export function StudioUserAccountMenu({
                   background: "rgba(245,198,66,0.2)",
                   border: "1px solid rgba(245,198,66,0.3)",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 11, fontWeight: 700, color: "#F5C642", flexShrink: 0,
+                  fontSize: 11, fontWeight: 600, color: "#F5C642", flexShrink: 0,
                 }}>
                   {initials}
                 </div>
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.92)" }}>{displayName || "User"}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.92)" }}>{displayName || "User"}</div>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.72)" }}>IdeasOut</div>
                   <div style={{ fontSize: 10, color: "rgba(255,255,255,0.72)" }}>v{APP_VERSION}</div>
                 </div>
@@ -181,7 +181,7 @@ export function StudioUserAccountMenu({
         alignItems: "center",
         justifyContent: "center",
         fontSize: variant === "sidebar" && !collapsed ? 10 : 9,
-        fontWeight: 700,
+        fontWeight: 600,
         color: "var(--gold-dark)",
         flexShrink: 0,
         boxShadow: "inset 0 1px 0 rgba(255,255,255,0.12)",
@@ -206,7 +206,7 @@ export function StudioUserAccountMenu({
               background: "rgba(200,169,110,0.1)",
               border: "1px solid rgba(200,169,110,0.2)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 9, fontWeight: 700, color: "var(--gold-dark)",
+              fontSize: 9, fontWeight: 600, color: "var(--gold-dark)",
               cursor: "pointer", flexShrink: 0,
               padding: 0, fontFamily: "inherit",
             }}

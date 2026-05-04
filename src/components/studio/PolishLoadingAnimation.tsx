@@ -75,7 +75,7 @@ export default function PolishLoadingAnimation({ currentIndex = 0, completedScor
                 background: completed ? "#50c8a0" : "transparent",
                 animation: running ? "polishSpin 1s linear infinite" : completed ? "polishCheck 0.3s ease" : "none",
               }}>
-                {completed && <span style={{ color: "#fff", fontSize: 12, fontWeight: 700 }}>&#10003;</span>}
+                {completed && <span style={{ color: "#fff", fontSize: 12, fontWeight: 600 }}>&#10003;</span>}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{phase.name}</div>
@@ -83,7 +83,7 @@ export default function PolishLoadingAnimation({ currentIndex = 0, completedScor
               </div>
               {/* Score */}
               {score !== undefined && (
-                <span style={{ fontSize: 14, fontWeight: 700, color: score >= 80 ? "#50c8a0" : score >= 60 ? "var(--gold)" : "#E53935" }}>
+                <span style={{ fontSize: 14, fontWeight: 600, color: score >= 80 ? "#50c8a0" : score >= 60 ? "var(--gold)" : "#E53935" }}>
                   {score}
                 </span>
               )}

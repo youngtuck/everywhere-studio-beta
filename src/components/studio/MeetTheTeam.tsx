@@ -48,13 +48,13 @@ function ReedDetailContent() {
         <p style={{ margin: "0 0 12px" }}>Reed is not an assistant. He is a thought partner. He asks better questions than most people do. He remembers what you have said. He connects what you are writing to what is happening in your space. When your writing is strong, he tells you. When it is not, he tells you that too.</p>
         <p style={{ margin: 0, fontWeight: 600 }}>Named for the reading that built him. Built for the writing that matters.</p>
       </div>
-      <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-tertiary)", marginBottom: 10 }}>
+      <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-tertiary)", marginBottom: 10 }}>
         CAPABILITIES
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
         {REED_CAPABILITIES.map((cap, i) => (
           <div key={i} style={{ padding: "10px 12px", border: "1px solid var(--glass-border)", borderRadius: 8 }}>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary)", marginBottom: 3 }}>{cap.name}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)", marginBottom: 3 }}>{cap.name}</div>
             <div style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.5 }}>{cap.desc}</div>
           </div>
         ))}
@@ -76,7 +76,7 @@ function CheckpointsDetailContent() {
               width: 8, height: 8, borderRadius: "50%", background: "#F5C642", marginTop: 6, flexShrink: 0,
             }} />
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>{cp.name}</div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{cp.name}</div>
               <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5 }}>{cp.desc}</div>
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function MeetTheTeam({ onClose, activeAgents = [] }: MeetTheTeamP
               onClick={() => setActiveDetail(null)}
               style={{
                 background: "none", border: "none", cursor: "pointer", padding: 0,
-                fontSize: 10, fontWeight: 700, color: "#4A90D9",
+                fontSize: 10, fontWeight: 600, color: "#4A90D9",
                 textTransform: "uppercase", letterSpacing: "0.05em",
                 marginBottom: 16, display: "flex", alignItems: "center", gap: 4,
                 fontFamily: "inherit",
@@ -188,11 +188,11 @@ export default function MeetTheTeam({ onClose, activeAgents = [] }: MeetTheTeamP
             >
               &lt; BACK TO DISCOVER
             </button>
-            <h2 style={{ fontSize: 18, fontWeight: 700, color: "#0D1B2A", margin: "0 0 4px" }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: "#0D1B2A", margin: "0 0 4px" }}>
               {detailView.title}
             </h2>
             <div style={{
-              fontSize: 10, fontWeight: 700, color: "#94A3B8",
+              fontSize: 10, fontWeight: 600, color: "#94A3B8",
               textTransform: "uppercase", letterSpacing: "0.1em",
               marginBottom: 20,
             }}>
@@ -204,7 +204,7 @@ export default function MeetTheTeam({ onClose, activeAgents = [] }: MeetTheTeamP
           <>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
               <div>
-                <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.02em" }}>
+                <h2 style={{ fontSize: 22, fontWeight: 600, color: "var(--text-primary)", margin: 0, letterSpacing: "-0.02em" }}>
                   Reed, then the pipeline
                 </h2>
                 <p style={{ fontSize: 13, color: "var(--text-tertiary)", margin: "4px 0 0" }}>
@@ -255,7 +255,7 @@ export default function MeetTheTeam({ onClose, activeAgents = [] }: MeetTheTeamP
             >
               <span style={{
                 width: 32, height: 32, borderRadius: 8, background: "rgba(74,144,217,0.15)", color: "#4A90D9",
-                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, flexShrink: 0,
+                display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 600, flexShrink: 0,
               }}>R</span>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text-primary)" }}>

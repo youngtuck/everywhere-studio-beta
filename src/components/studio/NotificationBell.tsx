@@ -126,7 +126,7 @@ export default function NotificationBell() {
               background: "var(--cornflower)",
               color: "#fff",
               fontSize: 9,
-              fontWeight: 700,
+              fontWeight: 600,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -166,7 +166,7 @@ export default function NotificationBell() {
               alignItems: "center",
             }}
           >
-            <span style={{ fontSize: 14, fontWeight: 700, color: "var(--fg)" }}>Notifications</span>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)" }}>Notifications</span>
             {unreadCount > 0 && (
               <button
                 type="button"
