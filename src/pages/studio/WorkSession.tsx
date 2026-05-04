@@ -413,13 +413,13 @@ function renderInlineMarkdown(text: string): React.ReactNode {
     const level = headingMatch[1].length;
     const headText = headingMatch[2];
     const fontSize = level === 1 ? 18 : level === 2 ? 15 : 14;
-    return <span style={{ fontWeight: 700, fontSize, color: "var(--fg)" }}>{headText}</span>;
+    return <span style={{ fontWeight: 600, fontSize, color: "var(--fg)" }}>{headText}</span>;
   }
   // Split on **bold** and *italic* markers
   const parts = content.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
   const rendered = parts.map((part, i) => {
     if (part.startsWith("**") && part.endsWith("**")) {
-      return <strong key={i} style={{ fontWeight: 700, color: "var(--fg)" }}>{part.slice(2, -2)}</strong>;
+      return <strong key={i} style={{ fontWeight: 600, color: "var(--fg)" }}>{part.slice(2, -2)}</strong>;
     }
     if (part.startsWith("*") && part.endsWith("*") && !part.startsWith("**")) {
       return <em key={i}>{part.slice(1, -1)}</em>;
@@ -782,7 +782,7 @@ function DpLabel({ children, collapsible, open, onToggle, action }: {
     <div
       onClick={collapsible ? onToggle : undefined}
       style={{
-        fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const,
+        fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const,
         color: "var(--fg-3)", marginBottom: 6, display: "flex", justifyContent: "space-between",
         alignItems: "center", cursor: collapsible ? "pointer" : "default", userSelect: "none" as const,
       }}
@@ -854,7 +854,7 @@ function OutlineDash({ selectedFormats, outlineRows }: { selectedFormats: Format
             padding: "5px 8px", borderRadius: 5,
             border: "1px solid var(--gold-bright)", background: "rgba(245,198,66,0.05)",
           }}>
-            <span style={{ fontSize: 14, color: "var(--fg)", fontWeight: 500 }}>{f}</span>
+            <span style={{ fontSize: 14, color: "var(--fg)", fontWeight: 400 }}>{f}</span>
             <span style={{ fontSize: 10, color: "var(--blue)" }}>{wordMap[f] ?? "~"}</span>
           </div>
         ))}
@@ -1140,7 +1140,7 @@ function ReviewDash({
 
       {/* Fixing/rerunning state */}
       {(fixingGate || rerunning) && !running && (
-        <div style={{ fontSize: 14, color: "var(--gold-bright)", marginBottom: 12, fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ fontSize: 14, color: "var(--gold-bright)", marginBottom: 12, fontWeight: 400, display: "flex", alignItems: "center", gap: 6 }}>
           <span style={{ animation: "pulse-dot 1.5s infinite" }}>&#9679;</span>
           Reed is improving the draft...
         </div>
@@ -1157,7 +1157,7 @@ function ReviewDash({
               marginBottom: 12,
               backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 6 }}>Reed</div>
+              <div style={{ fontSize: 9, fontWeight: 600, color: "#4A90D9", marginBottom: 6 }}>Reed</div>
               <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.6 }}>{reedMessage}</div>
             </div>
           )}
@@ -1171,7 +1171,7 @@ function ReviewDash({
               marginBottom: 12,
               backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)",
             }}>
-              <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
+              <div style={{ fontSize: 9, fontWeight: 600, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
               <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
               <button
                 type="button"
@@ -1369,7 +1369,7 @@ function ReviewDash({
               width: "100%", padding: 10, borderRadius: 6,
               background: allExported ? "rgba(74,144,217,0.12)" : (publishAggregateOk ? "var(--gold)" : "var(--surface)"),
               border: publishAggregateOk ? "none" : "1px solid var(--glass-border)",
-              fontSize: 14, fontWeight: 700,
+              fontSize: 14, fontWeight: 600,
               color: allExported ? "var(--blue)" : (publishAggregateOk ? "var(--fg)" : "var(--fg)"),
               cursor: allExported ? "default" : "pointer",
               fontFamily: FONT, transition: "all 0.2s",
@@ -1713,7 +1713,7 @@ function StageIntake({
                   padding: "12px 20px",
                   borderRadius: 10,
                   fontSize: 14,
-                  fontWeight: 700,
+                  fontWeight: 600,
                   fontFamily: FONT,
                   letterSpacing: "0.02em",
                 }}
@@ -1740,7 +1740,7 @@ function StageIntake({
               }} />
             </div>
             <div style={{ display: "flex", alignItems: "center", marginTop: 8 }}>
-              <span style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, letterSpacing: "0.04em" }}>
+              <span style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 400, letterSpacing: "0.04em" }}>
                 {reedQuestionCount >= totalQuestions
                   ? `${totalQuestions} of ${totalQuestions} questions answered`
                   : `Question ${Math.min(reedQuestionCount, totalQuestions)} of ${totalQuestions}`}
@@ -1872,7 +1872,7 @@ function ChatBubble({ role, text, userInitials, isChallenge }: { role: "reed" | 
             {isChallenge && (
               <div style={{
                 display: "inline-block",
-                fontSize: 14, fontWeight: 500,
+                fontSize: 14, fontWeight: 400,
                 color: "#fff", background: "var(--blue, #4A90D9)",
                 borderRadius: 99, padding: "2px 10px",
                 marginBottom: 6, fontFamily: FONT,
@@ -2651,7 +2651,7 @@ function StageEdit({
                 disabled={generating}
                 style={{
                   padding: "4px 12px", borderRadius: 6,
-                  fontSize: 14, fontWeight: 500,
+                  fontSize: 14, fontWeight: 400,
                   color: "var(--fg-3)",
                   background: "transparent",
                   border: "1px dashed var(--glass-border)",
@@ -2692,7 +2692,7 @@ function StageEdit({
                 borderBottom: "1px solid rgba(245,198,66,0.2)",
                 fontSize: 14,
                 color: "var(--gold-bright)",
-                fontWeight: 500,
+                fontWeight: 400,
               }}
               >
                 {proposalLoading ? "Reed is preparing a proposed change..." : "Applying suggestion..."}
@@ -2716,7 +2716,7 @@ function StageEdit({
                       flexShrink: 0,
                       fontFamily: "var(--font)",
                       fontSize: "clamp(22px, 3vw, 32px)",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       color: "var(--fg)",
                       background: "transparent",
                       border: "none",
@@ -2986,7 +2986,7 @@ function ReviewProgress({
       }}
     >
       <div style={{
-        fontSize: 10, fontWeight: 700, letterSpacing: "0.14em", color: "var(--fg-3)",
+        fontSize: 10, fontWeight: 600, letterSpacing: "0.14em", color: "var(--fg-3)",
         textTransform: "uppercase" as const, marginBottom: 22, fontFamily: FONT,
       }}>
         Review in progress
@@ -3091,43 +3091,31 @@ function ReviewFormatPreview({
     const podcast = parsePodcastSections(draft);
     return (
       <div className="draft-body">
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 16 }}>Podcast Script Preview</div>
+        <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 16 }}>Podcast Script Preview</div>
         {podcast.open && (
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>OPEN</span>
+            <span style={{ fontSize: 9, fontWeight: 600, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>OPEN</span>
             <div style={{ flex: 1 }}><p style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.7 }}>{renderInlineMarkdown(podcast.open)}</p></div>
           </div>
         )}
         {podcast.hook && (
           <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
-            <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, color: "var(--gold-bright)", width: 48, flexShrink: 0, paddingTop: 3 }}>HOOK</span>
+            <span style={{ fontSize: 9, fontWeight: 600, textTransform: "uppercase" as const, color: "var(--gold-bright)", width: 48, flexShrink: 0, paddingTop: 3 }}>HOOK</span>
             <div style={{ flex: 1 }}><p style={{ fontSize: 14, color: "var(--fg)", fontWeight: 600, lineHeight: 1.7 }}>{renderInlineMarkdown(podcast.hook)}</p></div>
           </div>
         )}
         {podcast.body.map((p, i) => (
           <div key={i} style={{ display: "flex", gap: 12, marginTop: 10 }}>
-            <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>BODY</span>
+            <span style={{ fontSize: 9, fontWeight: 600, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>BODY</span>
             <div style={{ flex: 1 }}>{renderPara(p, i)}</div>
           </div>
         ))}
         {podcast.close && (
           <div style={{ display: "flex", gap: 12, marginTop: 10 }}>
-            <span style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>CLOSE</span>
+            <span style={{ fontSize: 9, fontWeight: 600, textTransform: "uppercase" as const, color: "var(--fg-3)", width: 48, flexShrink: 0, paddingTop: 3 }}>CLOSE</span>
             <div style={{ flex: 1 }}><p style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.7 }}>{renderInlineMarkdown(podcast.close)}</p></div>
           </div>
         )}
-      </div>
-    );
-  }
-
-  if (format === "Sunday Story") {
-    return (
-      <div className="draft-body">
-        <div style={{ fontSize: 10, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 20 }}>
-          Sunday, {new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
-        </div>
-        <div className="draft-title-text" style={{ fontSize: 22, fontWeight: 800, lineHeight: 1.2, marginBottom: 20 }}>{title}</div>
-        {body.map((p, i) => renderPara(p, i))}
       </div>
     );
   }
@@ -3304,7 +3292,7 @@ function PreWrapOutputGate({
         }}
       >
         <h1 style={{
-          fontSize: "clamp(22px, 4vw, 28px)", fontWeight: 700, color: "var(--fg)",
+          fontSize: "clamp(22px, 4vw, 28px)", fontWeight: 600, color: "var(--fg)",
           margin: "0 0 8px", fontFamily: FONT, letterSpacing: "-0.02em",
         }}>
           Where is this going?
@@ -3318,7 +3306,7 @@ function PreWrapOutputGate({
           </p>
         ) : null}
         {showWrapExplainer && (
-          <p style={{ fontSize: 14, color: "var(--gold)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT, fontWeight: 500 }}>
+          <p style={{ fontSize: 14, color: "var(--gold)", margin: "0 0 14px", lineHeight: 1.5, fontFamily: FONT, fontWeight: 400 }}>
             Wrap formats and delivers your piece for the channel you choose.
           </p>
         )}
@@ -3342,10 +3330,10 @@ function PreWrapOutputGate({
             boxSizing: "border-box" as const,
           }}
         >
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", color: "#9A7030", marginBottom: 6, textTransform: "uppercase" as const }}>
+          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", color: "#9A7030", marginBottom: 6, textTransform: "uppercase" as const }}>
             {isMobile ? "Reed recommends (tap to select)" : "Reed recommends"}
           </div>
-          <div style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)" }}>{recLabel}</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)" }}>{recLabel}</div>
           <div style={{ fontSize: 14, color: "var(--fg-3)", marginTop: 6, lineHeight: 1.45 }}>
             Suggestion only. Your pick in the grids below uses the gold selected style.
           </div>
@@ -3354,7 +3342,7 @@ function PreWrapOutputGate({
         {categories.map(({ key, title, items }) => (
           <div key={key} style={{ marginBottom: 28 }}>
             <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--fg-3)",
+              fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", color: "var(--fg-3)",
               marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
             }}>
               {title}
@@ -3408,7 +3396,7 @@ function PreWrapOutputGate({
         {userTemplates.length > 0 && (
           <div style={{ marginBottom: 28 }}>
             <div style={{
-              fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--fg-3)",
+              fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", color: "var(--fg-3)",
               marginBottom: 10, textTransform: "uppercase" as const, fontFamily: FONT,
             }}>
               Your Templates
@@ -3501,7 +3489,7 @@ function PreWrapOutputGate({
             marginLeft: "auto",
             marginRight: "auto",
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>
               Presentation length
             </div>
             <label style={{ fontSize: 14, color: "var(--fg-2)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" as const }}>
@@ -3544,7 +3532,7 @@ function PreWrapOutputGate({
             marginLeft: "auto",
             marginRight: "auto",
           }}>
-            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>
+            <div style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 8, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>
               Talk length
             </div>
             <label style={{ fontSize: 14, color: "var(--fg-2)", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" as const }}>
@@ -3657,7 +3645,7 @@ function StageReview({
         <div style={{
           padding: "8px 20px", background: "rgba(245,198,66,0.08)",
           borderBottom: "1px solid rgba(245,198,66,0.2)",
-          fontSize: 14, color: "var(--gold-bright)", fontWeight: 500, flexShrink: 0,
+          fontSize: 14, color: "var(--gold-bright)", fontWeight: 400, flexShrink: 0,
         }}>
           Applying suggestion...
         </div>
@@ -6570,7 +6558,7 @@ export default function WorkSession() {
               {generating && (
                 <DpSection>
                   <DpLabel>Reed's Take</DpLabel>
-                  <div style={{ fontSize: 14, color: "var(--gold-bright)", lineHeight: 1.6, fontWeight: 500 }}>{generatingLabel}</div>
+                  <div style={{ fontSize: 14, color: "var(--gold-bright)", lineHeight: 1.6, fontWeight: 400 }}>{generatingLabel}</div>
                 </DpSection>
               )}
 
@@ -6708,7 +6696,7 @@ export default function WorkSession() {
                     if (bgNonPass.length === 0 && !citFlag) {
                       return (
                         <DpSection>
-                          <div style={{ fontSize: 10, color: "#22C55E", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                          <div style={{ fontSize: 10, color: "#22C55E", fontWeight: 400, display: "flex", alignItems: "center", gap: 6 }}>
                             <span>&#10003;</span>
                             <span>Reed has reviewed your draft. No issues found.</span>
                           </div>
@@ -6813,7 +6801,7 @@ export default function WorkSession() {
                   })()}
                   {backgroundPipelineRunning && (
                     <DpSection>
-                      <div style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 400, display: "flex", alignItems: "center", gap: 6 }}>
                         <span style={{ animation: "pulse 1.5s infinite" }}>&#9679;</span>
                         <span>Reed is reviewing your draft...</span>
                       </div>
@@ -6827,7 +6815,7 @@ export default function WorkSession() {
                         border: "1px solid rgba(74,144,217,0.25)", borderRadius: 8,
                         padding: "8px 28px 8px 10px", background: "rgba(74,144,217,0.04)",
                       }}>
-                        <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
+                        <div style={{ fontSize: 9, fontWeight: 600, color: "#4A90D9", marginBottom: 4 }}>Reed</div>
                         <div style={{ fontSize: 10, color: "var(--fg-2)", lineHeight: 1.5 }}>{reedActionMessage}</div>
                         <button
                           type="button"
@@ -6851,7 +6839,7 @@ export default function WorkSession() {
                   {/* CO_026: Proposal loading state */}
                   {proposalLoading && (
                     <DpSection>
-                      <div style={{ fontSize: 10, color: "var(--gold-bright)", fontWeight: 500, display: "flex", alignItems: "center", gap: 6 }}>
+                      <div style={{ fontSize: 10, color: "var(--gold-bright)", fontWeight: 400, display: "flex", alignItems: "center", gap: 6 }}>
                         <span style={{ animation: "pulse 1.5s infinite" }}>&#9679;</span>
                         <span>Reed is preparing a proposed change...</span>
                       </div>
@@ -6876,7 +6864,7 @@ export default function WorkSession() {
                           {pendingProposal.reason}
                         </div>
                         <div style={{
-                          fontSize: 10, color: "var(--fg-3)", fontWeight: 500,
+                          fontSize: 10, color: "var(--fg-3)", fontWeight: 400,
                         }}>
                           {pendingProposal.wordCountBefore} → {pendingProposal.wordCountAfter} words
                           {pendingProposal.wordCountAfter !== pendingProposal.wordCountBefore && (
@@ -7081,7 +7069,7 @@ export default function WorkSession() {
               boxShadow: "0 20px 48px rgba(0,0,0,0.22)",
             }}
           >
-            <h2 id="ew-cloud-restore-title" style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700, color: "var(--fg)" }}>
+            <h2 id="ew-cloud-restore-title" style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 600, color: "var(--fg)" }}>
               Continue saved session?
             </h2>
             <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>
@@ -7176,7 +7164,7 @@ export default function WorkSession() {
                 <path d="M3.5 3.5l7 7M10.5 3.5l-7 7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
               </svg>
             </button>
-            <h2 id="ew-new-session-park-title" style={{ margin: "0 0 8px", paddingRight: 36, fontSize: 17, fontWeight: 700, color: "var(--fg)" }}>
+            <h2 id="ew-new-session-park-title" style={{ margin: "0 0 8px", paddingRight: 36, fontSize: 17, fontWeight: 600, color: "var(--fg)" }}>
               New session
             </h2>
             <p style={{ margin: "0 0 16px", fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>
@@ -7333,7 +7321,7 @@ export default function WorkSession() {
                     }} />
                   </div>
                   <div style={{ display: "flex", alignItems: "center", marginTop: 4 }}>
-                    <span style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 500, letterSpacing: "0.04em" }}>
+                    <span style={{ fontSize: 10, color: "var(--fg-3)", fontWeight: 400, letterSpacing: "0.04em" }}>
                       {intakeReedQCount >= intakeTotalQ
                         ? `${intakeTotalQ} of ${intakeTotalQ} questions answered`
                         : `Question ${Math.min(intakeReedQCount, intakeTotalQ)} of ${intakeTotalQ}`}
@@ -7420,7 +7408,7 @@ export default function WorkSession() {
           >
             <h2
               id="talk-length-modal-title"
-              style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 700, color: "var(--fg)" }}
+              style={{ margin: "0 0 8px", fontSize: 17, fontWeight: 600, color: "var(--fg)" }}
             >
               Talk length
             </h2>

@@ -136,7 +136,7 @@ function RadioGroup({
 const Card = ({ title, children }: { title?: string; children: ReactNode }) => (
   <div className="liquid-glass-card" style={{ padding: 14, marginBottom: 10 }}>
     {title ? (
-      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>{title}</div>
+      <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>{title}</div>
     ) : null}
     {children}
   </div>
@@ -151,7 +151,7 @@ function PrefRow({ label, sublabel, children, last }: {
   return (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: last ? undefined : "1px solid var(--glass-border)" }}>
       <div>
-        <span style={{ fontSize: 12, color: "var(--fg-2)", fontWeight: 500 }}>{label}</span>
+        <span style={{ fontSize: 12, color: "var(--fg-2)", fontWeight: 400 }}>{label}</span>
         {sublabel ? <div style={{ fontSize: 10, color: "var(--fg-3)", marginTop: 2 }}>{sublabel}</div> : null}
       </div>
       {children}
@@ -167,7 +167,7 @@ function FormField({ label, helper, children, last }: {
 }) {
   return (
     <div style={{ padding: "10px 0", borderBottom: last ? undefined : "1px solid var(--glass-border)" }}>
-      <label style={{ display: "block", fontSize: 12, color: "var(--fg-2)", fontWeight: 500, marginBottom: 6 }}>{label}</label>
+      <label style={{ display: "block", fontSize: 12, color: "var(--fg-2)", fontWeight: 400, marginBottom: 6 }}>{label}</label>
       {children}
       {helper ? <div style={{ fontSize: 10, color: "var(--fg-3)", marginTop: 4, lineHeight: 1.4 }}>{helper}</div> : null}
     </div>
@@ -177,7 +177,7 @@ function FormField({ label, helper, children, last }: {
 function SectionHeader({ title, description }: { title: string; description?: string }) {
   return (
     <div style={{ marginBottom: 16 }}>
-      <h2 style={{ fontSize: 22, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.01em" }}>{title}</h2>
+      <h2 style={{ fontSize: 22, fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.01em" }}>{title}</h2>
       {description ? (
         <p style={{ fontSize: 14, color: "var(--fg-2)", marginTop: 4, marginBottom: 0, lineHeight: 1.5 }}>{description}</p>
       ) : null}
@@ -193,7 +193,7 @@ function DnaLaunchCard({ title, description, route, onLaunch }: {
 }) {
   return (
     <div className="liquid-glass-card" style={{ padding: 24, fontFamily: FONT }}>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "var(--fg)", marginBottom: 8, letterSpacing: "-0.01em" }}>{title}</div>
+      <div style={{ fontSize: 28, fontWeight: 600, color: "var(--fg)", marginBottom: 8, letterSpacing: "-0.01em" }}>{title}</div>
       <div style={{ fontSize: 14, color: "var(--fg-2)", marginBottom: 18, lineHeight: 1.55 }}>{description}</div>
       <button
         type="button"
@@ -399,7 +399,7 @@ export default function Settings() {
       <Card title="Display">
         <div style={{ padding: "10px 0" }}>
           <div style={{ display: "flex", alignItems: "flex-start", flexDirection: "column", gap: 10 }}>
-            <span style={{ fontSize: 12, color: "var(--fg-2)", fontWeight: 500 }}>Font size</span>
+            <span style={{ fontSize: 12, color: "var(--fg-2)", fontWeight: 400 }}>Font size</span>
             <div style={{ width: "100%" }}>
               <input
                 type="range"
@@ -615,7 +615,7 @@ export default function Settings() {
                     color: active ? "var(--fg)" : "var(--fg-2)",
                     fontFamily: FONT,
                     fontSize: 13,
-                    fontWeight: active ? 600 : 500,
+                    fontWeight: active ? 600 : 400,
                     cursor: "pointer",
                     transition: "background 0.12s, color 0.12s",
                   }}

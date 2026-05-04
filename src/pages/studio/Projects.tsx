@@ -241,7 +241,7 @@ export default function Projects() {
           style={{
             fontFamily: "'Inter', sans-serif",
             fontSize: 14,
-            fontWeight: 500,
+            fontWeight: 400,
             textTransform: "uppercase",
             letterSpacing: "0.05em",
             color: "var(--text-tertiary)",
@@ -255,7 +255,7 @@ export default function Projects() {
           style={{
             fontFamily: "'Inter', sans-serif",
             fontSize: 28,
-            fontWeight: 700,
+            fontWeight: 600,
             color: "var(--text-primary)",
             margin: 0,
             letterSpacing: "-0.02em",
@@ -276,7 +276,7 @@ export default function Projects() {
           borderRadius: 8,
           fontFamily: "'Inter', sans-serif",
           fontSize: 14,
-          fontWeight: 500,
+          fontWeight: 400,
           border: "none",
           cursor: "pointer",
           transition,
@@ -321,7 +321,7 @@ export default function Projects() {
           borderRadius: 8,
           fontFamily: "'Inter', sans-serif",
           fontSize: 14,
-          fontWeight: 500,
+          fontWeight: 400,
           border: "none",
           cursor: "pointer",
           transition,
@@ -586,7 +586,7 @@ export default function Projects() {
                 {avgScore > 0 && (
                   <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
                     <BarChart3 size={14} style={{ color: sc.text }} />
-                    <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 500, color: sc.text }}>
+                    <span style={{ fontFamily: "'Inter', sans-serif", fontSize: 12, fontWeight: 400, color: sc.text }}>
                       avg {avgScore}
                     </span>
                   </span>
@@ -679,7 +679,7 @@ export default function Projects() {
             onClick={(e) => e.stopPropagation()}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <div style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.02em" }}>New project</div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.02em" }}>New project</div>
               <button
                 type="button"
                 onClick={() => { if (!createLoading) setShowCreateModal(false); }}

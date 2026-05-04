@@ -168,7 +168,7 @@ export default function ComposerMemorySettings() {
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
         <div style={{ padding: "12px 20px 10px", maxWidth: isMobile ? "100%" : 720, margin: "0 auto", width: "100%" }}>
           <DnaNav />
-          <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>Composer memory</h1>
+          <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>Composer memory</h1>
           <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 4, lineHeight: 1.45 }}>
             Reed reads these lines in Work. Keep them short and factual. Higher sort priority loads first.
           </div>
@@ -184,7 +184,7 @@ export default function ComposerMemorySettings() {
 
         {(editingId === "new" || (editingId && editingId !== "new")) ? (
           <div className="liquid-glass-card" style={{ padding: 16, marginBottom: 16 }}>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "var(--fg-3)", marginBottom: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", marginBottom: 12 }}>
               {editingId === "new" ? "NEW ROW" : "EDIT ROW"}
             </div>
             <label style={{ display: "block", marginBottom: 10 }}>

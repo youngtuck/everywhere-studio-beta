@@ -39,7 +39,7 @@ function SectionCard({
       <div
         style={{
           fontSize: 9,
-          fontWeight: 700,
+          fontWeight: 600,
           letterSpacing: "0.1em",
           textTransform: "uppercase" as const,
           color: accent === "gold" ? "#9A7030" : "var(--fg-3)",
@@ -70,10 +70,10 @@ function AllCategoriesView() {
     <div style={{ display: "flex", flexDirection: "column", flex: 1, fontFamily: FONT, minHeight: 0 }}>
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
         <div style={{ padding: "14px 20px 16px", maxWidth: 1100, margin: "0 auto", width: "100%" }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
             Library
           </div>
-          <h1 style={{ fontSize: "clamp(20px, 2.4vw, 26px)", fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+          <h1 style={{ fontSize: "clamp(20px, 2.4vw, 26px)", fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
             Every output type
           </h1>
           <p style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, marginTop: 8, maxWidth: 560 }}>
@@ -98,10 +98,10 @@ function AllCategoriesView() {
           return (
             <section key={key} style={{ marginBottom: 28 }}>
               <div style={{ marginBottom: 12 }}>
-                <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>
+                <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>
                   Category
                 </div>
-                <h2 style={{ fontSize: 18, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.01em" }}>
+                <h2 style={{ fontSize: 18, fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.01em" }}>
                   {cat.label}
                 </h2>
                 <p style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.5, marginTop: 4, maxWidth: 640 }}>
@@ -157,10 +157,10 @@ function SingleCategoryView({ category }: { category: CategoryKey }) {
     <div style={{ display: "flex", flexDirection: "column", flex: 1, overflow: "hidden", fontFamily: FONT, minHeight: 0 }}>
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
         <div style={{ padding: "14px 20px 16px", maxWidth: 1100, margin: "0 auto", width: "100%" }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
             Output types
           </div>
-          <h1 style={{ fontSize: "clamp(20px, 2.4vw, 26px)", fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+          <h1 style={{ fontSize: "clamp(20px, 2.4vw, 26px)", fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
             {data.label}
           </h1>
           <p style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, marginTop: 8, maxWidth: 560 }}>
@@ -201,7 +201,7 @@ function SingleCategoryView({ category }: { category: CategoryKey }) {
               padding: "10px 12px",
               borderBottom: "1px solid var(--glass-border)",
               fontSize: 10,
-              fontWeight: 700,
+              fontWeight: 600,
               letterSpacing: "0.08em",
               textTransform: "uppercase" as const,
               color: "var(--fg-3)",
@@ -245,7 +245,7 @@ function SingleCategoryView({ category }: { category: CategoryKey }) {
                     }}
                   />
                   <span style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: "block", fontSize: 13, fontWeight: isSelected ? 600 : 500, color: "var(--fg)" }}>{t.name}</span>
+                    <span style={{ display: "block", fontSize: 13, fontWeight: isSelected ? 600 : 400, color: "var(--fg)" }}>{t.name}</span>
                     <span style={{ display: "block", fontSize: 10, color: "var(--fg-3)", marginTop: 2, lineHeight: 1.35 }}>
                       {(t.what || "").slice(0, 72)}{(t.what || "").length > 72 ? "..." : ""}
                     </span>
@@ -272,10 +272,10 @@ function SingleCategoryView({ category }: { category: CategoryKey }) {
             ) : (
               <>
                 <div style={{ marginBottom: 20 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                     Selected type
                   </div>
-                  <h2 style={{ fontSize: "clamp(18px, 2vw, 22px)", fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+                  <h2 style={{ fontSize: "clamp(18px, 2vw, 22px)", fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
                     {selected.name}
                   </h2>
                 </div>

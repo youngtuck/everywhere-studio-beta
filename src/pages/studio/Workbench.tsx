@@ -116,7 +116,7 @@ export default function Workbench() {
           style={{
             fontFamily: "'Inter', sans-serif",
             fontSize: 24,
-            fontWeight: 700,
+            fontWeight: 600,
             color: "var(--text-primary)",
             margin: "0 0 4px",
             letterSpacing: "-0.02em",
@@ -190,7 +190,7 @@ export default function Workbench() {
                   style={{
                     fontFamily: "'Inter', sans-serif",
                     fontSize: 13,
-                    fontWeight: 500,
+                    fontWeight: 400,
                     color: scoreStyle.text,
                   }}
                 >

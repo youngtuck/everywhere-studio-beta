@@ -158,7 +158,7 @@ function Card({
         <div style={{ minWidth: 0 }}>
           <div style={{
             fontSize: 10,
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: "0.12em",
             textTransform: "uppercase" as const,
             color: "var(--fg-3)",
@@ -172,7 +172,7 @@ function Card({
           {count != null && count > 0 ? (
             <span style={{
               fontSize: 10,
-              fontWeight: 700,
+              fontWeight: 600,
               color: "var(--fg-3)",
               padding: "3px 9px",
               borderRadius: 999,
@@ -283,7 +283,7 @@ function WatchFieldGroup({ title, description, children }: { title: string; desc
   return (
     <div style={{ marginBottom: 4 }}>
       <div style={{
-        fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)",
+        fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)",
         marginBottom: description ? 4 : 8, fontFamily: "var(--studio-mono-font, ui-monospace, monospace)",
       }}>{title}</div>
       {description ? (
@@ -315,7 +315,7 @@ function WatchRightPanel({ contentTriggers, onTurnIntoBrief }: {
     <div style={{ marginBottom: 14 }}>{children}</div>
   );
   const DpLabel = ({ children }: { children: React.ReactNode }) => (
-    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>{children}</div>
+    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>{children}</div>
   );
 
   return (
@@ -688,7 +688,7 @@ export default function Watch() {
                 aria-selected={selected}
                 onClick={() => setActiveTab(id)}
                 style={{
-                  fontSize: 14, fontWeight: selected ? 600 : 500, fontFamily: FONT,
+                  fontSize: 14, fontWeight: selected ? 600 : 400, fontFamily: FONT,
                   color: selected ? "var(--fg)" : "var(--fg-3)",
                   padding: "7px 14px", borderRadius: 10, border: "none", cursor: "pointer",
                   background: selected ? "var(--glass-surface)" : "transparent",
@@ -727,7 +727,7 @@ export default function Watch() {
         {activeTab === "settings" && (
           <>
               <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>
                   Briefing cadence
                 </span>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
@@ -744,7 +744,7 @@ export default function Watch() {
                         saveWatchConfig({ ...buildWatchConfigSnapshot(), frequency: val });
                       }}
                       style={{
-                        fontSize: 14, fontWeight: frequency === val ? 600 : 500,
+                        fontSize: 14, fontWeight: frequency === val ? 600 : 400,
                         padding: "6px 12px", borderRadius: 9, border: "1px solid var(--glass-border)",
                         background: frequency === val ? "var(--glass-surface)" : "transparent",
                         color: frequency === val ? "var(--fg)" : "var(--fg-3)",
@@ -771,7 +771,7 @@ export default function Watch() {
               </div>
             ) : contentTriggers.length === 0 && opportunities.length === 0 && marketSignals.length === 0 ? (
               <div className="liquid-glass-card" style={{ textAlign: "center" as const, padding: "40px 28px", maxWidth: 400, margin: "0 auto" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>
                   Sentinel
                 </div>
                 <div style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", marginBottom: 10 }}>No briefing yet</div>
@@ -787,7 +787,7 @@ export default function Watch() {
             ) : (
               <>
                 <div style={{ marginBottom: 18 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                     At a glance
                   </div>
                   <div style={{ fontSize: 14, color: "var(--fg-2)", lineHeight: 1.55 }}>
@@ -858,7 +858,7 @@ export default function Watch() {
                 background: "rgba(245,198,66,0.05)", borderColor: "rgba(245,198,66,0.22)",
                 padding: "18px 20px", marginBottom: 22,
               }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>
                   Quick start
                 </div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg)", marginBottom: 8 }}>
@@ -869,7 +869,7 @@ export default function Watch() {
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Suggested keywords</div>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Suggested keywords</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {DEFAULT_KEYWORDS.filter(k => !keywords.includes(k)).map(k => (
                       <button key={k} type="button" onClick={() => addKeyword(k)} style={{
@@ -886,7 +886,7 @@ export default function Watch() {
                 </div>
 
                 <div>
-                  <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Suggested sources</div>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Suggested sources</div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                     {DEFAULT_SOURCES.filter(s => s.type === "newsletter" || s.type === "substack").slice(0, 12).map(s => {
                       const isAdded = (s.type === "newsletter" ? newsletters : substacks).includes(s.name);
@@ -920,7 +920,7 @@ export default function Watch() {
 
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
               <div className="liquid-glass-card" style={{ padding: "18px 20px" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                   Topic & community
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>What to listen for</div>
@@ -944,7 +944,7 @@ export default function Watch() {
               </div>
 
               <div className="liquid-glass-card" style={{ padding: "18px 20px" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                   Media you follow
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>Sources for the briefing</div>
@@ -980,7 +980,7 @@ export default function Watch() {
               </div>
 
               <div className="liquid-glass-card" style={{ padding: "18px 20px" }}>
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
                   Competitive lens
                 </div>
                 <div style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>People and brands to contrast</div>

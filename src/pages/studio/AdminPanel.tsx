@@ -74,7 +74,7 @@ export default function AdminPanel() {
 
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: "32px 24px", fontFamily: "'Inter', sans-serif" }}>
-      <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: "0 0 24px", letterSpacing: "-0.02em" }}>Admin</h1>
+      <h1 style={{ fontSize: 28, fontWeight: 600, color: "var(--fg)", margin: "0 0 24px", letterSpacing: "-0.02em" }}>Admin</h1>
       <div style={{ display: "flex", gap: 4, marginBottom: 32, borderBottom: "1px solid var(--glass-border)", paddingBottom: 0 }}>
         {tabs.map(t => (
           <button key={t.key} onClick={() => setTab(t.key)} style={{
@@ -133,7 +133,7 @@ function InviteTab() {
     <div>
       <div style={{ display: "grid", gridTemplateColumns: result ? "1fr 1fr" : "1fr", gap: 24 }}>
         <div className="liquid-glass-card" style={{ padding: 24 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)", margin: "0 0 16px" }}>Generate Invite Code</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", margin: "0 0 16px" }}>Generate Invite Code</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <input value={name} onChange={e => setName(e.target.value)} placeholder="Who are you inviting?" style={inputStyle} />
             <input value={email} onChange={e => setEmail(e.target.value)} placeholder="Their email (optional)" style={inputStyle} />
@@ -146,8 +146,8 @@ function InviteTab() {
 
         {result && (
           <div className="liquid-glass-card" style={{ padding: 24 }}>
-            <h3 style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)", margin: "0 0 16px" }}>Invite Created</h3>
-            <div style={{ fontSize: 28, fontWeight: 700, color: "var(--gold-dark)", letterSpacing: "2px", marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
+            <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", margin: "0 0 16px" }}>Invite Created</h3>
+            <div style={{ fontSize: 28, fontWeight: 600, color: "var(--gold-dark)", letterSpacing: "2px", marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
               {result.code}
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -268,7 +268,7 @@ function PeopleTab() {
           <button key={f} onClick={() => setFilter(f)} style={{
             padding: "6px 14px", borderRadius: 6, border: "none",
             background: filter === f ? "var(--fg)" : "transparent", color: filter === f ? "var(--bg)" : "var(--fg-3)",
-            fontSize: 13, fontWeight: 500, cursor: "pointer", textTransform: "capitalize",
+            fontSize: 13, fontWeight: 400, cursor: "pointer", textTransform: "capitalize",
           }}>{f}</button>
         ))}
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search..." style={{ ...inputStyle, flex: 1, minWidth: 160 }} />
@@ -374,7 +374,7 @@ function CodesTab() {
           { label: "Deactivated", value: deactivated, color: "#E53935" },
         ].map(s => (
           <div key={s.label} className="liquid-glass-card" style={{ padding: "12px 20px" }}>
-            <div style={{ fontSize: 24, fontWeight: 700, color: s.color }}>{s.value}</div>
+            <div style={{ fontSize: 24, fontWeight: 600, color: s.color }}>{s.value}</div>
             <div style={{ fontSize: 12, color: "var(--fg-3)" }}>{s.label}</div>
           </div>
         ))}
@@ -436,7 +436,7 @@ function DashboardTab() {
         {metrics.map(m => (
           <div key={m.label} className="liquid-glass-card" style={{ padding: 20 }}>
             <div style={{ fontSize: 11, fontWeight: 600, color: "var(--fg-3)", letterSpacing: "1px", textTransform: "uppercase", marginBottom: 4 }}>{m.label}</div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: "var(--fg)" }}>{m.value}</div>
+            <div style={{ fontSize: 28, fontWeight: 600, color: "var(--fg)" }}>{m.value}</div>
             {m.sub && <div style={{ fontSize: 12, color: "var(--fg-3)", marginTop: 2 }}>{m.sub}</div>}
           </div>
         ))}
@@ -467,12 +467,12 @@ const inputStyle: React.CSSProperties = {
 };
 const btnGold: React.CSSProperties = {
   padding: "10px 20px", borderRadius: 8, border: "none",
-  background: "#F5C642", color: "#0D1B2A", fontSize: 14, fontWeight: 700,
+  background: "#F5C642", color: "#0D1B2A", fontSize: 14, fontWeight: 600,
   cursor: "pointer", fontFamily: "'Inter', sans-serif",
 };
 const btnOutline: React.CSSProperties = {
   padding: "8px 14px", borderRadius: 8, border: "1px solid var(--glass-border)",
-  background: "transparent", color: "var(--fg-2)", fontSize: 13, fontWeight: 500,
+  background: "transparent", color: "var(--fg-2)", fontSize: 13, fontWeight: 400,
   cursor: "pointer", fontFamily: "'Inter', sans-serif",
   display: "flex", alignItems: "center", gap: 6, justifyContent: "center",
 };

@@ -102,7 +102,7 @@ function PipelineDetailPanel({
   return (
     <div className="liquid-glass-card" style={{ padding: 16 }}>
       <div style={{ marginBottom: 14 }}>
-        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>
           {kindLabel}
         </div>
         <div style={{ fontSize: 13, fontWeight: 600, color: "var(--fg)", marginBottom: 4, lineHeight: 1.4 }}>{item.title}</div>
@@ -110,7 +110,7 @@ function PipelineDetailPanel({
         <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>{item.detail}</div>
       </div>
       <div>
-        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Actions</div>
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Actions</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <button
             type="button"
@@ -129,7 +129,7 @@ function PipelineDetailPanel({
           )}
           {!isProgress && (
             <button type="button" className="liquid-glass-btn" style={{ width: "100%", justifyContent: "flex-start", padding: "8px 12px" }}>
-              <span className="liquid-glass-btn-label" style={{ color: "var(--fg-2)", fontWeight: 500 }}>Edit note</span>
+              <span className="liquid-glass-btn-label" style={{ color: "var(--fg-2)", fontWeight: 400 }}>Edit note</span>
             </button>
           )}
           <button
@@ -163,7 +163,7 @@ function InProgressSessionRow({
     tier === 1
       ? { fontSize: 14, fontWeight: 600 as const, color: "var(--fg)", opacity: 1, lineHeight: 1.35 }
       : tier === 2
-        ? { fontSize: 13, fontWeight: 500 as const, color: "var(--fg)", opacity: 0.85, lineHeight: 1.35 }
+        ? { fontSize: 13, fontWeight: 400 as const, color: "var(--fg)", opacity: 0.85, lineHeight: 1.35 }
         : { fontSize: 12, fontWeight: 400 as const, color: "var(--fg-3)", lineHeight: 1.35 };
 
   const tsStyle =
@@ -507,7 +507,7 @@ export default function TheLot() {
 
   const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
     <div className="liquid-glass-card" style={{ padding: 14, marginBottom: 10 }}>
-      <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>{title}</div>
+      <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>{title}</div>
       {children}
     </div>
   );
@@ -528,7 +528,7 @@ export default function TheLot() {
         onMouseLeave={e => { if (!active) e.currentTarget.style.background = active ? "rgba(245,198,66,0.06)" : "transparent"; }}
       >
         <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 12, color: active ? "var(--fg)" : "var(--fg-2)", fontWeight: active ? 500 : 400, marginBottom: 2 }}>{item.title}</div>
+          <div style={{ fontSize: 12, color: active ? "var(--fg)" : "var(--fg-2)", fontWeight: 400, marginBottom: 2 }}>{item.title}</div>
           <div style={{ fontSize: 10, color: "var(--fg-3)" }}>{item.meta}</div>
         </div>
         {item.strengthLabel && (

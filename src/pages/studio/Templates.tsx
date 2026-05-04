@@ -451,10 +451,10 @@ export default function Templates() {
     <div style={{ display: "flex", flexDirection: "column", flex: 1, height: "100%", overflow: "hidden", fontFamily: FONT, minHeight: 0 }}>
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
         <div style={{ padding: "14px 20px 16px", maxWidth: 1100, margin: "0 auto", width: "100%" }}>
-          <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
+          <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>
             Wrap layer
           </div>
-          <h1 style={{ fontSize: "clamp(20px, 2.4vw, 26px)", fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+          <h1 style={{ fontSize: "clamp(20px, 2.4vw, 26px)", fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
             Templates
           </h1>
           <p style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, marginTop: 8, maxWidth: 520 }}>
@@ -490,7 +490,7 @@ export default function Templates() {
           }}
         >
           <div style={{ padding: "10px 12px", borderBottom: "1px solid var(--glass-border)" }}>
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>System</span>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>System</span>
           </div>
           <div style={{ overflowY: "auto", flex: 1, padding: 6, minHeight: 0 }}>
             {SYSTEM_TEMPLATES.map((t, i) => {
@@ -514,7 +514,7 @@ export default function Templates() {
                       transition: "background 0.15s ease, border-color 0.15s ease",
                     }}
                   >
-                    <div style={{ fontSize: 13, fontWeight: on ? 600 : 500, color: "var(--fg)" }}>{t.name}</div>
+                    <div style={{ fontSize: 13, fontWeight: on ? 600 : 400, color: "var(--fg)" }}>{t.name}</div>
                     <div style={{ fontSize: 10, color: "var(--fg-3)", marginTop: 3, lineHeight: 1.35 }}>Based on {t.base} · {t.format}</div>
                   </button>
                   <div style={{ display: "flex", justifyContent: "flex-end", padding: "0 4px 2px" }}>
@@ -535,7 +535,7 @@ export default function Templates() {
           <div style={{ height: 1, background: "var(--glass-border)", margin: "4px 10px" }} />
 
           <div style={{ padding: "8px 12px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0 }}>
-            <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>My Templates</span>
+            <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)" }}>My Templates</span>
             <button type="button" className="liquid-glass-btn-gold" onClick={openNewModal} style={{ padding: "5px 12px", fontSize: 10, fontWeight: 600 }}>
               <span className="liquid-glass-btn-gold-label">+ New Template</span>
             </button>
@@ -568,7 +568,7 @@ export default function Templates() {
                         fontFamily: FONT,
                       }}
                     >
-                      <div style={{ fontSize: 12, fontWeight: on ? 600 : 500, color: "var(--fg)" }}>{row.name}</div>
+                      <div style={{ fontSize: 12, fontWeight: on ? 600 : 400, color: "var(--fg)" }}>{row.name}</div>
                       <div style={{ fontSize: 10, color: "var(--fg-3)", marginTop: 1 }}>
                         {row.output_type.replace(/_/g, " ")}{parseSettings(row.settings).forkedFromName ? " · From system" : ""}
                       </div>
@@ -594,9 +594,9 @@ export default function Templates() {
               <>
                 <div style={{ marginBottom: 18, display: "flex", flexWrap: "wrap", alignItems: "flex-start", justifyContent: "space-between", gap: 10 }}>
                   <div>
-                    <h2 style={{ fontSize: "clamp(18px, 2vw, 22px)", fontWeight: 700, color: "var(--fg)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>{selectedSystem.name}</h2>
+                    <h2 style={{ fontSize: "clamp(18px, 2vw, 22px)", fontWeight: 600, color: "var(--fg)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>{selectedSystem.name}</h2>
                     <span className="liquid-glass-card" style={{
-                      fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const,
+                      fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const,
                       color: "var(--fg-3)", padding: "4px 10px", borderRadius: 8, display: "inline-block",
                     }}>System template</span>
                   </div>
@@ -610,7 +610,7 @@ export default function Templates() {
                 </div>
 
                 <div className="liquid-glass-card" style={{ padding: "14px 16px", marginBottom: 14, borderRadius: 14 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>Sections</div>
+                  <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 10 }}>Sections</div>
                   {selectedSystem.sections.map((sec, i) => (
                     <div
                       key={sec}
@@ -622,15 +622,15 @@ export default function Templates() {
                         gap: 10,
                       }}
                     >
-                      <span style={{ fontSize: 10, fontWeight: 700, color: "var(--gold, #F5C642)", minWidth: 20 }}>{i + 1}</span>
-                      <span style={{ fontSize: 12, fontWeight: 500, color: "var(--fg)" }}>{sec}</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: "var(--gold, #F5C642)", minWidth: 20 }}>{i + 1}</span>
+                      <span style={{ fontSize: 12, fontWeight: 400, color: "var(--fg)" }}>{sec}</span>
                     </div>
                   ))}
                 </div>
 
                 {selectedSystem.reedInterview && (
                   <div className="liquid-glass-card" style={{ padding: "14px 16px", marginBottom: 14, borderRadius: 14, border: "1px solid rgba(74,144,217,0.18)" }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--blue, #4A90D9)", marginBottom: 10 }}>Reed interview</div>
+                    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--blue, #4A90D9)", marginBottom: 10 }}>Reed interview</div>
                     {selectedSystem.reedInterview.map((q, i) => (
                       <div key={i} style={{ fontSize: 12, color: "var(--fg-2)", lineHeight: 1.55, padding: "6px 0 6px 12px", borderLeft: "2px solid rgba(74,144,217,0.35)", marginBottom: 6 }}>{q}</div>
                     ))}
@@ -639,11 +639,11 @@ export default function Templates() {
 
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12 }}>
                   <div className="liquid-glass-card" style={{ padding: "12px 14px", borderRadius: 14 }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>Format</div>
+                    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>Format</div>
                     <div style={{ fontSize: 12, color: "var(--fg-2)" }}>{selectedSystem.format}</div>
                   </div>
                   <div className="liquid-glass-card" style={{ padding: "12px 14px", borderRadius: 14 }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>Base output type</div>
+                    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 4 }}>Base output type</div>
                     <div style={{ fontSize: 12, color: "var(--fg-2)" }}>{selectedSystem.base}</div>
                   </div>
                 </div>
@@ -653,9 +653,9 @@ export default function Templates() {
             {selectedUser && (
               <>
                 <div style={{ marginBottom: 16 }}>
-                  <h2 style={{ fontSize: "clamp(18px, 2vw, 22px)", fontWeight: 700, color: "var(--fg)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>{selectedUser.name}</h2>
+                  <h2 style={{ fontSize: "clamp(18px, 2vw, 22px)", fontWeight: 600, color: "var(--fg)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>{selectedUser.name}</h2>
                   <span className="liquid-glass-card" style={{
-                    fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const,
+                    fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const,
                     color: "var(--fg-3)", padding: "4px 10px", borderRadius: 8, display: "inline-block",
                   }}>My template</span>
                   {parseSettings(selectedUser.settings).forkedFromName && (
@@ -665,10 +665,10 @@ export default function Templates() {
                   )}
                 </div>
 
-                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Name</label>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Name</label>
                 <input className="liquid-glass-input" value={formName} onChange={e => setFormName(e.target.value)} style={{ width: "100%", marginBottom: 14, fontSize: 13, padding: "10px 12px", borderRadius: 10 }} />
 
-                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Output type</label>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Output type</label>
                 <select
                   className="liquid-glass-input"
                   value={formOutputType}
@@ -680,7 +680,7 @@ export default function Templates() {
                   ))}
                 </select>
 
-                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Description</label>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Description</label>
                 <textarea
                   className="liquid-glass-input"
                   value={formDescription}
@@ -689,7 +689,7 @@ export default function Templates() {
                   style={{ width: "100%", marginBottom: 14, fontSize: 13, padding: "10px 12px", borderRadius: 10, resize: "vertical" as const, fontFamily: FONT }}
                 />
 
-                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Sections (one per line)</label>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Sections (one per line)</label>
                 <textarea
                   className="liquid-glass-input"
                   value={formSectionsText}
@@ -698,7 +698,7 @@ export default function Templates() {
                   style={{ width: "100%", marginBottom: 14, fontSize: 13, padding: "10px 12px", borderRadius: 10, resize: "vertical" as const, fontFamily: FONT }}
                 />
 
-                <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Custom instructions</label>
+                <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 6, letterSpacing: "0.06em", textTransform: "uppercase" as const }}>Custom instructions</label>
                 <textarea
                   className="liquid-glass-input"
                   value={formCustomInstructions}
@@ -732,7 +732,7 @@ export default function Templates() {
                     <ReedProfileIcon size={24} title="Reed" />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>Reed</div>
+                    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>Reed</div>
                     <p style={{ fontSize: 13, color: "var(--fg-2)", lineHeight: 1.6, margin: 0 }}>
                       Select a system template or one of your saved templates. Use + New Template to start from scratch.
                     </p>
@@ -763,7 +763,7 @@ export default function Templates() {
 
       {modal === "fork-notice" && forkSystemIndex != null && (
         <ModalBackdrop onClose={() => { setModal(null); setForkSystemIndex(null); }}>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--fg)", margin: "0 0 12px" }}>System template</h2>
+          <h2 style={{ fontSize: 17, fontWeight: 600, color: "var(--fg)", margin: "0 0 12px" }}>System template</h2>
           <p style={{ fontSize: 13, color: "var(--fg-2)", lineHeight: 1.6, margin: "0 0 18px" }}>
             This is a system template. You are creating your own version based on it. Your copy is fully editable and saved under My Templates.
           </p>
@@ -780,20 +780,20 @@ export default function Templates() {
 
       {modal === "fork-form" && forkSystemIndex != null && (
         <ModalBackdrop onClose={() => { setModal(null); setForkSystemIndex(null); }}>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--fg)", margin: "0 0 12px" }}>Save your template</h2>
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Name</label>
+          <h2 style={{ fontSize: 17, fontWeight: 600, color: "var(--fg)", margin: "0 0 12px" }}>Save your template</h2>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Name</label>
           <input className="liquid-glass-input" value={formName} onChange={e => setFormName(e.target.value)} style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10 }} />
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Output type</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Output type</label>
           <select className="liquid-glass-input" value={formOutputType} onChange={e => setFormOutputType(e.target.value)} style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }}>
             {outputTypeOptions.map(o => (
               <option key={o.id} value={o.id}>{o.label}</option>
             ))}
           </select>
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Description</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Description</label>
           <textarea className="liquid-glass-input" value={formDescription} onChange={e => setFormDescription(e.target.value)} rows={3} style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }} />
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Sections (one per line)</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Sections (one per line)</label>
           <textarea className="liquid-glass-input" value={formSectionsText} onChange={e => setFormSectionsText(e.target.value)} rows={5} style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }} />
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Custom instructions</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Custom instructions</label>
           <textarea className="liquid-glass-input" value={formCustomInstructions} onChange={e => setFormCustomInstructions(e.target.value)} rows={3} style={{ width: "100%", marginBottom: 16, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button type="button" className="liquid-glass-btn" onClick={() => { setModal(null); setForkSystemIndex(null); }}>Cancel</button>
@@ -806,20 +806,20 @@ export default function Templates() {
 
       {modal === "new" && (
         <ModalBackdrop onClose={() => setModal(null)}>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--fg)", margin: "0 0 12px" }}>New template</h2>
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Name</label>
+          <h2 style={{ fontSize: 17, fontWeight: 600, color: "var(--fg)", margin: "0 0 12px" }}>New template</h2>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Name</label>
           <input className="liquid-glass-input" value={formName} onChange={e => setFormName(e.target.value)} style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10 }} />
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Output type</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Output type</label>
           <select className="liquid-glass-input" value={formOutputType} onChange={e => setFormOutputType(e.target.value)} style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }}>
             {outputTypeOptions.map(o => (
               <option key={o.id} value={o.id}>{o.label}</option>
             ))}
           </select>
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Description</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Description</label>
           <textarea className="liquid-glass-input" value={formDescription} onChange={e => setFormDescription(e.target.value)} rows={3} placeholder="What this template is for." style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }} />
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Sections (one per line, optional)</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Sections (one per line, optional)</label>
           <textarea className="liquid-glass-input" value={formSectionsText} onChange={e => setFormSectionsText(e.target.value)} rows={4} placeholder={"Hook\nBody\nClose"} style={{ width: "100%", marginBottom: 12, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }} />
-          <label style={{ display: "block", fontSize: 10, fontWeight: 700, color: "var(--fg-3)", marginBottom: 4 }}>Custom instructions</label>
+          <label style={{ display: "block", fontSize: 10, fontWeight: 600, color: "var(--fg-3)", marginBottom: 4 }}>Custom instructions</label>
           <textarea className="liquid-glass-input" value={formCustomInstructions} onChange={e => setFormCustomInstructions(e.target.value)} rows={4} placeholder="How Reed and Wrap should use this template." style={{ width: "100%", marginBottom: 16, fontSize: 13, padding: "8px 10px", borderRadius: 10, fontFamily: FONT }} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button type="button" className="liquid-glass-btn" onClick={() => setModal(null)}>Cancel</button>
@@ -832,7 +832,7 @@ export default function Templates() {
 
       {modal === "rename" && renameId && (
         <ModalBackdrop onClose={() => { setModal(null); setRenameId(null); }}>
-          <h2 style={{ fontSize: 17, fontWeight: 700, color: "var(--fg)", margin: "0 0 12px" }}>Rename template</h2>
+          <h2 style={{ fontSize: 17, fontWeight: 600, color: "var(--fg)", margin: "0 0 12px" }}>Rename template</h2>
           <input className="liquid-glass-input" value={renameValue} onChange={e => setRenameValue(e.target.value)} style={{ width: "100%", marginBottom: 16, fontSize: 13, padding: "10px 12px", borderRadius: 10 }} />
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
             <button type="button" className="liquid-glass-btn" onClick={() => { setModal(null); setRenameId(null); }}>Cancel</button>

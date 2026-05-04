@@ -133,7 +133,7 @@ function WrapReaderFormattedBody({ content }: { content: string }) {
           : level === 2
             ? {
                 fontSize: 16,
-                fontWeight: 700 as const,
+                fontWeight: 600 as const,
                 color: "var(--fg)",
                 margin: 0,
                 marginTop: gapTop(),
@@ -141,7 +141,7 @@ function WrapReaderFormattedBody({ content }: { content: string }) {
               }
             : {
                 fontSize: 17,
-                fontWeight: 700 as const,
+                fontWeight: 600 as const,
                 color: "var(--fg)",
                 margin: 0,
                 marginTop: gapTop(),
@@ -286,7 +286,7 @@ function WrapStepRail({
               <div style={{
                 width: 26, height: 26, borderRadius: "50%",
                 display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 11, fontWeight: 700,
+                fontSize: 11, fontWeight: 600,
                 background: check && !active ? "rgba(34,197,94,0.15)" : active ? "rgba(245,198,66,0.2)" : "rgba(0,0,0,0.04)",
                 border: `1px solid ${check && !active ? "rgba(34,197,94,0.4)" : active ? "rgba(245,198,66,0.55)" : "var(--glass-border)"}`,
                 color: check && !active ? "#16A34A" : active ? "#9A7030" : "var(--fg-3)",
@@ -294,7 +294,7 @@ function WrapStepRail({
                 {check && !active ? "✓" : s.n}
               </div>
               <span style={{
-                fontSize: 11, fontWeight: active ? 700 : 500,
+                fontSize: 11, fontWeight: active ? 600 : 400,
                 color: active ? "var(--fg)" : "var(--fg-3)",
                 letterSpacing: "0.02em",
               }}>
@@ -328,7 +328,7 @@ function WrapDashPanel({
 }) {
   const isFreestyle = !outputType || outputType === "freestyle";
   const DpLabel = ({ children }: { children: React.ReactNode }) => (
-    <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>{children}</div>
+    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 6 }}>{children}</div>
   );
 
   const chips = [
@@ -379,12 +379,12 @@ function WrapDashPanel({
         <div style={{ fontSize: 10, fontWeight: 600, color: "#9A7030", marginBottom: 6 }}>
           {outputTypeDisplayLabel(outputType)}
           {outputType === "presentation" && presentationMinutes != null && (
-            <span style={{ fontWeight: 500, color: "var(--fg-3)" }}>
+            <span style={{ fontWeight: 400, color: "var(--fg-3)" }}>
               {" "}· {presentationMinutes} min (~{presentationTargetWords(presentationMinutes)} words)
             </span>
           )}
           {outputType === "talk" && talkDurationMinutes != null && (
-            <span style={{ fontWeight: 500, color: "var(--fg-3)" }}>
+            <span style={{ fontWeight: 400, color: "var(--fg-3)" }}>
               {" "}· {talkDurationMinutes} min (~{talkTargetWords(talkDurationMinutes)} words)
             </span>
           )}
@@ -403,14 +403,14 @@ function WrapDashPanel({
         className={exported ? "liquid-glass-btn" : "liquid-glass-btn-gold"}
         style={{
           width: "100%", padding: 10, borderRadius: 10, marginBottom: 12,
-          fontSize: 11, fontWeight: 700,
+          fontSize: 11, fontWeight: 600,
           cursor: exported || exporting ? "default" : "pointer",
           fontFamily: FONT, letterSpacing: "0.04em",
           opacity: exporting ? 0.6 : 1,
         }}
       >
         {exported ? (
-          <span className="liquid-glass-btn-label" style={{ color: "var(--blue, #4A90D9)", fontWeight: 700 }}>Exported</span>
+          <span className="liquid-glass-btn-label" style={{ color: "var(--blue, #4A90D9)", fontWeight: 600 }}>Exported</span>
         ) : exporting ? (
           <span className="liquid-glass-btn-gold-label">Exporting…</span>
         ) : (
@@ -419,7 +419,7 @@ function WrapDashPanel({
       </button>
 
       <div className="liquid-glass-card" style={{ padding: "10px 12px", marginBottom: 12 }}>
-        <div style={{ fontSize: 9, fontWeight: 700, color: "#4A90D9", marginBottom: 6 }}>Reed</div>
+        <div style={{ fontSize: 9, fontWeight: 600, color: "#4A90D9", marginBottom: 6 }}>Reed</div>
         <div style={{ fontSize: 11, color: "var(--fg-2)", lineHeight: 1.6 }}>
           Each format is ready to paste. Tweak tone in the Reed panel if you want a pass on one surface.
         </div>
@@ -428,7 +428,7 @@ function WrapDashPanel({
       <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
         {chips.map((chip, i) => (
           <button key={i} type="button" className="liquid-glass-btn" onClick={() => prefillReed(chip.prefill)} style={{ fontSize: 10, padding: "4px 10px" }}>
-            <span className="liquid-glass-btn-label" style={{ color: "var(--fg-2)", fontWeight: 500 }}>{chip.label}</span>
+            <span className="liquid-glass-btn-label" style={{ color: "var(--fg-2)", fontWeight: 400 }}>{chip.label}</span>
           </button>
         ))}
       </div>
@@ -980,7 +980,7 @@ export default function WrapPage() {
       }}>
         <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
           <div style={{ padding: "16px 24px 12px" }}>
-            <div style={{ fontSize: 17, fontWeight: 700, color: "var(--fg)", marginBottom: 4 }}>Wrap</div>
+            <div style={{ fontSize: 17, fontWeight: 600, color: "var(--fg)", marginBottom: 4 }}>Wrap</div>
             <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.5 }}>
               Choose a saved piece. You will pick channels next, then get paste-ready versions.
             </div>
@@ -1068,7 +1068,7 @@ export default function WrapPage() {
                     </span>
                     {typeof output.score === "number" && output.score > 0 && (
                       <span style={{
-                        fontSize: 10, fontWeight: 700, color: output.score >= 75 ? "#16A34A" : "#9A7030",
+                        fontSize: 10, fontWeight: 600, color: output.score >= 75 ? "#16A34A" : "#9A7030",
                         flexShrink: 0, width: 36, textAlign: "right" as const,
                       }}>
                         {output.score}
@@ -1094,7 +1094,7 @@ export default function WrapPage() {
         <WrapStepRail phase="choose" chooseConfirmed={wrapChooseConfirmed} refineConfirmed={wrapRefineConfirmed} />
         <div style={{ flex: 1, minHeight: 0, overflowY: "auto", padding: isMobile ? "20px 16px" : "28px 32px 40px" }}>
           <div style={{ maxWidth: 720, margin: "0 auto" }}>
-            <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", fontWeight: 700, color: "var(--fg)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>
+            <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", fontWeight: 600, color: "var(--fg)", margin: "0 0 8px", letterSpacing: "-0.02em" }}>
               Where should this land?
             </h1>
             <p style={{ fontSize: 13, color: "var(--fg-3)", margin: "0 0 24px", lineHeight: 1.55 }}>
@@ -1102,7 +1102,7 @@ export default function WrapPage() {
             </p>
 
             <div className="liquid-glass-card" style={{ padding: "16px 18px", marginBottom: 20 }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.1em", color: "var(--fg-3)", marginBottom: 6, textTransform: "uppercase" as const }}>Piece</div>
+              <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.1em", color: "var(--fg-3)", marginBottom: 6, textTransform: "uppercase" as const }}>Piece</div>
               <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg)", lineHeight: 1.35 }}>{activeOutput.title || "Untitled"}</div>
               <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 6, lineHeight: 1.45 }}>
                 {Math.round((activeOutput.content || "").length / 5)} words approx.
@@ -1124,15 +1124,15 @@ export default function WrapPage() {
               <summary style={{
                 cursor: "pointer",
                 fontSize: 12,
-                fontWeight: 700,
+                fontWeight: 600,
                 color: "var(--fg)",
                 listStyle: "none" as const,
               }}
               >
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "var(--fg-3)", textTransform: "uppercase" as const, marginRight: 8 }}>Library filing</span>
+                <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", textTransform: "uppercase" as const, marginRight: 8 }}>Library filing</span>
                 <span style={{ fontWeight: 600 }}>{outputTypeDisplayLabel(wrapCatalogTypeId)}</span>
-                <span style={{ color: "var(--fg-3)", fontWeight: 500 }}>{` · ${landingShelfLabel(landingShelf)}`}</span>
-                <span style={{ color: "var(--fg-3)", fontWeight: 500, fontSize: 11 }}> · expand to change</span>
+                <span style={{ color: "var(--fg-3)", fontWeight: 400 }}>{` · ${landingShelfLabel(landingShelf)}`}</span>
+                <span style={{ color: "var(--fg-3)", fontWeight: 400, fontSize: 11 }}> · expand to change</span>
               </summary>
               <p style={{ fontSize: 12, color: "var(--fg-3)", margin: "14px 0 12px", lineHeight: 1.55 }}>
                 Defaults to your Work output type. Pick a shelf and type for Catalog only. This does not rerun Work.
@@ -1158,7 +1158,7 @@ export default function WrapPage() {
                         cursor: "pointer",
                         fontFamily: FONT,
                         fontSize: 10,
-                        fontWeight: on ? 700 : 600,
+                        fontWeight: on ? 600 : 400,
                         color: on ? "var(--fg)" : "var(--fg-3)",
                         border: on ? "1px solid rgba(245,198,66,0.45)" : "1px solid var(--glass-border)",
                         background: on ? "rgba(245,198,66,0.08)" : undefined,
@@ -1196,7 +1196,7 @@ export default function WrapPage() {
                         background: sel ? "rgba(245,198,66,0.08)" : undefined,
                       }}
                     >
-                      <span style={{ fontSize: 10, fontWeight: sel ? 700 : 600, color: "var(--fg)", display: "block", lineHeight: 1.25 }}>{t.name}</span>
+                      <span style={{ fontSize: 10, fontWeight: sel ? 600 : 400, color: "var(--fg)", display: "block", lineHeight: 1.25 }}>{t.name}</span>
                       <span style={{ fontSize: 7, color: "var(--fg-3)", marginTop: 3, display: "block", fontFamily: "var(--font-mono, ui-monospace, monospace)" }}>{t.id}</span>
                     </button>
                   );
@@ -1215,7 +1215,7 @@ export default function WrapPage() {
                   background: "rgba(245,198,66,0.07)",
                 }}
               >
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "#9A7030", marginBottom: 6, textTransform: "uppercase" as const }}>
+                <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", color: "#9A7030", marginBottom: 6, textTransform: "uppercase" as const }}>
                   Different from Work
                 </div>
                 <p style={{ fontSize: 12, color: "var(--fg-2)", margin: 0, lineHeight: 1.55 }}>
@@ -1226,7 +1226,7 @@ export default function WrapPage() {
               </div>
             )}
 
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", color: "var(--fg-3)", marginBottom: 8, textTransform: "uppercase" as const }}>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", marginBottom: 8, textTransform: "uppercase" as const }}>
               Channels ({selectedChannels.length} selected)
             </div>
             <div style={{
@@ -1259,7 +1259,7 @@ export default function WrapPage() {
                         fontFamily: FONT,
                       }}
                     >
-                      <span style={{ fontSize: 11, fontWeight: on ? 700 : 600, color: "var(--fg)", display: "block", lineHeight: 1.25 }}>{ch}</span>
+                      <span style={{ fontSize: 11, fontWeight: on ? 600 : 400, color: "var(--fg)", display: "block", lineHeight: 1.25 }}>{ch}</span>
                       {on ? (
                         <span style={{ fontSize: 8, fontWeight: 600, color: "#9A7030", marginTop: 4, display: "block" }}>On</span>
                       ) : null}
@@ -1390,7 +1390,7 @@ export default function WrapPage() {
               />
             ) : doneFmt ? (
               <span style={{
-                fontSize: 11, fontWeight: 700, color: "#16A34A",
+                fontSize: 11, fontWeight: 600, color: "#16A34A",
                 padding: "4px 10px", borderRadius: 8,
                 background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.28)",
               }}>Ready</span>
@@ -1608,30 +1608,30 @@ export default function WrapPage() {
         <>
           {displayMetadata.subject && (
             <div style={{ marginBottom: displayMetadata.preview ? 4 : 16 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "var(--fg-3)", letterSpacing: "0.08em" }}>SUBJECT: </span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", letterSpacing: "0.08em" }}>SUBJECT: </span>
               <span style={{ fontSize: 12, color: "var(--fg)" }}>{displayMetadata.subject}</span>
             </div>
           )}
           {displayMetadata.preview && (
             <div style={{ marginBottom: 16 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "var(--fg-3)", letterSpacing: "0.08em" }}>PREVIEW: </span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", letterSpacing: "0.08em" }}>PREVIEW: </span>
               <span style={{ fontSize: 12, color: "var(--fg-2)" }}>{displayMetadata.preview}</span>
             </div>
           )}
           {displayMetadata.videoTitle && (
             <div style={{ marginBottom: 16 }}>
-              <span style={{ fontSize: 10, fontWeight: 700, color: "var(--fg-3)", letterSpacing: "0.08em" }}>VIDEO TITLE: </span>
+              <span style={{ fontSize: 10, fontWeight: 600, color: "var(--fg-3)", letterSpacing: "0.08em" }}>VIDEO TITLE: </span>
               <span style={{ fontSize: 12, color: "var(--fg)" }}>{displayMetadata.videoTitle}</span>
             </div>
           )}
 
-          <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: "#9A7030", marginBottom: 10, textTransform: "uppercase" as const }}>
+          <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.12em", color: "#9A7030", marginBottom: 10, textTransform: "uppercase" as const }}>
             {activeFormat}
           </div>
           <p style={{ fontSize: 11, color: "var(--fg-3)", margin: "0 0 14px", lineHeight: 1.55 }}>
             {surfaceHint}
           </p>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: "var(--fg)", margin: "0 0 20px", lineHeight: 1.25 }}>
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: "var(--fg)", margin: "0 0 20px", lineHeight: 1.25 }}>
             {contentTitle}
           </h1>
           {readerUsesMarkdown ? (
@@ -1692,7 +1692,7 @@ export default function WrapPage() {
         </div>
         {isMobile && (
           <label style={{ display: "flex", flexDirection: "column", gap: 4, width: "100%" }}>
-            <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.08em", color: "var(--fg-3)", textTransform: "uppercase" as const }}>Channel version</span>
+            <span style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", textTransform: "uppercase" as const }}>Channel version</span>
             <select
               className="liquid-glass-input"
               value={activeFormat}
@@ -1764,7 +1764,7 @@ export default function WrapPage() {
                 >
                   <span style={{
                     fontSize: 11,
-                    fontWeight: active ? 700 : 500,
+                    fontWeight: active ? 600 : 400,
                     color: active ? "var(--fg)" : "var(--fg-2)",
                     overflow: "hidden",
                     textOverflow: "ellipsis",
@@ -1773,12 +1773,12 @@ export default function WrapPage() {
                   }}>{fmt}</span>
                   {tabErr ? (
                     <span style={{
-                      fontSize: 8, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: "0.06em",
+                      fontSize: 8, fontWeight: 600, textTransform: "uppercase" as const, letterSpacing: "0.06em",
                       color: "#B91C1C", padding: "2px 5px", borderRadius: 4, flexShrink: 0,
                       background: "rgba(220,38,38,0.1)", border: "1px solid rgba(220,38,38,0.22)",
                     }}>Issue</span>
                   ) : ready ? (
-                    <span style={{ fontSize: 9, fontWeight: 700, color: "#16A34A", flexShrink: 0 }}>OK</span>
+                    <span style={{ fontSize: 9, fontWeight: 600, color: "#16A34A", flexShrink: 0 }}>OK</span>
                   ) : null}
                 </button>
               );

@@ -101,10 +101,10 @@ export default function Onboarding() {
 
       {/* Step content */}
       <div style={{ width: "100%", maxWidth: 520 }}>
-        <div style={{ fontSize: 12, letterSpacing: "0.2em", color: "#C8961A", textTransform: "uppercase", marginBottom: 12, fontWeight: 700, opacity: 0.8 }}>
+        <div style={{ fontSize: 12, letterSpacing: "0.2em", color: "#C8961A", textTransform: "uppercase", marginBottom: 12, fontWeight: 600, opacity: 0.8 }}>
           Voice DNA
         </div>
-        <h1 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 800, color: "#E8E8E6", letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 8 }}>
+        <h1 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 600, color: "#E8E8E6", letterSpacing: "-0.04em", lineHeight: 1.1, marginBottom: 8 }}>
           {current.title}
         </h1>
         <p style={{ fontSize: 14, color: "rgba(232,232,230,0.45)", marginBottom: 32, lineHeight: 1.6 }}>
@@ -172,7 +172,7 @@ export default function Onboarding() {
             border: "none",
             borderRadius: 100,
             fontSize: 14,
-            fontWeight: 700,
+            fontWeight: 600,
             fontFamily: "var(--font, 'Inter', sans-serif)",
             cursor: value.trim() ? "pointer" : "default",
             transition: "all 0.2s",

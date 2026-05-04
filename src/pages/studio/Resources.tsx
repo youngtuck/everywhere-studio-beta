@@ -140,7 +140,7 @@ function FileDetailPanel({
         )}
       </div>
       <div>
-        <div style={{ fontSize: 9, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Actions</div>
+        <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Actions</div>
         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
           <button type="button" className="liquid-glass-btn" onClick={onView} style={{ width: "100%", justifyContent: "flex-start", padding: "8px 12px" }}>
             <span className="liquid-glass-btn-label" style={{ color: "var(--fg-2)", fontWeight: 600 }}>View file</span>
@@ -329,7 +329,7 @@ export default function Resources() {
           </svg>
         </div>
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 12, color: active ? "var(--fg)" : "var(--fg-2)", fontWeight: 500, marginBottom: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
+          <div style={{ fontSize: 12, color: active ? "var(--fg)" : "var(--fg-2)", fontWeight: 400, marginBottom: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}>
             {resource.title}
           </div>
           <div style={{ fontSize: 10, color: "var(--fg-3)" }}>
@@ -357,7 +357,7 @@ export default function Resources() {
         {/* Foundation section */}
         {(voiceDnaExists || brandDnaExists) ? (
           <>
-            <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Foundation</div>
+            <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Foundation</div>
             <div className="liquid-glass-card" style={{ overflow: "hidden", marginBottom: 20 }}>
               {voiceDnaExists && (
                 <div
@@ -372,10 +372,10 @@ export default function Resources() {
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                 >
                   <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: "rgba(245,198,66,0.08)", border: "1px solid rgba(245,198,66,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--gold)" }}>V</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--gold)" }}>V</span>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, color: "var(--fg)", fontWeight: 500, marginBottom: 1 }}>Voice DNA</div>
+                    <div style={{ fontSize: 12, color: "var(--fg)", fontWeight: 400, marginBottom: 1 }}>Voice DNA</div>
                     <div style={{ fontSize: 10, color: "var(--fg-3)" }}>Your communication signature. Click to view.{voiceDnaDate ? ` · ${formatDate(voiceDnaDate)}` : ""}</div>
                   </div>
                   <svg style={{ width: 12, height: 12, stroke: "var(--fg-3)", strokeWidth: 2, fill: "none", flexShrink: 0 }} viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
@@ -394,10 +394,10 @@ export default function Resources() {
                   onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}
                 >
                   <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: "rgba(245,198,66,0.08)", border: "1px solid rgba(245,198,66,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "var(--gold)" }}>B</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--gold)" }}>B</span>
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 12, color: "var(--fg)", fontWeight: 500, marginBottom: 1 }}>Brand DNA</div>
+                    <div style={{ fontSize: 12, color: "var(--fg)", fontWeight: 400, marginBottom: 1 }}>Brand DNA</div>
                     <div style={{ fontSize: 10, color: "var(--fg-3)" }}>Your brand profile. Click to view.{brandDnaDate ? ` · ${formatDate(brandDnaDate)}` : ""}</div>
                   </div>
                   <svg style={{ width: 12, height: 12, stroke: "var(--fg-3)", strokeWidth: 2, fill: "none", flexShrink: 0 }} viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
@@ -412,7 +412,7 @@ export default function Resources() {
         )}
 
         {/* Project Files section */}
-        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Project Files</div>
+        <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "var(--fg-3)", marginBottom: 8 }}>Project Files</div>
 
         {loading ? (
           <div className="liquid-glass-card" style={{ padding: 12 }}>

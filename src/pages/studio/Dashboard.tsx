@@ -90,7 +90,7 @@ function HomeDashContent({
   const S = { label: {
     fontFamily: "var(--studio-mono-font)",
     fontSize: "var(--studio-label-size)",
-    fontWeight: 700,
+    fontWeight: 600,
     letterSpacing: "0.08em",
     textTransform: "uppercase" as const,
     color: "var(--fg-3)",
@@ -164,7 +164,7 @@ function StepHint({ number, text, active }: { number: number; text: string; acti
       <div style={{
         width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 11, fontWeight: 700,
+        fontSize: 11, fontWeight: 600,
         background: active ? "var(--fg)" : "var(--glass-card)",
         color: active ? "var(--bg)" : "var(--fg-3)",
         border: active ? "none" : "1px solid var(--glass-border)",
@@ -379,7 +379,7 @@ export default function Dashboard() {
             <line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" />
           </svg>
         </div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--fg)", marginBottom: 6 }}>Start something new</div>
+        <div style={{ fontSize: 15, fontWeight: 600, color: "var(--fg)", marginBottom: 6 }}>Start something new</div>
         <div style={{ fontSize: 12, color: "var(--fg-3)", lineHeight: 1.55, maxWidth: 320 }}>
           Drop an idea, a transcript, or just start talking.
         </div>
@@ -390,7 +390,7 @@ export default function Dashboard() {
         <div style={{
           fontFamily: "var(--studio-mono-font)",
           fontSize: "var(--studio-label-size)",
-          fontWeight: 700,
+          fontWeight: 600,
           letterSpacing: "0.08em",
           textTransform: "uppercase" as const,
           color: "var(--fg-3)",
@@ -560,7 +560,7 @@ function HomeCard({
       {label && (
         <div style={{
           fontSize: 9,
-          fontWeight: 700,
+          fontWeight: 600,
           letterSpacing: "0.1em",
           textTransform: "uppercase" as const,
           color: labelColor || "var(--fg-3)",

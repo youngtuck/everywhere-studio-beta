@@ -196,7 +196,7 @@ export default function ProjectDetail() {
                 onBlur={handleSaveEdit}
                 onKeyDown={handleKeyDown}
                 style={{
-                  fontSize: 24, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.02em",
+                  fontSize: 24, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.02em",
                   fontFamily: "'Inter', sans-serif", border: "1px solid var(--glass-border)",
                   borderRadius: "var(--studio-radius)", padding: "4px 10px",
                   background: "var(--glass-input)", outline: "none", width: "100%",
@@ -208,7 +208,7 @@ export default function ProjectDetail() {
             <h1
               onClick={handleStartEdit}
               style={{
-                fontSize: 24, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.02em",
+                fontSize: 24, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.02em",
                 marginBottom: 6, fontFamily: "'Inter', sans-serif", cursor: "pointer",
                 borderRadius: "var(--studio-radius)", padding: "2px 4px", margin: "-2px -4px 6px -4px",
                 transition: "background .12s",
@@ -237,7 +237,7 @@ export default function ProjectDetail() {
             padding: "8px 14px", borderRadius: "var(--studio-radius)",
             border: "1px solid var(--glass-border)", background: "var(--glass-surface)",
             cursor: archiving ? "wait" : "pointer", color: "var(--fg-2)",
-            fontSize: 13, fontFamily: "'Inter', sans-serif", fontWeight: 500,
+            fontSize: 13, fontFamily: "'Inter', sans-serif", fontWeight: 400,
             opacity: archiving ? 0.5 : 1,
           }}
         >
@@ -250,17 +250,17 @@ export default function ProjectDetail() {
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "var(--studio-gap)", marginBottom: "var(--studio-gap-lg)" }}>
         <div className="card" style={{ padding: "18px 20px" }}>
           <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", textTransform: "uppercase", marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Total outputs</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums", fontFamily: "'Inter', sans-serif" }}>{outputsCount}</div>
+          <div style={{ fontSize: 32, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums", fontFamily: "'Inter', sans-serif" }}>{outputsCount}</div>
         </div>
         <div className="card" style={{ padding: "18px 20px" }}>
           <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", textTransform: "uppercase", marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Avg Impact Score</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: avgScore > 0 ? scoreColor(avgScore) : "rgba(0,0,0,0.35)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums", fontFamily: "'Inter', sans-serif" }}>
+          <div style={{ fontSize: 32, fontWeight: 600, color: avgScore > 0 ? scoreColor(avgScore) : "rgba(0,0,0,0.35)", letterSpacing: "-0.02em", fontVariantNumeric: "tabular-nums", fontFamily: "'Inter', sans-serif" }}>
             {avgScore > 0 ? avgScore : "–"}
           </div>
         </div>
         <div className="card" style={{ padding: "18px 20px" }}>
           <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", textTransform: "uppercase", marginBottom: 6, fontFamily: "'Inter', sans-serif" }}>Last active</div>
-          <div style={{ fontSize: 32, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.02em", fontFamily: "'Inter', sans-serif" }}>{lastActive}</div>
+          <div style={{ fontSize: 32, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.02em", fontFamily: "'Inter', sans-serif" }}>{lastActive}</div>
         </div>
       </div>
 
@@ -303,7 +303,7 @@ export default function ProjectDetail() {
                   <span style={{ flex: 1, fontSize: 14, color: "var(--fg)", fontWeight: 400, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{o.title}</span>
                   <span style={{ fontSize: 14, color: "var(--fg-3)", width: 90, flexShrink: 0 }}>{TYPE_LABELS[o.output_type] || o.output_type}</span>
                   {o.score && o.score > 0 ? (
-                    <span style={{ fontSize: 13, fontWeight: 700, color: scoreColor(o.score), width: 42, textAlign: "right", flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>{o.score}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: scoreColor(o.score), width: 42, textAlign: "right", flexShrink: 0, fontVariantNumeric: "tabular-nums" }}>{o.score}</span>
                   ) : (
                     <span style={{ fontSize: 13, color: "var(--fg-3)", width: 42, textAlign: "right", flexShrink: 0 }}>–</span>
                   )}

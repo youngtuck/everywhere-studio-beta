@@ -133,7 +133,7 @@ function TraitBar({
   return (
     <div style={{ marginBottom: 20 }}>
       <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-        <div style={{ fontFamily: "var(--font)", fontSize: isMobile ? 12 : 14, fontWeight: 500, color: "var(--fg)", width: isMobile ? 120 : 180, flexShrink: 0 }}>{label}</div>
+        <div style={{ fontFamily: "var(--font)", fontSize: isMobile ? 12 : 14, fontWeight: 400, color: "var(--fg)", width: isMobile ? 120 : 180, flexShrink: 0 }}>{label}</div>
         <div style={{ flex: 1, height: 8, borderRadius: 4, background: "rgba(0,0,0,0.04)", overflow: "hidden" }}>
           <div style={{ width: `${score}%`, height: "100%", overflow: "hidden", borderRadius: 4 }}>
             <div
@@ -194,7 +194,7 @@ function TraitBar({
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <div style={{
-      fontFamily: "var(--font)", fontSize: 10, fontWeight: 700,
+      fontFamily: "var(--font)", fontSize: 10, fontWeight: 600,
       textTransform: "uppercase", letterSpacing: "0.08em",
       color: "var(--fg-3)", marginBottom: 12,
     }}>
@@ -267,7 +267,7 @@ export default function VoiceDnaSettings() {
           <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px" }}>
             <DnaNav />
             <header style={{ marginBottom: 24 }}>
-              <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+              <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
                 Voice DNA
               </h1>
             </header>
@@ -310,7 +310,7 @@ export default function VoiceDnaSettings() {
           <DnaNav />
           {/* HEADER */}
       <header style={{ marginBottom: 24 }}>
-        <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+        <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 600, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
           Voice DNA
         </h1>
         <p style={{ fontFamily: "var(--font)", fontSize: 14, color: "var(--fg-2)", marginTop: 4, marginBottom: 0 }}>
@@ -439,7 +439,7 @@ export default function VoiceDnaSettings() {
             style={{
               display: "flex", alignItems: "center", gap: 8,
               background: "none", border: "none", cursor: "pointer",
-              fontFamily: "var(--font)", fontSize: 10, fontWeight: 700,
+              fontFamily: "var(--font)", fontSize: 10, fontWeight: 600,
               letterSpacing: "0.08em", textTransform: "uppercase" as const,
               color: "var(--fg-3)", padding: 0,
             }}

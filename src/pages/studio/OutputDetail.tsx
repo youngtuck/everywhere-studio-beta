@@ -68,7 +68,7 @@ const toolbarBtn = (active = false): React.CSSProperties => ({
   borderRadius: 8,
   background: active ? "var(--gold)" : "var(--glass-card)",
   fontSize: 13,
-  fontWeight: active ? 700 : 500,
+  fontWeight: active ? 600 : 400,
   color: active ? "var(--fg)" : "var(--fg-2)",
   cursor: "pointer",
   transition: "all 0.15s ease",
@@ -453,12 +453,12 @@ export default function OutputDetail() {
               onChange={(e) => setTitleDraft(e.target.value)}
               onBlur={saveTitle}
               onKeyDown={(e) => { if (e.key === "Enter") saveTitle(); if (e.key === "Escape") setEditingTitle(false); }}
-              style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)", fontFamily: font, border: "none", borderBottom: "2px solid var(--gold)", outline: "none", background: "transparent", padding: "2px 0", width: "100%", maxWidth: 400 }}
+              style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", fontFamily: font, border: "none", borderBottom: "2px solid var(--gold)", outline: "none", background: "transparent", padding: "2px 0", width: "100%", maxWidth: 400 }}
             />
           ) : (
             <h1
               onClick={() => { setTitleDraft(output!.title); setEditingTitle(true); }}
-              style={{ fontSize: 16, fontWeight: 700, color: "var(--fg)", margin: 0, cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}
+              style={{ fontSize: 16, fontWeight: 600, color: "var(--fg)", margin: 0, cursor: "pointer", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" as const }}
               title="Click to edit title"
             >
               {output!.title}
@@ -469,7 +469,7 @@ export default function OutputDetail() {
         {/* Center: Output type badge */}
         {!isMobile && (
           <span style={{
-            fontSize: 11, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase" as const,
+            fontSize: 11, fontWeight: 600, letterSpacing: "0.1em", textTransform: "uppercase" as const,
             color: "var(--fg-3)", background: "var(--glass-surface)", padding: "4px 12px", borderRadius: 4, flexShrink: 0,
           }}>
             {output!.output_type.replace(/_/g, " ")}
@@ -484,7 +484,7 @@ export default function OutputDetail() {
               display: "inline-flex", alignItems: "center", gap: 6,
               padding: "8px 16px", borderRadius: 8,
               background: copied ? "#50c8a0" : "var(--fg)", color: "var(--bg)",
-              border: "none", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: font,
+              border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: font,
               transition: "all 0.2s ease", minWidth: 90, justifyContent: "center",
             }}
           >
@@ -566,7 +566,7 @@ export default function OutputDetail() {
         <div className="liquid-glass-card" style={{ padding: "14px 18px", borderRadius: 14, display: "flex", alignItems: "center", gap: 16, fontSize: 14, color: "var(--fg-2)", flexWrap: "wrap" }}>
           <span style={{ textTransform: "capitalize" }}>{output!.output_type.replace(/_/g, " ")}</span>
           <span>{new Date(output!.created_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
-          <span style={{ fontWeight: 700, color: scoreColor }}>Score: {Math.round(output!.score / 10)}%</span>
+          <span style={{ fontWeight: 600, color: scoreColor }}>Score: {Math.round(output!.score / 10)}%</span>
           {userProjects.length > 1 && (
             <select
               value={output!.project_id || ""}
@@ -648,7 +648,7 @@ export default function OutputDetail() {
             padding: "16px 0", cursor: "pointer", fontFamily: font,
           }}
         >
-          <span style={{ fontSize: 14, fontWeight: 700, color: "var(--fg)", letterSpacing: "0.04em" }}>Quality Pipeline</span>
+          <span style={{ fontSize: 14, fontWeight: 600, color: "var(--fg)", letterSpacing: "0.04em" }}>Quality Pipeline</span>
           {qualityOpen ? <ChevronUp size={16} color="var(--fg-3)" /> : <ChevronDown size={16} color="var(--fg-3)" />}
         </button>
 

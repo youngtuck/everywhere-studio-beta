@@ -481,7 +481,7 @@ export default function VisualWrap() {
         >
           <ArrowLeft size={16} /> Back
         </button>
-        <h1 style={{ fontSize: 28, fontWeight: 700, color: "var(--fg)", letterSpacing: "-0.02em", flex: 1, fontFamily: "'Inter', sans-serif" }}>
+        <h1 style={{ fontSize: 28, fontWeight: 600, color: "var(--fg)", letterSpacing: "-0.02em", flex: 1, fontFamily: "'Inter', sans-serif" }}>
           Visual Intelligence
         </h1>
         <span
@@ -750,7 +750,7 @@ export default function VisualWrap() {
             background: "#C8961A",
             color: "#07090f",
             fontSize: 14,
-            fontWeight: 700,
+            fontWeight: 600,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
             cursor: generating || generatingAll ? "not-allowed" : "pointer",
@@ -807,7 +807,7 @@ export default function VisualWrap() {
               textAlign: "center",
             }}
           >
-            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--fg-3)", marginBottom: 4, fontFamily: "'Inter', sans-serif" }}>
+            <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: "var(--fg-3)", marginBottom: 4, fontFamily: "'Inter', sans-serif" }}>
               Kai
             </div>
             <div style={{ fontSize: 12, color: "var(--fg-3)", marginBottom: 12, fontFamily: "'Inter', sans-serif" }}>
@@ -1079,7 +1079,7 @@ export default function VisualWrap() {
                       alignItems: "center",
                     }}
                   >
-                    <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", color: "var(--fg-3)", marginBottom: 8 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)", marginBottom: 8 }}>
                       {VIBES[vibe].label}
                     </div>
                     <div
@@ -1239,7 +1239,7 @@ export default function VisualWrap() {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%", marginBottom: 8 }}>
-                    <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.08em", color: "var(--fg-3)" }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, letterSpacing: "0.08em", color: "var(--fg-3)" }}>
                       {vibeConfig?.label || sv.vibe}
                     </div>
                     <div style={{ fontSize: 11, color: "var(--fg-3)" }}>
