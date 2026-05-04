@@ -166,16 +166,16 @@ export default function ComposerMemorySettings() {
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: FONT }}>
       <header className="liquid-glass" style={{ flexShrink: 0, borderRadius: 0, borderBottom: "1px solid var(--glass-border)" }}>
-        <div style={{ padding: "12px 20px 10px", maxWidth: isMobile ? "100%" : 640, margin: "0 auto", width: "100%" }}>
+        <div style={{ padding: "12px 20px 10px", maxWidth: isMobile ? "100%" : 720, margin: "0 auto", width: "100%" }}>
           <DnaNav />
-          <div style={{ fontSize: 18, fontWeight: 600, color: "var(--fg)" }}>Composer memory</div>
+          <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>Composer memory</h1>
           <div style={{ fontSize: 11, color: "var(--fg-3)", marginTop: 4, lineHeight: 1.45 }}>
             Reed reads these lines in Work. Keep them short and factual. Higher sort priority loads first.
           </div>
         </div>
       </header>
 
-      <div style={{ padding: isMobile ? "20px 16px" : "24px 24px 32px", maxWidth: isMobile ? "100%" : 640, margin: "0 auto", width: "100%", overflowY: "auto", flex: 1, minHeight: 0 }}>
+      <div style={{ padding: isMobile ? "20px 16px" : "24px 24px 32px", maxWidth: isMobile ? "100%" : 720, margin: "0 auto", width: "100%", overflowY: "auto", flex: 1, minHeight: 0 }}>
         <div style={{ display: "flex", justifyContent: "flex-end", marginBottom: 12 }}>
           <button type="button" className="liquid-glass-btn-gold" onClick={openNew} disabled={editingId !== null} style={{ padding: "8px 16px" }}>
             <span className="liquid-glass-btn-gold-label">Add row</span>

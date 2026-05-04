@@ -227,14 +227,9 @@ export default function VoiceDnaSettings() {
   const [loading, setLoading] = useState(true);
   const [interviewOpen, setInterviewOpen] = useState(false);
 
-  // Ensure parent main is scrollable (WorkSession may have set overflow: hidden)
-  useEffect(() => {
-    const main = document.querySelector(".studio-main-inner") as HTMLElement;
-    if (main) {
-      main.style.overflow = "";
-      main.style.overflowY = "auto";
-    }
-  }, []);
+  // CO_038C WS10: scroll lives inside the canonical flex+minHeight wrapper below.
+  // The previous imperative `.studio-main-inner` overflow patch is removed; the
+  // wrapper now scrolls inside the stage canvas per the viewport-lock contract.
 
   useEffect(() => {
     if (!user) return;
@@ -254,37 +249,45 @@ export default function VoiceDnaSettings() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
-        <DnaNav />
-        <p style={{ fontSize: 14, color: "var(--fg-3)" }}>Loading Voice DNA...</p>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: "var(--font)" }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+          <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px" }}>
+            <DnaNav />
+            <p style={{ fontSize: 14, color: "var(--fg-3)" }}>Loading Voice DNA...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!voiceDna) {
     return (
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
-        <DnaNav />
-        <header style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
-            Voice DNA
-          </h1>
-        </header>
-        <Card>
-          <p style={{ fontSize: 15, color: "var(--fg-2)", margin: "0 0 20px", lineHeight: 1.6 }}>
-            Your Voice DNA has not been captured yet. Voice DNA teaches Reed how you communicate so every piece of content sounds like you wrote it.
-          </p>
-          <button
-            onClick={() => navigate("/onboarding?retrain=voice")}
-            style={{
-              background: "var(--gold-bright)", color: "var(--fg)", border: "none",
-              borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
-              cursor: "pointer", fontFamily: "var(--font)",
-            }}
-          >
-            Set Up Voice DNA
-          </button>
-        </Card>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: "var(--font)" }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+          <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px" }}>
+            <DnaNav />
+            <header style={{ marginBottom: 24 }}>
+              <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+                Voice DNA
+              </h1>
+            </header>
+            <Card>
+              <p style={{ fontSize: 15, color: "var(--fg-2)", margin: "0 0 20px", lineHeight: 1.6 }}>
+                Your Voice DNA has not been captured yet. Voice DNA teaches Reed how you communicate so every piece of content sounds like you wrote it.
+              </p>
+              <button
+                onClick={() => navigate("/onboarding?retrain=voice")}
+                style={{
+                  background: "var(--gold-bright)", color: "var(--fg)", border: "none",
+                  borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
+                  cursor: "pointer", fontFamily: "var(--font)",
+                }}
+              >
+                Set Up Voice DNA
+              </button>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
@@ -301,9 +304,11 @@ export default function VoiceDnaSettings() {
   const interviewResponses: Record<string, string> | undefined = voiceDna.interview_responses;
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
-      <DnaNav />
-      {/* HEADER */}
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: "var(--font)" }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px" }}>
+          <DnaNav />
+          {/* HEADER */}
       <header style={{ marginBottom: 24 }}>
         <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
           Voice DNA
@@ -507,6 +512,8 @@ export default function VoiceDnaSettings() {
           Retrain Voice DNA
         </button>
       </Card>
+        </div>
+      </div>
     </div>
   );
 }

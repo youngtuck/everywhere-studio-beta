@@ -46,14 +46,9 @@ export default function BrandDnaSettings() {
   const [completedAt, setCompletedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Ensure parent main is scrollable (WorkSession may have set overflow: hidden)
-  useEffect(() => {
-    const main = document.querySelector(".studio-main-inner") as HTMLElement;
-    if (main) {
-      main.style.overflow = "";
-      main.style.overflowY = "auto";
-    }
-  }, []);
+  // CO_038C WS10: scroll lives inside the canonical flex+minHeight wrapper below.
+  // The previous imperative `.studio-main-inner` overflow patch is removed; the
+  // wrapper now scrolls inside the stage canvas per the viewport-lock contract.
 
   useEffect(() => {
     if (!user) return;
@@ -73,36 +68,44 @@ export default function BrandDnaSettings() {
 
   if (loading) {
     return (
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
-        <p style={{ fontSize: 14, color: "var(--fg-3)" }}>Loading Brand DNA...</p>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: "var(--font)" }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+          <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px" }}>
+            <p style={{ fontSize: 14, color: "var(--fg-3)" }}>Loading Brand DNA...</p>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!brandDna && !brandDnaMd) {
     return (
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
-        <DnaNav />
-        <header style={{ marginBottom: 24 }}>
-          <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
-            Brand DNA
-          </h1>
-        </header>
-        <section style={{ background: "var(--glass-card)", border: "1px solid var(--glass-border)", borderRadius: 12, padding: 32, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}>
-          <p style={{ fontSize: 15, color: "var(--fg-2)", margin: "0 0 20px", lineHeight: 1.6 }}>
-            Your Brand DNA has not been captured yet. Brand DNA teaches Reed your brand voice, values, and positioning so content stays on-brand.
-          </p>
-          <button
-            onClick={() => navigate("/onboarding?retrain=brand")}
-            style={{
-              background: "var(--gold-bright)", color: "var(--fg)", border: "none",
-              borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
-              cursor: "pointer", fontFamily: "var(--font)",
-            }}
-          >
-            Set Up Brand DNA
-          </button>
-        </section>
+      <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: "var(--font)" }}>
+        <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+          <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px" }}>
+            <DnaNav />
+            <header style={{ marginBottom: 24 }}>
+              <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+                Brand DNA
+              </h1>
+            </header>
+            <section style={{ background: "var(--glass-card)", border: "1px solid var(--glass-border)", borderRadius: 12, padding: 32, backdropFilter: "var(--glass-blur-light)", WebkitBackdropFilter: "var(--glass-blur-light)" }}>
+              <p style={{ fontSize: 15, color: "var(--fg-2)", margin: "0 0 20px", lineHeight: 1.6 }}>
+                Your Brand DNA has not been captured yet. Brand DNA teaches Reed your brand voice, values, and positioning so content stays on-brand.
+              </p>
+              <button
+                onClick={() => navigate("/onboarding?retrain=brand")}
+                style={{
+                  background: "var(--gold-bright)", color: "var(--fg)", border: "none",
+                  borderRadius: 8, padding: "12px 24px", fontSize: 14, fontWeight: 600,
+                  cursor: "pointer", fontFamily: "var(--font)",
+                }}
+              >
+                Set Up Brand DNA
+              </button>
+            </section>
+          </div>
+        </div>
       </div>
     );
   }
@@ -118,12 +121,14 @@ export default function BrandDnaSettings() {
     : [];
 
   return (
-    <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px", fontFamily: "var(--font)" }}>
-      <DnaNav />
-      <header style={{ marginBottom: 24 }}>
-        <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
-          Brand DNA
-        </h1>
+    <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, fontFamily: "var(--font)" }}>
+      <div style={{ flex: 1, minHeight: 0, overflowY: "auto" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", padding: isMobile ? "20px 16px 100px" : "32px 24px 80px" }}>
+          <DnaNav />
+          <header style={{ marginBottom: 24 }}>
+            <h1 style={{ fontFamily: "var(--font)", fontSize: 28, fontWeight: 700, color: "var(--fg)", margin: 0, letterSpacing: "-0.02em" }}>
+              Brand DNA
+            </h1>
         <p style={{ fontFamily: "var(--font)", fontSize: 14, color: "var(--fg-2)", marginTop: 4, marginBottom: 0 }}>
           How Reed stays on-brand across everything it produces
         </p>
@@ -235,6 +240,8 @@ export default function BrandDnaSettings() {
           Retrain Brand DNA
         </button>
       </section>
+        </div>
+      </div>
     </div>
   );
 }
